@@ -2,8 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { QRCodeComponent } from "@/components/QRCodeComponent";
-import { Mail, QrCode, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Times, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, PaperPlane, Plus, Th, List } from "lucide-react";
+import { Mail, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Times, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, PaperPlane, Plus, Th, List } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "firebase/firestore";
@@ -657,57 +656,27 @@ const Team = () => {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.fillRect(600, 120, 150, 150);
     
-    // Add QR code
-    const qrCanvas = document.createElement('canvas');
-    const qrCtx = qrCanvas.getContext('2d');
-    if (qrCtx) {
-      // Create a simple QR code placeholder
-      qrCanvas.width = 120;
-      qrCanvas.height = 120;
-      
-      // Draw a simple pattern as QR code placeholder
-      qrCtx.fillStyle = '#000000';
-      const cellSize = 3;
-      const margin = 3;
-      
-      // Create a simple pattern
-      for (let i = 0; i < 18; i++) {
-        for (let j = 0; j < 18; j++) {
-          if (Math.random() > 0.5) {
-            qrCtx.fillRect(margin + i * cellSize, margin + j * cellSize, cellSize, cellSize);
-          }
-        }
+    // Add QR code placeholder
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.fillRect(615, 285, 120, 120);
+    
+    // Add QR code text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '12px Arial';
+    ctx.fillText('QR Code', 640, 350);
+    
+    // Download the canvas
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${selectedMember.name.replace(/\s+/g, '_')}_ID_Card.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showNotification("ID Card downloaded successfully!", "success");
       }
-      
-      // Add position markers (corners)
-      qrCtx.fillRect(margin, margin, 21, 21);
-      qrCtx.fillRect(margin + 39, margin, 21, 21);
-      qrCtx.fillRect(margin, margin + 39, 21, 21);
-      qrCtx.fillRect(margin, margin + 39, margin + 39, 21, 21);
-      
-      // Add white squares in the middle of position markers
-      qrCtx.fillStyle = '#FFFFFF';
-      qrCtx.fillRect(margin + 6, margin + 6, 9, 9);
-      qrCtx.fillRect(margin + 45, margin + 6, 9, 9);
-      qrCtx.fillRect(margin + 6, margin + 45, 9, 9);
-      qrCtx.fillRect(margin + 45, margin + 45, 9, 9);
-      
-      // Draw the QR code on the main canvas
-      ctx.drawImage(qrCanvas, 615, 285, 120, 120);
-      
-      // Download the canvas
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${selectedMember.name.replace(/\s+/g, '_')}_ID_Card.png`;
-          a.click();
-          URL.revokeObjectURL(url);
-          showNotification("ID Card downloaded successfully!", "success");
-        }
-      });
-    }
+    });
   };
 
   // Share ID card
@@ -1166,7 +1135,6 @@ const Team = () => {
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
                   onClick={() => setActiveTab("idcard")}
                 >
-                  <QrCode className="w-4 h-4 mr-1" />
                   ID Card
                 </Button>
               </div>
@@ -1412,18 +1380,20 @@ const Team = () => {
                           
                           <div className="flex flex-col items-center">
                             <img
-                              src={selectedMember.image || `https://picsum600/seed/${selectedMember.id}/100/100.jpg`}
+                              src={selectedMember.image || `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`}
                               alt={selectedMember.name}
                               className="w-16 h-16 rounded-full object-cover border-2 border-white border-opacity-30 mb-2"
                               onError={(e) => {
                                 e.currentTarget.src = `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`;
                               }}
                             />
-                            <QRCodeComponent 
-                              value={`https://tomoacademy.com/team/${selectedMember.id}`}
-                              size={48}
-                              className="rounded"
-                            />
+                            <div className="w-12 h-12 bg-white bg-opacity-20 rounded flex items-center justify-center">
+                              <div className="grid grid-cols-3 gap-0.5">
+                                {[...Array(9)].map((_, i) => (
+                                  <div key={i} className={`w-1 h-1 ${i % 2 === 0 ? 'bg-white' : 'bg-transparent'}`}></div>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
