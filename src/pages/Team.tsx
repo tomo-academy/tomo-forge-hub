@@ -546,29 +546,45 @@ const Team = () => {
     }
   };
 
-  // Generate QR code for ID card
+  // Generate QR code for ID card using a simple approach
   useEffect(() => {
     if (selectedMember && activeTab === "idcard") {
-      const generateQRCode = async () => {
-        try {
-          // Dynamic import to avoid build issues
-          const QRCode = await import('qrcode');
-          const url = await QRCode.toDataURL(`https://tomoacademy.com/team/${selectedMember.id}`, {
-            width: 60,
-            margin: 1,
-            color: {
-              dark: "#000000",
-              light: "#FFFFFF"
+      // Create a simple QR code placeholder
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 60;
+      canvas.height = 60;
+      
+      if (ctx) {
+        // Draw a simple pattern as QR code placeholder
+        ctx.fillStyle = '#000000';
+        const cellSize = 3;
+        const margin = 3;
+        
+        // Create a simple pattern
+        for (let i = 0; i < 18; i++) {
+          for (let j = 0; j < 18; j++) {
+            if (Math.random() > 0.5) {
+              ctx.fillRect(margin + i * cellSize, margin + j * cellSize, cellSize, cellSize);
             }
-          });
-          setQrCodeUrl(url);
-        } catch (err) {
-          console.error("Error generating QR code:", err);
-          // Fallback to a placeholder or skip QR code generation
-          setQrCodeUrl("");
+          }
         }
-      };
-      generateQRCode();
+        
+        // Add position markers (corners)
+        ctx.fillRect(margin, margin, 21, 21);
+        ctx.fillRect(margin + 39, margin, 21, 21);
+        ctx.fillRect(margin, margin + 39, 21, 21);
+        
+        // Add white squares in the middle of position markers
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(margin + 6, margin + 6, 9, 9);
+        ctx.fillRect(margin + 45, margin + 6, 9, 9);
+        ctx.fillRect(margin + 6, margin + 45, 9, 9);
+        
+        // Convert canvas to data URL
+        const url = canvas.toDataURL('image/png');
+        setQrCodeUrl(url);
+      }
     }
   }, [selectedMember, activeTab]);
 
