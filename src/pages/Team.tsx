@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { QRCodeDisplay } from "@/components/QRCodeDisplay";
+import { QRCodeComponent } from "@/components/QRCodeComponent";
 import { Mail, QrCode, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Times, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, PaperPlane, Plus, Th, List } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
@@ -683,12 +683,14 @@ const Team = () => {
       qrCtx.fillRect(margin, margin, 21, 21);
       qrCtx.fillRect(margin + 39, margin, 21, 21);
       qrCtx.fillRect(margin, margin + 39, 21, 21);
+      qrCtx.fillRect(margin, margin + 39, margin + 39, 21, 21);
       
       // Add white squares in the middle of position markers
       qrCtx.fillStyle = '#FFFFFF';
       qrCtx.fillRect(margin + 6, margin + 6, 9, 9);
       qrCtx.fillRect(margin + 45, margin + 6, 9, 9);
       qrCtx.fillRect(margin + 6, margin + 45, 9, 9);
+      qrCtx.fillRect(margin + 45, margin + 45, 9, 9);
       
       // Draw the QR code on the main canvas
       ctx.drawImage(qrCanvas, 615, 285, 120, 120);
@@ -1053,7 +1055,7 @@ const Team = () => {
                     <Mail className="w-3 h-3 mr-1" />
                     <span className="truncate">{member.email}</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 mb-4 py-3 border-y border-gray-200">
+                  <div className="grid grid grid-cols-3 gap-2 mb-4 py-3 border-y border-gray-200">
                     <div className="text-center">
                       <p className="text-lg font-bold">{member.stats.videos}</p>
                       <p className="text-xs text-gray-500">Videos</p>
@@ -1195,7 +1197,7 @@ const Team = () => {
                     {/* Right Column */}
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-4">Performance Metrics</h3>
-                      <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="grid grid grid-cols-2 gap-4 mb-6">
                         <div className="text-center p-4 bg-gray-50 rounded-lg">
                           <div className="text-2xl font-bold text-blue-600 mb-1">{selectedMember.stats.videos}</div>
                           <div className="text-sm text-gray-600">Videos Created</div>
@@ -1376,7 +1378,7 @@ const Team = () => {
                       <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
                       
                       {/* Card content */}
-                      <div className="relative z-10 h-full flex flex-col justify-between">
+                      <div className="relative z-10 h-full flex flex flex-col justify-between">
                         <div className="flex justify-between items-start">
                           <div>
                             <h3 className="text-xl font-bold">TOMO ACADEMY</h3>
@@ -1410,14 +1412,14 @@ const Team = () => {
                           
                           <div className="flex flex-col items-center">
                             <img
-                              src={selectedMember.image || `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`}
+                              src={selectedMember.image || `https://picsum600/seed/${selectedMember.id}/100/100.jpg`}
                               alt={selectedMember.name}
                               className="w-16 h-16 rounded-full object-cover border-2 border-white border-opacity-30 mb-2"
                               onError={(e) => {
                                 e.currentTarget.src = `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`;
                               }}
                             />
-                            <QRCodeDisplay 
+                            <QRCodeComponent 
                               value={`https://tomoacademy.com/team/${selectedMember.id}`}
                               size={48}
                               className="rounded"
