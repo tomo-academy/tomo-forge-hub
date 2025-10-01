@@ -30,6 +30,9 @@ const Navbar = () => {
             <Link to="/tasks" className="text-muted-foreground hover:text-foreground transition-fast">
               Tasks
             </Link>
+            <Link to="/resources" className="text-muted-foreground hover:text-foreground transition-fast">
+              Resources
+            </Link>
             <Button variant="default" size="sm" className="bg-primary hover:bg-primary-hover shadow-glow">
               Login
             </Button>
@@ -68,6 +71,12 @@ const Navbar = () => {
               className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast"
             >
               Tasks
+            </Link>
+            <Link
+              to="/resources"
+              className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast"
+            >
+              Resources
             </Link>
             <div className="px-4">
               <Button variant="default" className="w-full bg-primary hover:bg-primary-hover">
