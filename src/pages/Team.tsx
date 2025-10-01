@@ -2,23 +2,22 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
+import { QRCodeDisplay } from "@/components/QRCodeDisplay";
 import { Mail, QrCode, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Times, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, PaperPlane, Plus, Th, List } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import QRCode from 'qrcode';
-import html2canvas from 'html2canvas';
 
-// Firebase configuration using environment variables
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyDRKzkXTtv4Gpleej264l_Fv_U7j4nU2xE",
+  authDomain: "tomo-3c4bc.firebaseapp.com",
+  projectId: "tomo-3c4bc",
+  storageBucket: "tomo-3c4bc.firebasestorage.app",
+  messagingSenderId: "314585475223",
+  appId: "1:314585475223:web:38f9f825d0558d3207e1d2",
+  measurementId: "G-JT4K0CC8RY"
 };
 
 // Initialize Firebase
@@ -79,7 +78,6 @@ const Team = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [activeTab, setActiveTab] = useState<"about" | "content" | "contact" | "idcard">("about");
-  const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
@@ -548,45 +546,6 @@ const Team = () => {
     }
   };
 
-  // Generate QR code for ID card using qrcode library
-  useEffect(() => {
-    if (selectedMember && activeTab === "idcard") {
-      const profileUrl = `https://tomoacademy.com/team/${selectedMember.id}`;
-      QRCode.toDataURL(profileUrl, { width: 60, margin: 1 }, (err, url) => {
-        if (err) {
-          console.error("Error generating QR code:", err);
-          // Fallback to placeholder
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = 60;
-          canvas.height = 60;
-          if (ctx) {
-            ctx.fillStyle = '#000000';
-            const cellSize = 3;
-            const margin = 3;
-            for (let i = 0; i < 18; i++) {
-              for (let j = 0; j < 18; j++) {
-                if (Math.random() > 0.5) {
-                  ctx.fillRect(margin + i * cellSize, margin + j * cellSize, cellSize, cellSize);
-                }
-              }
-            }
-            ctx.fillRect(margin, margin, 21, 21);
-            ctx.fillRect(margin + 39, margin, 21, 21);
-            ctx.fillRect(margin, margin + 39, 21, 21);
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(margin + 6, margin + 6, 9, 9);
-            ctx.fillRect(margin + 45, margin + 6, 9, 9);
-            ctx.fillRect(margin + 6, margin + 45, 9, 9);
-            setQrCodeUrl(canvas.toDataURL('image/png'));
-          }
-          return;
-        }
-        setQrCodeUrl(url);
-      });
-    }
-  }, [selectedMember, activeTab]);
-
   // Filter team members based on search and filters
   const filteredMembers = teamMembers.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -626,17 +585,104 @@ const Team = () => {
 
   // Download ID card
   const downloadIdCard = () => {
-    if (idCardRef.current) {
-      html2canvas(idCardRef.current).then((canvas) => {
-        const link = document.createElement('a');
-        link.download = `${selectedMember?.name}-id-card.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showNotification("ID Card downloaded successfully!", "success");
-      }).catch((error) => {
-        console.error("Error downloading ID card:", error);
-        showNotification("Error downloading ID card", "error");
-      });
+    if (!selectedMember || !idCardRef.current) return;
+    
+    // Create a canvas from the ID card
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const cardElement = idCardRef.current;
+    
+    if (!ctx) return;
+    
+    // Set canvas size
+    canvas.width = 800;
+    canvas.height = 512;
+    
+    // Draw gradient background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    const variant = selectedMember.cardVariant || 'tech';
+    
+    switch (variant) {
+      case 'tech':
+        gradient.addColorStop(0, '#1e293b');
+        gradient.addColorStop(1, '#334155');
+        break;
+      case 'science':
+        gradient.addColorStop(0, '#047857');
+        gradient.addColorStop(1, '#059669');
+        break;
+      case 'arts':
+        gradient.addColorStop(0, '#b91c1c');
+        gradient.addColorStop(1, '#dc2626');
+        break;
+      case 'business':
+        gradient.addColorStop(0, '#6d28d9');
+        gradient.addColorStop(1, '#7c3aed');
+        break;
+      default:
+        gradient.addColorStop(0, '#4f46e5');
+        gradient.addColorStop(1, '#7c3aed');
+    }
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add decorative elements
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.beginPath();
+    ctx.arc(650, 100, 80, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(150, 400, 60, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Add text content
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 32px Arial';
+    ctx.fillText('TOMO ACADEMY', 40, 60);
+    ctx.font = '16px Arial';
+    ctx.fillText('ID CARD', 40, 85);
+    
+    ctx.font = 'bold 28px Arial';
+    ctx.fillText(selectedMember.name, 40, 150);
+    ctx.font = '18px Arial';
+    ctx.fillText(selectedMember.role, 40, 180);
+    
+    ctx.font = '14px Arial';
+    ctx.fillText(`ID: ${selectedMember.employeeId || selectedMember.id}`, 40, 220);
+    ctx.fillText(`Department: ${selectedMember.department}`, 40, 245);
+    ctx.fillText(`Since: ${selectedMember.since || 2020}`, 40, 270);
+    
+    // Add profile image placeholder
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.fillRect(600, 120, 150, 150);
+    
+    // Add QR code
+    const qrCanvas = document.createElement('canvas');
+    const qrCtx = qrCanvas.getContext('2d');
+    if (qrCtx) {
+      const qrData = QRCodeGenerator.generate(
+        `https://tomoacademy.com/team/${selectedMember.id}`,
+        120
+      );
+      const qrImage = new Image();
+      qrImage.onload = () => {
+        ctx.drawImage(qrImage, 615, 285, 120, 120);
+        
+        // Download the canvas
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedMember.name.replace(/\s+/g, '_')}_ID_Card.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification("ID Card downloaded successfully!", "success");
+          }
+        });
+      };
+      qrImage.src = qrData;
     }
   };
 
@@ -1301,7 +1347,7 @@ const Team = () => {
                   <div className="flex flex-col items-center">
                     <div
                       ref={idCardRef}
-                      className={`w-full max-w-md h-64 bg-gradient-to-br ${getIdCardVariant(selectedMember.cardVariant)} rounded-2xl shadow-xl p-6 text-white relative overflow-hidden`}
+                      className={`w-full max-w-md h-64 bg-gradient-to-br ${getIdCardVariant(selectedMember.cardVariant)} rounded-2xl shadow-xl p-6 text-white relative overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
                     >
                       {/* Decorative elements */}
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
@@ -1349,17 +1395,11 @@ const Team = () => {
                                 e.currentTarget.src = `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`;
                               }}
                             />
-                            {qrCodeUrl ? (
-                              <img
-                                src={qrCodeUrl}
-                                alt="QR Code"
-                                className="w-12 h-12 bg-white p-1 rounded"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 bg-white p-1 rounded flex items-center justify-center">
-                                <QrCode className="w-8 h-8 text-gray-800" />
-                              </div>
-                            )}
+                            <QRCodeDisplay 
+                              value={`https://tomoacademy.com/team/${selectedMember.id}`}
+                              size={48}
+                              className="rounded"
+                            />
                           </div>
                         </div>
                       </div>
