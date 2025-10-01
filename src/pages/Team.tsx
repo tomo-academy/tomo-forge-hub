@@ -7,16 +7,18 @@ import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import QRCode from 'qrcode';
+import html2canvas from 'html2canvas';
 
-// Firebase configuration
+// Firebase configuration using environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyDRKzkXTtv4Gpleej264l_Fv_U7j4nU2xE",
-  authDomain: "tomo-3c4bc.firebaseapp.com",
-  projectId: "tomo-3c4bc",
-  storageBucket: "tomo-3c4bc.firebasestorage.app",
-  messagingSenderId: "314585475223",
-  appId: "1:314585475223:web:38f9f825d0558d3207e1d2",
-  measurementId: "G-JT4K0CC8RY"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -546,45 +548,42 @@ const Team = () => {
     }
   };
 
-  // Generate QR code for ID card using a simple approach
+  // Generate QR code for ID card using qrcode library
   useEffect(() => {
     if (selectedMember && activeTab === "idcard") {
-      // Create a simple QR code placeholder
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = 60;
-      canvas.height = 60;
-      
-      if (ctx) {
-        // Draw a simple pattern as QR code placeholder
-        ctx.fillStyle = '#000000';
-        const cellSize = 3;
-        const margin = 3;
-        
-        // Create a simple pattern
-        for (let i = 0; i < 18; i++) {
-          for (let j = 0; j < 18; j++) {
-            if (Math.random() > 0.5) {
-              ctx.fillRect(margin + i * cellSize, margin + j * cellSize, cellSize, cellSize);
+      const profileUrl = `https://tomoacademy.com/team/${selectedMember.id}`;
+      QRCode.toDataURL(profileUrl, { width: 60, margin: 1 }, (err, url) => {
+        if (err) {
+          console.error("Error generating QR code:", err);
+          // Fallback to placeholder
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = 60;
+          canvas.height = 60;
+          if (ctx) {
+            ctx.fillStyle = '#000000';
+            const cellSize = 3;
+            const margin = 3;
+            for (let i = 0; i < 18; i++) {
+              for (let j = 0; j < 18; j++) {
+                if (Math.random() > 0.5) {
+                  ctx.fillRect(margin + i * cellSize, margin + j * cellSize, cellSize, cellSize);
+                }
+              }
             }
+            ctx.fillRect(margin, margin, 21, 21);
+            ctx.fillRect(margin + 39, margin, 21, 21);
+            ctx.fillRect(margin, margin + 39, 21, 21);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(margin + 6, margin + 6, 9, 9);
+            ctx.fillRect(margin + 45, margin + 6, 9, 9);
+            ctx.fillRect(margin + 6, margin + 45, 9, 9);
+            setQrCodeUrl(canvas.toDataURL('image/png'));
           }
+          return;
         }
-        
-        // Add position markers (corners)
-        ctx.fillRect(margin, margin, 21, 21);
-        ctx.fillRect(margin + 39, margin, 21, 21);
-        ctx.fillRect(margin, margin + 39, 21, 21);
-        
-        // Add white squares in the middle of position markers
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(margin + 6, margin + 6, 9, 9);
-        ctx.fillRect(margin + 45, margin + 6, 9, 9);
-        ctx.fillRect(margin + 6, margin + 45, 9, 9);
-        
-        // Convert canvas to data URL
-        const url = canvas.toDataURL('image/png');
         setQrCodeUrl(url);
-      }
+      });
     }
   }, [selectedMember, activeTab]);
 
@@ -627,8 +626,18 @@ const Team = () => {
 
   // Download ID card
   const downloadIdCard = () => {
-    showNotification("ID Card download started!", "success");
-    // In a real implementation, this would generate and download an image of the ID card
+    if (idCardRef.current) {
+      html2canvas(idCardRef.current).then((canvas) => {
+        const link = document.createElement('a');
+        link.download = `${selectedMember?.name}-id-card.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showNotification("ID Card downloaded successfully!", "success");
+      }).catch((error) => {
+        console.error("Error downloading ID card:", error);
+        showNotification("Error downloading ID card", "error");
+      });
+    }
   };
 
   // Share ID card
