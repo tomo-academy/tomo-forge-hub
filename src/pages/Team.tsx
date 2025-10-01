@@ -4,7 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { Mail, QrCode, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Times, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, PaperPlane, Plus, Th, List } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import QRCode from "qrcode";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDRKzkXTtv4Gpleej264l_Fv_U7j4nU2xE",
+  authDomain: "tomo-3c4bc.firebaseapp.com",
+  projectId: "tomo-3c4bc",
+  storageBucket: "tomo-3c4bc.firebasestorage.app",
+  messagingSenderId: "314585475223",
+  appId: "1:314585475223:web:38f9f825d0558d3207e1d2",
+  measurementId: "G-JT4K0CC8RY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 interface TeamMember {
   id: string;
@@ -35,10 +53,40 @@ interface TeamMember {
   employeeId?: string;
   since?: number;
   cardVariant?: "tech" | "science" | "arts" | "business";
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+interface ContactMessage {
+  id?: string;
+  to: string;
+  from: string;
+  name: string;
+  subject: string;
+  message: string;
+  timestamp?: Timestamp;
 }
 
 const Team = () => {
-  const teamMembers: TeamMember[] = [
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All Roles");
+  const [departmentFilter, setDepartmentFilter] = useState("All Departments");
+  const [availabilityFilter, setAvailabilityFilter] = useState("All");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [activeTab, setActiveTab] = useState<"about" | "content" | "contact" | "idcard">("about");
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [submittingContact, setSubmittingContact] = useState(false);
+  const idCardRef = useRef<HTMLDivElement>(null);
+
+  // Initial team members data
+  const initialTeamMembers: TeamMember[] = [
     {
       id: "EMP001",
       name: "Kanish SJ",
@@ -447,25 +495,64 @@ const Team = () => {
     }
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("All Roles");
-  const [departmentFilter, setDepartmentFilter] = useState("All Departments");
-  const [availabilityFilter, setAvailabilityFilter] = useState("All");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
-  const [activeTab, setActiveTab] = useState<"about" | "content" | "contact" | "idcard">("about");
-  const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const idCardRef = useRef<HTMLDivElement>(null);
+  // Initialize Firebase data
+  useEffect(() => {
+    initializeFirebaseData();
+  }, []);
+
+  // Initialize Firebase with team members data
+  const initializeFirebaseData = async () => {
+    try {
+      setLoading(true);
+      
+      // Check if team members collection exists
+      const teamMembersRef = collection(db, "teamMembers");
+      const snapshot = await getDocs(teamMembersRef);
+      
+      if (snapshot.empty) {
+        // If no data exists, add initial team members
+        console.log("No team members found, adding initial data...");
+        
+        for (const member of initialTeamMembers) {
+          const memberWithTimestamp = {
+            ...member,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now()
+          };
+          await addDoc(teamMembersRef, memberWithTimestamp);
+        }
+        
+        // Fetch the newly added data
+        const newSnapshot = await getDocs(teamMembersRef);
+        const members: TeamMember[] = [];
+        newSnapshot.forEach(doc => {
+          members.push({ id: doc.id, ...doc.data() } as TeamMember);
+        });
+        setTeamMembers(members);
+      } else {
+        // Data exists, fetch from Firestore
+        const members: TeamMember[] = [];
+        snapshot.forEach(doc => {
+          members.push({ id: doc.id, ...doc.data() } as TeamMember);
+        });
+        setTeamMembers(members);
+      }
+    } catch (error) {
+      console.error("Error initializing Firebase data:", error);
+      // Fallback to local data
+      setTeamMembers(initialTeamMembers);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Generate QR code for ID card
   useEffect(() => {
     if (selectedMember && activeTab === "idcard") {
       const generateQRCode = async () => {
         try {
+          // Dynamic import to avoid build issues
+          const QRCode = await import('qrcode');
           const url = await QRCode.toDataURL(`https://tomoacademy.com/team/${selectedMember.id}`, {
             width: 60,
             margin: 1,
@@ -477,6 +564,8 @@ const Team = () => {
           setQrCodeUrl(url);
         } catch (err) {
           console.error("Error generating QR code:", err);
+          // Fallback to a placeholder or skip QR code generation
+          setQrCodeUrl("");
         }
       };
       generateQRCode();
@@ -547,6 +636,38 @@ const Team = () => {
     }
   };
 
+  // Handle contact form submission
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedMember) return;
+    
+    setSubmittingContact(true);
+    
+    try {
+      const formData = new FormData(e.currentTarget);
+      const contactMessage: ContactMessage = {
+        to: selectedMember.email,
+        from: formData.get("email") as string,
+        name: formData.get("name") as string,
+        subject: formData.get("subject") as string,
+        message: formData.get("message") as string,
+        timestamp: Timestamp.now()
+      };
+      
+      // Save to Firestore
+      const docRef = await addDoc(collection(db, "contactMessages"), contactMessage);
+      console.log("Contact message saved with ID: ", docRef.id);
+      
+      showNotification("Message sent successfully!", "success");
+      e.currentTarget.reset();
+    } catch (error) {
+      console.error("Error sending message:", error);
+      showNotification("Error sending message. Please try again.", "error");
+    } finally {
+      setSubmittingContact(false);
+    }
+  };
+
   // Format date for display
   const formatDate = (dateString: string) => {
     const options = { year: "numeric", month: "short", day: "numeric" } as const;
@@ -597,6 +718,17 @@ const Team = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading team members...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -608,14 +740,14 @@ const Team = () => {
           <div className="text-center">
             <div className="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-6">
               <CheckCircle className="w-4 h-4 mr-2" />
-              14 Expert Educators • 50,000+ Students Impacted
+              {teamMembers.length} Expert Educators • 50,000+ Students Impacted
             </div>
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Meet the minds behind
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> educational innovation</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Our diverse team of 14 dedicated educators, content creators, and technology innovators work together to bridge traditional learning with modern digital solutions. Each member brings unique expertise and passion for empowering students.
+              Our diverse team of dedicated educators, content creators, and technology innovators work together to bridge traditional learning with modern digital solutions. Each member brings unique expertise and passion for empowering students.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -642,11 +774,13 @@ const Team = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl lg:text-5xl font-bold text-blue-600 mb-2">14</div>
+              <div className="text-4xl lg:text-5xl font-bold text-blue-600 mb-2">{teamMembers.length}</div>
               <div className="text-gray-600">Expert Educators</div>
             </div>
             <div>
-              <div className="text-4xl lg:text-5xl font-bold text-purple-600 mb-2">696</div>
+              <div className="text-4xl lg:text-5xl font-bold text-purple-600 mb-2">
+                {teamMembers.reduce((acc, member) => acc + member.stats.videos, 0)}
+              </div>
               <div className="text-gray-600">Educational Videos</div>
             </div>
             <div>
@@ -654,7 +788,9 @@ const Team = () => {
               <div className="text-gray-600">Students Helped</div>
             </div>
             <div>
-              <div className="text-4xl lg:text-5xl font-bold text-green-600 mb-2">4.8</div>
+              <div className="text-4xl lg:text-5xl font-bold text-green-600 mb-2">
+                {(teamMembers.reduce((acc, member) => acc + member.stats.rating, 0) / teamMembers.length).toFixed(1)}
+              </div>
               <div className="text-gray-600">Avg Performance</div>
             </div>
           </div>
@@ -1076,42 +1212,59 @@ const Team = () => {
 
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-4">Send a Message</h3>
-                      <form className="space-y-4">
+                      <form onSubmit={handleContactSubmit} className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-900 mb-2">Your Name</label>
                           <input
                             type="text"
+                            name="name"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter your name"
+                            required
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-900 mb-2">Email Address</label>
                           <input
                             type="email"
+                            name="email"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter your email"
+                            required
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-900 mb-2">Subject</label>
                           <input
                             type="text"
+                            name="subject"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter subject"
+                            required
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-900 mb-2">Message</label>
                           <textarea
+                            name="message"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             rows={4}
                             placeholder="Enter your message"
+                            required
                           ></textarea>
                         </div>
-                        <Button type="submit" className="w-full">
-                          <PaperPlane className="w-5 h-5 mr-2" />
-                          Send Message
+                        <Button type="submit" className="w-full" disabled={submittingContact}>
+                          {submittingContact ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <PaperPlane className="w-5 h-5 mr-2" />
+                              Send Message
+                            </>
+                          )}
                         </Button>
                       </form>
                     </div>
@@ -1171,12 +1324,16 @@ const Team = () => {
                                 e.currentTarget.src = `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`;
                               }}
                             />
-                            {qrCodeUrl && (
+                            {qrCodeUrl ? (
                               <img
                                 src={qrCodeUrl}
                                 alt="QR Code"
                                 className="w-12 h-12 bg-white p-1 rounded"
                               />
+                            ) : (
+                              <div className="w-12 h-12 bg-white p-1 rounded flex items-center justify-center">
+                                <QrCode className="w-8 h-8 text-gray-800" />
+                              </div>
                             )}
                           </div>
                         </div>
