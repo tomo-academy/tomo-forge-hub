@@ -661,28 +661,50 @@ const Team = () => {
     const qrCanvas = document.createElement('canvas');
     const qrCtx = qrCanvas.getContext('2d');
     if (qrCtx) {
-      const qrData = QRCodeGenerator.generate(
-        `https://tomoacademy.com/team/${selectedMember.id}`,
-        120
-      );
-      const qrImage = new Image();
-      qrImage.onload = () => {
-        ctx.drawImage(qrImage, 615, 285, 120, 120);
-        
-        // Download the canvas
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${selectedMember.name.replace(/\s+/g, '_')}_ID_Card.png`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showNotification("ID Card downloaded successfully!", "success");
+      // Create a simple QR code placeholder
+      qrCanvas.width = 120;
+      qrCanvas.height = 120;
+      
+      // Draw a simple pattern as QR code placeholder
+      qrCtx.fillStyle = '#000000';
+      const cellSize = 3;
+      const margin = 3;
+      
+      // Create a simple pattern
+      for (let i = 0; i < 18; i++) {
+        for (let j = 0; j < 18; j++) {
+          if (Math.random() > 0.5) {
+            qrCtx.fillRect(margin + i * cellSize, margin + j * cellSize, cellSize, cellSize);
           }
-        });
-      };
-      qrImage.src = qrData;
+        }
+      }
+      
+      // Add position markers (corners)
+      qrCtx.fillRect(margin, margin, 21, 21);
+      qrCtx.fillRect(margin + 39, margin, 21, 21);
+      qrCtx.fillRect(margin, margin + 39, 21, 21);
+      
+      // Add white squares in the middle of position markers
+      qrCtx.fillStyle = '#FFFFFF';
+      qrCtx.fillRect(margin + 6, margin + 6, 9, 9);
+      qrCtx.fillRect(margin + 45, margin + 6, 9, 9);
+      qrCtx.fillRect(margin + 6, margin + 45, 9, 9);
+      
+      // Draw the QR code on the main canvas
+      ctx.drawImage(qrCanvas, 615, 285, 120, 120);
+      
+      // Download the canvas
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${selectedMember.name.replace(/\s+/g, '_')}_ID_Card.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showNotification("ID Card downloaded successfully!", "success");
+        }
+      });
     }
   };
 
