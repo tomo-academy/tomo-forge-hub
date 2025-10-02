@@ -463,7 +463,7 @@ END:VCARD`;
                       className="w-full mt-1 bg-primary hover:bg-primary-hover text-xs p-1"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setShowDetailModal(true);
+                        window.open(`/profile/${employee.id}`, '_blank');
                       }}
                     >
                       <Eye className="w-3 h-3" />
@@ -543,11 +543,11 @@ END:VCARD`;
                   className="w-full mt-2 bg-primary hover:bg-primary-hover"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowDetailModal(true);
+                    window.open(`/profile/${employee.id}`, '_blank');
                   }}
                 >
                   <Eye className="w-3 h-3 mr-1" />
-                  View Details
+                  View Profile
                 </Button>
               </div>
             )}

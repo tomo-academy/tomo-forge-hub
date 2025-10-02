@@ -23,8 +23,13 @@ const EmployeeProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('Looking for employee ID:', employeeId);
+    console.log('Available employees:', employees.map(emp => emp.id));
+    
     // Find employee by ID
     const foundEmployee = employees.find(emp => emp.id === employeeId);
+    console.log('Found employee:', foundEmployee);
+    
     setEmployee(foundEmployee);
     setIsLoading(false);
   }, [employeeId]);
@@ -35,18 +40,43 @@ const EmployeeProfile = () => {
 
   if (!employee) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="p-8 text-center max-w-md">
-          <h1 className="text-2xl font-bold mb-4">Employee Not Found</h1>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="p-8 text-center max-w-2xl">
+          <h1 className="text-2xl font-bold mb-4">Employee Profile</h1>
           <p className="text-muted-foreground mb-6">
-            The employee profile you're looking for doesn't exist.
+            Looking for employee ID: <code className="bg-muted px-2 py-1 rounded">{employeeId}</code>
           </p>
-          <Link to="/team">
-            <Button>
-              <Users className="w-4 h-4 mr-2" />
-              View All Team Members
-            </Button>
-          </Link>
+          
+          <div className="mb-6">
+            <h3 className="font-semibold mb-3">Available Employee IDs:</h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {employees.map(emp => (
+                <Link 
+                  key={emp.id} 
+                  to={`/profile/${emp.id}`}
+                  className="p-2 bg-muted rounded hover:bg-primary/10 transition-colors"
+                >
+                  <div className="font-mono text-xs">{emp.id}</div>
+                  <div className="text-xs text-muted-foreground">{emp.name}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex gap-2 justify-center">
+            <Link to="/team">
+              <Button>
+                <Users className="w-4 h-4 mr-2" />
+                View All Team Members
+              </Button>
+            </Link>
+            <Link to={`/profile/${employees[0].id}`}>
+              <Button variant="outline">
+                <Eye className="w-4 h-4 mr-2" />
+                View Sample Profile
+              </Button>
+            </Link>
+          </div>
         </Card>
       </div>
     );

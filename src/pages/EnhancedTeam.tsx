@@ -330,13 +330,21 @@ const EnhancedTeam = () => {
                   <Download className="w-4 h-4" />
                   Export IDs
                 </Button>
-              <Button 
-                className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
-                onClick={() => setShowAddMember(true)}
-              >
-                <Plus className="w-4 h-4" />
-                Add Member
-              </Button>
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={() => window.open('/profile/kanish-sj', '_blank')}
+                >
+                  <Eye className="w-4 h-4" />
+                  Test Profile
+                </Button>
+                <Button 
+                  className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
+                  onClick={() => setShowAddMember(true)}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Member
+                </Button>
               </div>
             </div>
 
