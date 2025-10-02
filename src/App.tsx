@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import EnhancedDashboard from "./pages/EnhancedDashboard";
 import Team from "./pages/Team";
+import EnhancedTeam from "./pages/EnhancedTeam";
 import Videos from "./pages/Videos";
 import EnhancedVideos from "./pages/EnhancedVideos";
 import Tasks from "./pages/Tasks";
@@ -34,7 +35,8 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<EnhancedDashboard />} />
             <Route path="/dashboard/classic" element={<Dashboard />} />
-            <Route path="/team" element={<Team />} />
+            <Route path="/team" element={<EnhancedTeam />} />
+            <Route path="/team/classic" element={<Team />} />
             <Route path="/videos" element={<EnhancedVideos />} />
             <Route path="/videos/classic" element={<Videos />} />
             <Route path="/tasks" element={<Tasks />} />

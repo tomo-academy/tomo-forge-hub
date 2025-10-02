@@ -132,41 +132,131 @@ const MOCK_VIDEOS: YouTubeVideo[] = [
 export class YouTubeService {
   private apiKey: string;
   private channelId: string;
+  private baseUrl: string = 'https://www.googleapis.com/youtube/v3';
 
   constructor(apiKey?: string, channelId?: string) {
-    // In production, these would come from environment variables
-    this.apiKey = apiKey || 'demo_api_key';
-    this.channelId = channelId || 'UCMTpEQrAqzibxN6gZDLIDpA';
+    this.apiKey = apiKey || import.meta.env.VITE_YOUTUBE_API_KEY || 'AIzaSyBGi6_Tqc9kkeR4ich-HeCJAIP0_i4gcy0';
+    this.channelId = channelId || import.meta.env.VITE_YOUTUBE_CHANNEL_ID || 'UCMTpEQrAqzibxN6gZDLIDpA';
   }
 
   // Get channel information
   async getChannelInfo(): Promise<YouTubeChannel> {
-    // In production, this would make a real API call
-    // const response = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${this.channelId}&key=${this.apiKey}`);
-    
-    // For now, return mock data with some randomization to simulate live data
-    return {
-      ...MOCK_CHANNEL_DATA,
-      subscriberCount: MOCK_CHANNEL_DATA.subscriberCount + Math.floor(Math.random() * 100),
-      viewCount: MOCK_CHANNEL_DATA.viewCount + Math.floor(Math.random() * 1000),
-    };
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/channels?part=snippet,statistics&id=${this.channelId}&key=${this.apiKey}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`YouTube API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.items || data.items.length === 0) {
+        throw new Error('Channel not found');
+      }
+      
+      const channel = data.items[0];
+      
+      return {
+        id: channel.id,
+        title: channel.snippet.title,
+        description: channel.snippet.description,
+        subscriberCount: parseInt(channel.statistics.subscriberCount) || 0,
+        videoCount: parseInt(channel.statistics.videoCount) || 0,
+        viewCount: parseInt(channel.statistics.viewCount) || 0,
+        thumbnails: {
+          default: channel.snippet.thumbnails.default?.url || '',
+          medium: channel.snippet.thumbnails.medium?.url || '',
+          high: channel.snippet.thumbnails.high?.url || '',
+        }
+      };
+    } catch (error) {
+      console.warn('Failed to fetch real YouTube data, using mock data:', error);
+      // Fallback to mock data with some randomization
+      return {
+        ...MOCK_CHANNEL_DATA,
+        subscriberCount: MOCK_CHANNEL_DATA.subscriberCount + Math.floor(Math.random() * 100),
+        viewCount: MOCK_CHANNEL_DATA.viewCount + Math.floor(Math.random() * 1000),
+      };
+    }
   }
 
   // Get channel videos
   async getChannelVideos(maxResults: number = 10): Promise<YouTubeVideo[]> {
-    // In production, this would make a real API call
-    // const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${this.channelId}&maxResults=${maxResults}&order=date&key=${this.apiKey}`);
-    
-    // Return mock data with some randomization
-    return MOCK_VIDEOS.map(video => ({
-      ...video,
-      statistics: {
-        ...video.statistics,
-        viewCount: video.statistics.viewCount + Math.floor(Math.random() * 100),
-        likeCount: video.statistics.likeCount + Math.floor(Math.random() * 10),
-        commentCount: video.statistics.commentCount + Math.floor(Math.random() * 5),
+    try {
+      // First, get the channel's uploads playlist
+      const channelResponse = await fetch(
+        `${this.baseUrl}/channels?part=contentDetails&id=${this.channelId}&key=${this.apiKey}`
+      );
+      
+      if (!channelResponse.ok) {
+        throw new Error(`YouTube API error: ${channelResponse.status}`);
       }
-    })).slice(0, maxResults);
+      
+      const channelData = await channelResponse.json();
+      const uploadsPlaylistId = channelData.items[0]?.contentDetails?.relatedPlaylists?.uploads;
+      
+      if (!uploadsPlaylistId) {
+        throw new Error('Uploads playlist not found');
+      }
+      
+      // Get videos from uploads playlist
+      const playlistResponse = await fetch(
+        `${this.baseUrl}/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${this.apiKey}`
+      );
+      
+      if (!playlistResponse.ok) {
+        throw new Error(`YouTube API error: ${playlistResponse.status}`);
+      }
+      
+      const playlistData = await playlistResponse.json();
+      const videoIds = playlistData.items.map((item: any) => item.snippet.resourceId.videoId).join(',');
+      
+      // Get detailed video information including statistics
+      const videosResponse = await fetch(
+        `${this.baseUrl}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${this.apiKey}`
+      );
+      
+      if (!videosResponse.ok) {
+        throw new Error(`YouTube API error: ${videosResponse.status}`);
+      }
+      
+      const videosData = await videosResponse.json();
+      
+      return videosData.items.map((video: any) => ({
+        id: video.id,
+        title: video.snippet.title,
+        description: video.snippet.description,
+        publishedAt: video.snippet.publishedAt,
+        thumbnails: {
+          default: video.snippet.thumbnails.default?.url || '',
+          medium: video.snippet.thumbnails.medium?.url || '',
+          high: video.snippet.thumbnails.high?.url || '',
+          maxres: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high?.url || '',
+        },
+        statistics: {
+          viewCount: parseInt(video.statistics.viewCount) || 0,
+          likeCount: parseInt(video.statistics.likeCount) || 0,
+          commentCount: parseInt(video.statistics.commentCount) || 0,
+        },
+        duration: video.contentDetails.duration,
+        tags: video.snippet.tags || [],
+        categoryId: video.snippet.categoryId,
+      }));
+    } catch (error) {
+      console.warn('Failed to fetch real YouTube videos, using mock data:', error);
+      // Fallback to mock data with some randomization
+      return MOCK_VIDEOS.map(video => ({
+        ...video,
+        statistics: {
+          ...video.statistics,
+          viewCount: video.statistics.viewCount + Math.floor(Math.random() * 100),
+          likeCount: video.statistics.likeCount + Math.floor(Math.random() * 10),
+          commentCount: video.statistics.commentCount + Math.floor(Math.random() * 5),
+        }
+      })).slice(0, maxResults);
+    }
   }
 
   // Get video statistics
