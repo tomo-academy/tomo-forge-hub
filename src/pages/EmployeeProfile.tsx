@@ -1,0 +1,505 @@
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
+import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
+import { employees } from "@/data/employees";
+import QRCode from "react-qr-code";
+import { 
+  ArrowLeft, Mail, Phone, MapPin, Calendar, Star, 
+  Video, CheckCircle, Briefcase, Award, Shield,
+  Linkedin, Twitter, Github, Globe, Instagram,
+  Download, Share2, Copy, ExternalLink, Youtube,
+  User, Clock, TrendingUp, Eye, MessageSquare,
+  Building2, Users, Target, Activity
+} from "lucide-react";
+
+const EmployeeProfile = () => {
+  const { employeeId } = useParams<{ employeeId: string }>();
+  const [employee, setEmployee] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Find employee by ID
+    const foundEmployee = employees.find(emp => emp.id === employeeId);
+    setEmployee(foundEmployee);
+    setIsLoading(false);
+  }, [employeeId]);
+
+  if (isLoading) {
+    return <LoadingSpinnerOverlay isLoading={true}><div className="h-screen" /></LoadingSpinnerOverlay>;
+  }
+
+  if (!employee) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-8 text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-4">Employee Not Found</h1>
+          <p className="text-muted-foreground mb-6">
+            The employee profile you're looking for doesn't exist.
+          </p>
+          <Link to="/team">
+            <Button>
+              <Users className="w-4 h-4 mr-2" />
+              View All Team Members
+            </Button>
+          </Link>
+        </Card>
+      </div>
+    );
+  }
+
+  const qrData = `https://tomoacademy.com/profile/${employee.id}`;
+
+  const getAvailabilityColor = () => {
+    switch (employee.availability) {
+      case 'available':
+        return 'bg-success text-success-foreground';
+      case 'busy':
+        return 'bg-warning text-warning-foreground';
+      case 'offline':
+        return 'bg-muted text-muted-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const downloadVCard = () => {
+    const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${employee.name}
+ORG:TOMO Academy
+TITLE:${employee.role}
+EMAIL:${employee.email}
+${employee.phone ? `TEL:${employee.phone}` : ''}
+${employee.location ? `ADR:;;${employee.location};;;;` : ''}
+NOTE:Employee ID: ${employee.employeeId} | Department: ${employee.department}
+URL:https://tomoacademy.com/profile/${employee.id}
+END:VCARD`;
+
+    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${employee.name.replace(/\s+/g, '_')}_TOMO_Academy.vcf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const shareProfile = async () => {
+    const shareData = {
+      title: `${employee.name} - TOMO Academy`,
+      text: `Check out ${employee.name}'s profile at TOMO Academy - ${employee.role}`,
+      url: window.location.href
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+      } catch (err) {
+        console.error('Failed to copy URL:', err);
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary to-accent text-white">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <Link to="/team">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </Link>
+            
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
+              <img 
+                src="/TOMO.svg" 
+                alt="TOMO Academy"
+                className="w-full h-full object-cover rounded-full"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling!.style.display = 'block';
+                }}
+              />
+              <Youtube className="w-6 h-6 text-primary hidden" />
+            </div>
+            
+            <div>
+              <h1 className="text-2xl font-bold">TOMO Academy</h1>
+              <p className="text-white/90">Employee Profile</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-start gap-6">
+            {/* Employee Avatar */}
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-4xl border-4 border-white shadow-lg">
+                {employee.avatar || employee.name.split(' ').map((n: string) => n[0]).join('')}
+              </div>
+              <div className={`absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-4 border-white ${
+                employee.availability === 'available' ? 'bg-success' :
+                employee.availability === 'busy' ? 'bg-warning' : 'bg-muted'
+              }`} />
+            </div>
+
+            {/* Basic Info */}
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-2">{employee.name}</h1>
+              <p className="text-xl text-white/90 mb-3">{employee.role}</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Badge variant="secondary" className="bg-white/20 text-white">
+                  {employee.department}
+                </Badge>
+                <Badge className={getAvailabilityColor()}>
+                  {employee.availability}
+                </Badge>
+                <Badge variant="outline" className="border-white/30 text-white">
+                  ID: {employee.employeeId}
+                </Badge>
+              </div>
+              
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{employee.stats.videos}</div>
+                  <div className="text-sm text-white/80">Videos</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{employee.stats.tasks}</div>
+                  <div className="text-sm text-white/80">Tasks</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{employee.stats.projects}</div>
+                  <div className="text-sm text-white/80">Projects</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{employee.stats.rating}</div>
+                  <div className="text-sm text-white/80">Rating</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Button onClick={downloadVCard} className="gap-2">
+            <Download className="w-4 h-4" />
+            Download Contact
+          </Button>
+          <Button variant="outline" onClick={shareProfile} className="gap-2">
+            <Share2 className="w-4 h-4" />
+            Share Profile
+          </Button>
+          <Button variant="outline" onClick={() => navigator.clipboard.writeText(employee.email)} className="gap-2">
+            <Copy className="w-4 h-4" />
+            Copy Email
+          </Button>
+          <Link to="/team">
+            <Button variant="outline" className="gap-2">
+              <Users className="w-4 h-4" />
+              View Team
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Main Info */}
+          <div className="md:col-span-2 space-y-6">
+            {/* About */}
+            {employee.bio && (
+              <AnimatedCard hoverEffect="border">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <User className="w-5 h-5 text-primary" />
+                    About
+                  </h2>
+                  <p className="text-muted-foreground leading-relaxed">{employee.bio}</p>
+                </div>
+              </AnimatedCard>
+            )}
+
+            {/* Skills */}
+            <AnimatedCard hoverEffect="border">
+              <div className="p-6">
+                <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-primary" />
+                  Skills & Expertise
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {employee.skills.map((skill: string, index: number) => (
+                    <Badge key={index} variant="outline">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
+
+            {/* Recent Work */}
+            {employee.recentWork && employee.recentWork.length > 0 && (
+              <AnimatedCard hoverEffect="border">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-primary" />
+                    Recent Work
+                  </h2>
+                  <div className="space-y-3">
+                    {employee.recentWork.map((work: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div>
+                          <p className="font-medium">{work.title}</p>
+                          <p className="text-sm text-muted-foreground">{work.type}</p>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {new Date(work.date).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </AnimatedCard>
+            )}
+
+            {/* Performance Stats */}
+            <AnimatedCard hoverEffect="border">
+              <div className="p-6">
+                <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  Performance Statistics
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-primary/10 rounded-lg">
+                    <Video className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <div className="text-2xl font-bold">{employee.stats.videos}</div>
+                    <div className="text-sm text-muted-foreground">Videos Created</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-success/10 rounded-lg">
+                    <CheckCircle className="w-8 h-8 text-success mx-auto mb-2" />
+                    <div className="text-2xl font-bold">{employee.stats.tasks}</div>
+                    <div className="text-sm text-muted-foreground">Tasks Completed</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-accent/10 rounded-lg">
+                    <Briefcase className="w-8 h-8 text-accent mx-auto mb-2" />
+                    <div className="text-2xl font-bold">{employee.stats.projects}</div>
+                    <div className="text-sm text-muted-foreground">Active Projects</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-warning/10 rounded-lg">
+                    <Star className="w-8 h-8 text-warning mx-auto mb-2" />
+                    <div className="text-2xl font-bold">{employee.stats.rating}</div>
+                    <div className="text-sm text-muted-foreground">Average Rating</div>
+                  </div>
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Contact Information */}
+            <GlowCard glowColor="primary">
+              <div className="p-6">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-primary" />
+                  Contact Information
+                </h2>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Email</p>
+                      <p className="text-sm text-muted-foreground">{employee.email}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigator.clipboard.writeText(employee.email)}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  
+                  {employee.phone && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-4 h-4 text-primary" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Phone</p>
+                        <p className="text-sm text-muted-foreground">{employee.phone}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigator.clipboard.writeText(employee.phone)}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-4 h-4 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Employee ID</p>
+                      <p className="text-sm text-muted-foreground font-mono">{employee.employeeId}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-4 h-4 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Join Date</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(employee.joinDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {employee.location && (
+                    <div className="flex items-center gap-3">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Location</p>
+                        <p className="text-sm text-muted-foreground">{employee.location}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <Building2 className="w-4 h-4 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Department</p>
+                      <p className="text-sm text-muted-foreground">{employee.department}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </GlowCard>
+
+            {/* Social Links */}
+            {employee.social && Object.keys(employee.social).length > 0 && (
+              <AnimatedCard hoverEffect="glow">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold mb-4">Social Links</h2>
+                  <div className="space-y-2">
+                    {employee.social.linkedin && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => window.open(employee.social.linkedin, '_blank')}
+                      >
+                        <Linkedin className="w-4 h-4 mr-2" />
+                        LinkedIn Profile
+                      </Button>
+                    )}
+                    {employee.social.twitter && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => window.open(employee.social.twitter, '_blank')}
+                      >
+                        <Twitter className="w-4 h-4 mr-2" />
+                        Twitter Profile
+                      </Button>
+                    )}
+                    {employee.social.github && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => window.open(employee.social.github, '_blank')}
+                      >
+                        <Github className="w-4 h-4 mr-2" />
+                        GitHub Profile
+                      </Button>
+                    )}
+                    {employee.social.website && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => window.open(employee.social.website, '_blank')}
+                      >
+                        <Globe className="w-4 h-4 mr-2" />
+                        Personal Website
+                      </Button>
+                    )}
+                    {employee.social.instagram && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => window.open(employee.social.instagram, '_blank')}
+                      >
+                        <Instagram className="w-4 h-4 mr-2" />
+                        Instagram Profile
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </AnimatedCard>
+            )}
+
+            {/* QR Code */}
+            <AnimatedCard hoverEffect="glow">
+              <div className="p-6 text-center">
+                <h2 className="text-xl font-bold mb-4">Profile QR Code</h2>
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 bg-white rounded-lg shadow-lg">
+                    <QRCode
+                      value={qrData}
+                      size={150}
+                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Scan to share this profile
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={downloadVCard}>
+                    <Download className="w-3 h-3 mr-1" />
+                    vCard
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={shareProfile}>
+                    <Share2 className="w-3 h-3 mr-1" />
+                    Share
+                  </Button>
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center py-8 border-t border-border">
+          <p className="text-muted-foreground">
+            © 2025 TOMO Academy. All rights reserved.
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Internal Employee Profile System
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EmployeeProfile;

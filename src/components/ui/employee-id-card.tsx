@@ -85,20 +85,9 @@ export function EmployeeIDCard({
     }
   };
 
-  // Create a simple, scannable QR data format
-  const qrData = `TOMO Academy Employee
-Name: ${employee.name}
-Role: ${employee.role}
-Department: ${employee.department}
-ID: ${employee.employeeId}
-Email: ${employee.email}
-${employee.phone ? `Phone: ${employee.phone}` : ''}
-${employee.location ? `Location: ${employee.location}` : ''}
-Profile: https://tomoacademy.com/team/${employee.id}
-Verified: ✓ TOMO Academy
-Skills: ${employee.skills?.join(', ') || 'N/A'}
-Rating: ${employee.stats.rating}/5.0
-Videos: ${employee.stats.videos} | Tasks: ${employee.stats.tasks}`;
+  // Create QR data that links to the profile page
+  const profileUrl = `${window.location.origin}/profile/${employee.id}`;
+  const qrData = profileUrl;
 
   const downloadVCard = () => {
     const vcard = `BEGIN:VCARD
@@ -151,8 +140,10 @@ END:VCARD`;
   return (
     <>
       <div className={cn(
-        "relative group perspective-1000",
-        isLandscape ? "w-[400px] h-[250px]" : "w-[280px] h-[400px]"
+        "relative group perspective-1000 mx-auto",
+        isLandscape 
+          ? "w-full max-w-[400px] h-[250px] sm:w-[400px]" 
+          : "w-full max-w-[280px] h-[400px] sm:w-[280px]"
       )}>
         <div 
           className={cn(

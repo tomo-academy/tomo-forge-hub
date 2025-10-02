@@ -381,8 +381,9 @@ const EnhancedTeam = () => {
             </div>
 
             {/* Filters & View Toggle */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
+            <div className="space-y-4">
+              {/* Search */}
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name, role, or skills..."
@@ -392,49 +393,52 @@ const EnhancedTeam = () => {
                 />
               </div>
               
-              <div className="flex gap-2">
+              {/* Department Filters - Mobile Scrollable */}
+              <div className="flex gap-2 overflow-x-auto pb-2">
                 {departmentList.map((dept) => (
                   <Button
                     key={dept}
                     variant={selectedDepartment === dept ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedDepartment(dept)}
-                    className="capitalize"
+                    className="capitalize whitespace-nowrap flex-shrink-0"
                   >
-                    {dept === "all" ? "All Departments" : dept}
+                    {dept === "all" ? "All" : dept.split(' ')[0]}
                   </Button>
                 ))}
               </div>
 
               {/* View Mode Toggle */}
-              <div className="flex gap-1 p-1 bg-muted rounded-lg">
-                <Button
-                  variant={viewMode === "cards" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("cards")}
-                  className="gap-2"
-                >
-                  <CreditCard className="w-4 h-4" />
-                  ID Cards
-                </Button>
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="gap-2"
-                >
-                  <Grid className="w-4 h-4" />
-                  Grid
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="gap-2"
-                >
-                  <List className="w-4 h-4" />
-                  List
-                </Button>
+              <div className="flex justify-center">
+                <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                  <Button
+                    variant={viewMode === "cards" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("cards")}
+                    className="gap-2"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span className="hidden sm:inline">ID Cards</span>
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="gap-2"
+                  >
+                    <Grid className="w-4 h-4" />
+                    <span className="hidden sm:inline">Grid</span>
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className="gap-2"
+                  >
+                    <List className="w-4 h-4" />
+                    <span className="hidden sm:inline">List</span>
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -445,16 +449,21 @@ const EnhancedTeam = () => {
                   <h2 className="text-2xl font-bold mb-2">Premium Employee ID Cards</h2>
                   <p className="text-muted-foreground">Click any card to flip and view contact details</p>
                 </div>
-                <EmployeeIDCardsGrid 
-                  employees={filteredMembers} 
-                  variant="landscape" 
-                  columns={2}
-                />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 justify-items-center">
+                  {filteredMembers.map((member) => (
+                    <EmployeeIDCard
+                      key={member.id}
+                      employee={member}
+                      variant="landscape"
+                      premium={true}
+                    />
+                  ))}
+                </div>
               </div>
             )}
 
             {viewMode === "grid" && (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredMembers.map((member) => (
                   <AnimatedCard key={member.id} hoverEffect="lift" className="overflow-hidden">
                     <div className="p-6 space-y-4">
@@ -593,7 +602,7 @@ const EnhancedTeam = () => {
                   <Building2 className="w-6 h-6 text-primary" />
                   <h2 className="text-2xl font-bold">Department Overview</h2>
                 </div>
-                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Object.entries(departments).map(([deptName, deptMembers]) => {
                     const totalVideos = deptMembers.reduce((sum, m) => sum + m.stats.videos, 0);
                     const avgRating = deptMembers.reduce((sum, m) => sum + m.stats.rating, 0) / deptMembers.length;
@@ -626,7 +635,7 @@ const EnhancedTeam = () => {
             </GlowCard>
 
             {/* Role-based Teams */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.entries(roles).map(([roleName, roleMembers]) => (
                 <AnimatedCard key={roleName} hoverEffect="lift" className="p-6">
                   <div className="flex items-center gap-3 mb-4">
