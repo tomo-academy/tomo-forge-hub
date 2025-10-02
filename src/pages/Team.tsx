@@ -2,28 +2,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { Mail, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Times, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, PaperPlane, Plus, Th, List } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Mail, Award, Search, Filter, X, Download, Share2, User, Calendar, MapPin, Star, Video, PlayCircle, CheckCircle, Users, Clock, ChevronRight, Menu, Send as PaperPlane, Facebook, Twitter, Linkedin, Instagram, Youtube, Github, Plus, LayoutGrid, List } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDRKzkXTtv4Gpleej264l_Fv_U7j4nU2xE",
-  authDomain: "tomo-3c4bc.firebaseapp.com",
-  projectId: "tomo-3c4bc",
-  storageBucket: "tomo-3c4bc.firebasestorage.app",
-  messagingSenderId: "314585475223",
-  appId: "1:314585475223:web:38f9f825d0558d3207e1d2",
-  measurementId: "G-JT4K0CC8RY"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
+// Team member interface
 interface TeamMember {
   id: string;
   name: string;
@@ -53,8 +35,6 @@ interface TeamMember {
   employeeId?: string;
   since?: number;
   cardVariant?: "tech" | "science" | "arts" | "business";
-  createdAt?: Timestamp;
-  updatedAt?: Timestamp;
 }
 
 interface ContactMessage {
@@ -64,12 +44,185 @@ interface ContactMessage {
   name: string;
   subject: string;
   message: string;
-  timestamp?: Timestamp;
+  timestamp?: Date;
 }
 
+// Initial team members data
+const initialTeamMembers: TeamMember[] = [
+  {
+    id: "1",
+    name: "Dr. Sarah Johnson",
+    role: "Senior Researcher",
+    department: "Computer Science",
+    email: "sarah.johnson@tomoacademy.com",
+    skills: ["Machine Learning", "Data Science", "Python", "TensorFlow"],
+    stats: {
+      videos: 24,
+      tasks: 142,
+      rating: 4.8
+    },
+    bio: "Dr. Johnson is a leading expert in machine learning with over 10 years of experience in developing predictive models.",
+    availability: "available",
+    education: "Ph.D. in Computer Science, MIT",
+    experience: 10,
+    location: "San Francisco, CA",
+    availabilityHours: "Mon-Fri, 9AM-5PM PST",
+    contributions: ["AI Research Lab", "Data Science Initiative", "ML Mentorship Program"],
+    content: [
+      { title: "Introduction to Neural Networks", duration: "45 min", views: "12.5K", date: "2023-06-15" },
+      { title: "Advanced TensorFlow Techniques", duration: "1h 20min", views: "8.2K", date: "2023-05-22" },
+      { title: "Building Recommender Systems", duration: "55 min", views: "9.7K", date: "2023-04-10" }
+    ],
+    employeeId: "TM2023001",
+    since: 2018,
+    cardVariant: "tech"
+  },
+  {
+    id: "2",
+    name: "Prof. Michael Chen",
+    role: "Department Head",
+    department: "Physics",
+    email: "michael.chen@tomoacademy.com",
+    skills: ["Quantum Physics", "Particle Physics", "Research Methodology", "Data Analysis"],
+    stats: {
+      videos: 18,
+      tasks: 98,
+      rating: 4.9
+    },
+    bio: "Professor Chen specializes in quantum mechanics and has published numerous papers on particle physics.",
+    availability: "mentoring",
+    education: "Ph.D. in Physics, Stanford",
+    experience: 15,
+    location: "Boston, MA",
+    availabilityHours: "Tue-Thu, 10AM-4PM EST",
+    contributions: ["Quantum Research Lab", "Physics Curriculum Development", "Graduate Mentorship"],
+    content: [
+      { title: "Quantum Entanglement Explained", duration: "1h 15min", views: "15.3K", date: "2023-07-02" },
+      { title: "Introduction to Particle Physics", duration: "50 min", views: "11.8K", date: "2023-06-18" },
+      { title: "Quantum Computing Basics", duration: "1h 5min", views: "13.2K", date: "2023-05-30" }
+    ],
+    employeeId: "TM2023002",
+    since: 2015,
+    cardVariant: "science"
+  },
+  {
+    id: "3",
+    name: "Emily Rodriguez",
+    role: "Creative Director",
+    department: "Digital Arts",
+    email: "emily.rodriguez@tomoacademy.com",
+    skills: ["UI/UX Design", "Digital Illustration", "Animation", "Creative Strategy"],
+    stats: {
+      videos: 32,
+      tasks: 186,
+      rating: 4.7
+    },
+    bio: "Emily brings creativity and innovation to digital arts, with a focus on user experience and visual storytelling.",
+    availability: "available",
+    education: "MFA in Digital Arts, Parsons",
+    experience: 8,
+    location: "New York, NY",
+    availabilityHours: "Mon-Wed, 11AM-6PM EST",
+    contributions: ["Design System", "Visual Branding", "Creative Workshops"],
+    content: [
+      { title: "Principles of UI Design", duration: "40 min", views: "18.7K", date: "2023-07-10" },
+      { title: "Digital Illustration Techniques", duration: "1h 10min", views: "14.5K", date: "2023-06-25" },
+      { title: "Creating Engaging Animations", duration: "55 min", views: "16.2K", date: "2023-05-15" }
+    ],
+    employeeId: "TM2023003",
+    since: 2019,
+    cardVariant: "arts"
+  },
+  {
+    id: "4",
+    name: "James Wilson",
+    role: "Business Strategist",
+    department: "Business Administration",
+    email: "james.wilson@tomoacademy.com",
+    skills: ["Strategic Planning", "Market Analysis", "Leadership", "Financial Modeling"],
+    stats: {
+      videos: 21,
+      tasks: 124,
+      rating: 4.6
+    },
+    bio: "James has extensive experience in business strategy and has helped numerous organizations achieve their growth objectives.",
+    availability: "recent",
+    education: "MBA, Harvard Business School",
+    experience: 12,
+    location: "Chicago, IL",
+    availabilityHours: "Mon-Fri, 8AM-4PM CST",
+    contributions: ["Business Strategy Framework", "Leadership Development", "Startup Mentorship"],
+    content: [
+      { title: "Strategic Planning Fundamentals", duration: "50 min", views: "10.3K", date: "2023-07-05" },
+      { title: "Market Analysis Techniques", duration: "1h 5min", views: "8.9K", date: "2023-06-20" },
+      { title: "Effective Leadership Skills", duration: "45 min", views: "12.1K", date: "2023-05-28" }
+    ],
+    employeeId: "TM2023004",
+    since: 2020,
+    cardVariant: "business"
+  },
+  {
+    id: "5",
+    name: "Dr. Lisa Park",
+    role: "Data Scientist",
+    department: "Computer Science",
+    email: "lisa.park@tomoacademy.com",
+    skills: ["Data Visualization", "Statistical Analysis", "R Programming", "Big Data"],
+    stats: {
+      videos: 27,
+      tasks: 156,
+      rating: 4.8
+    },
+    bio: "Dr. Park specializes in turning complex data into actionable insights through advanced analytics and visualization.",
+    availability: "available",
+    education: "Ph.D. in Statistics, UC Berkeley",
+    experience: 9,
+    location: "Seattle, WA",
+    availabilityHours: "Mon-Thu, 9AM-5PM PST",
+    contributions: ["Data Analytics Lab", "Visualization Tools", "Statistical Methods Research"],
+    content: [
+      { title: "Data Visualization Best Practices", duration: "55 min", views: "14.8K", date: "2023-07-08" },
+      { title: "Advanced Statistical Methods", duration: "1h 15min", views: "11.2K", date: "2023-06-12" },
+      { title: "Big Data Processing with R", duration: "1h 30min", views: "9.5K", date: "2023-05-20" }
+    ],
+    employeeId: "TM2023005",
+    since: 2017,
+    cardVariant: "tech"
+  },
+  {
+    id: "6",
+    name: "Prof. Alex Thompson",
+    role: "Research Lead",
+    department: "Biology",
+    email: "alex.thompson@tomoacademy.com",
+    skills: ["Molecular Biology", "Genetics", "Biotechnology", "Research Methodology"],
+    stats: {
+      videos: 19,
+      tasks: 112,
+      rating: 4.9
+    },
+    bio: "Professor Thompson is a renowned biologist with groundbreaking research in genetics and molecular biology.",
+    availability: "mentoring",
+    education: "Ph.D. in Molecular Biology, Johns Hopkins",
+    experience: 14,
+    location: "Baltimore, MD",
+    availabilityHours: "Tue-Fri, 10AM-5PM EST",
+    contributions: ["Genetics Research Lab", "Biotechnology Innovation", "Graduate Mentorship Program"],
+    content: [
+      { title: "Introduction to Molecular Biology", duration: "1h 20min", views: "16.4K", date: "2023-07-12" },
+      { title: "Genetics and Evolution", duration: "1h 10min", views: "13.7K", date: "2023-06-28" },
+      { title: "Biotechnology Applications", duration: "50 min", views: "11.9K", date: "2023-05-25" }
+    ],
+    employeeId: "TM2023006",
+    since: 2016,
+    cardVariant: "science"
+  }
+];
+
 const Team = () => {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All Roles");
   const [departmentFilter, setDepartmentFilter] = useState("All Departments");
@@ -80,470 +233,26 @@ const Team = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [submittingContact, setSubmittingContact] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const idCardRef = useRef<HTMLDivElement>(null);
 
-  // Initial team members data
-  const initialTeamMembers: TeamMember[] = [
-    {
-      id: "EMP001",
-      name: "Kanish SJ",
-      role: "Senior Software Developer",
-      department: "Engineering",
-      email: "kanish.sj@tomoacademy.com",
-      skills: ["JavaScript", "Firebase", "Node.js", "React"],
-      stats: { videos: 45, tasks: 120, rating: 4.8 },
-      image: "https://randomuser.me/api/portraits/men/1.jpg",
-      bio: "Kanish is a passionate software developer with expertise in web technologies. With years of experience in the field, Kanish brings innovative teaching methods and a deep understanding of programming concepts to help students succeed.",
-      availability: "available",
-      education: "MS in Computer Science, University of Excellence • BS in Software Engineering, State University",
-      experience: 7,
-      location: "San Francisco, CA",
-      availabilityHours: "Mon-Fri, 9AM-5PM EST",
-      contributions: [
-        "JavaScript Fundamentals Series - 12 episodes",
-        "React Advanced Concepts - 8 episodes",
-        "Node.js Applications - 6 episodes"
-      ],
-      content: [
-        { title: "Introduction to JavaScript", duration: "15:30", views: "5.2K", date: "2023-05-15" },
-        { title: "Advanced React Concepts", duration: "22:45", views: "3.8K", date: "2023-06-02" },
-        { title: "Node.js Applications", duration: "18:20", views: "2.9K", date: "2023-06-20" }
-      ],
-      employeeId: "TA0001",
-      since: 2020,
-      cardVariant: "tech"
-    },
-    {
-      id: "EMP002",
-      name: "Kamesh",
-      role: "UI/UX Designer",
-      department: "Design",
-      email: "kamesh@tomoacademy.com",
-      skills: ["Figma", "Adobe XD", "Illustrator", "Branding"],
-      stats: { videos: 67, tasks: 98, rating: 4.9 },
-      image: "https://randomuser.me/api/portraits/men/2.jpg",
-      bio: "Kamesh is a creative UI/UX designer with a passion for creating intuitive and beautiful user interfaces. With a keen eye for detail and a deep understanding of user psychology, Kamesh helps students learn the principles of good design.",
-      availability: "mentoring",
-      education: "MFA in Design, School of Visual Arts • BFA in Graphic Design, State University",
-      experience: 5,
-      location: "New York, NY",
-      availabilityHours: "Mon-Wed, 10AM-6PM EST",
-      contributions: [
-        "UI Design Fundamentals - 10 episodes",
-        "UX Research Methods - 7 episodes",
-        "Branding Principles - 5 episodes"
-      ],
-      content: [
-        { title: "Introduction to UI Design", duration: "12:15", views: "4.5K", date: "2023-05-10" },
-        { title: "UX Research Methods", duration: "18:30", views: "3.2K", date: "2023-05-25" },
-        { title: "Branding Principles", duration: "15:45", views: "2.7K", date: "2023-06-15" }
-      ],
-      employeeId: "TA0002",
-      since: 2021,
-      cardVariant: "arts"
-    },
-    {
-      id: "EMP003",
-      name: "Ajay Krithick",
-      role: "Content Creator",
-      department: "Content",
-      email: "ajay@tomoacademy.com",
-      skills: ["Video Editing", "Scripting", "SEO"],
-      stats: { videos: 89, tasks: 145, rating: 4.7 },
-      image: "https://randomuser.me/api/portraits/men/3.jpg",
-      bio: "Ajay is a talented content creator with expertise in video production and SEO. With a background in journalism and digital marketing, Ajay helps students learn how to create engaging content that reaches a wide audience.",
-      availability: "available",
-      education: "MA in Journalism, University of Excellence • BS in Marketing, State University",
-      experience: 6,
-      location: "Los Angeles, CA",
-      availabilityHours: "Tue-Thu, 11AM-7PM EST",
-      contributions: [
-        "Video Production Basics - 15 episodes",
-        "Script Writing Techniques - 10 episodes",
-        "SEO for Content Creators - 8 episodes"
-      ],
-      content: [
-        { title: "Video Production Basics", duration: "20:10", views: "6.8K", date: "2023-04-20" },
-        { title: "Script Writing Techniques", duration: "16:45", views: "4.2K", date: "2023-05-10" },
-        { title: "SEO for Content Creators", duration: "18:30", views: "3.5K", date: "2023-05-30" }
-      ],
-      employeeId: "TA0003",
-      since: 2019,
-      cardVariant: "business"
-    },
-    {
-      id: "EMP004",
-      name: "Nithish",
-      role: "Video Editor",
-      department: "Production",
-      email: "nithish@tomoacademy.com",
-      skills: ["Premiere Pro", "After Effects"],
-      stats: { videos: 102, tasks: 167, rating: 4.9 },
-      image: "https://randomuser.me/api/portraits/men/4.jpg",
-      bio: "Nithish is a skilled video editor with expertise in post-production techniques. With a background in film production and visual effects, Nithish helps students learn how to create professional-looking videos using industry-standard software.",
-      availability: "recent",
-      education: "BFA in Film Production, School of Visual Arts • Certificate in Visual Effects, Digital Media Institute",
-      experience: 4,
-      location: "Chicago, IL",
-      availabilityHours: "Wed-Fri, 12PM-8PM EST",
-      contributions: [
-        "Premiere Pro Basics - 12 episodes",
-        "After Effects Techniques - 10 episodes",
-        "Color Grading Fundamentals - 6 episodes"
-      ],
-      content: [
-        { title: "Premiere Pro Basics", duration: "25:15", views: "7.2K", date: "2023-04-15" },
-        { title: "After Effects Techniques", duration: "22:30", views: "5.8K", date: "2023-05-05" },
-        { title: "Color Grading Fundamentals", duration: "18:45", views: "4.1K", date: "2023-05-25" }
-      ],
-      employeeId: "TA0004",
-      since: 2020,
-      cardVariant: "arts"
-    },
-    {
-      id: "EMP005",
-      name: "Haridharuson L.J",
-      role: "Content Strategist",
-      department: "Content",
-      email: "haridharuson@tomoacademy.com",
-      skills: ["Strategy", "Planning", "Research"],
-      stats: { videos: 34, tasks: 78, rating: 4.6 },
-      image: "https://randomuser.me/api/portraits/men/5.jpg",
-      bio: "Haridharuson is a strategic thinker with expertise in content planning and research. With a background in marketing analytics and business strategy, Haridharuson helps students learn how to develop effective content strategies that drive engagement.",
-      availability: "available",
-      education: "MBA in Marketing, Business School • BA in Communications, State University",
-      experience: 8,
-      location: "Boston, MA",
-      availabilityHours: "Mon-Thu, 9AM-5PM EST",
-      contributions: [
-        "Content Strategy Fundamentals - 8 episodes",
-        "Research Methods for Content - 6 episodes",
-        "Planning Effective Content Calendars - 5 episodes"
-      ],
-      content: [
-        { title: "Content Strategy Fundamentals", duration: "18:20", views: "3.5K", date: "2023-05-05" },
-        { title: "Research Methods for Content", duration: "15:45", views: "2.8K", date: "2023-05-20" },
-        { title: "Planning Effective Content Calendars", duration: "12:30", views: "2.2K", date: "2023-06-10" }
-      ],
-      employeeId: "TA0005",
-      since: 2018,
-      cardVariant: "business"
-    },
-    {
-      id: "EMP006",
-      name: "Aditya Chaurasiya",
-      role: "Social Media Manager",
-      department: "Marketing",
-      email: "aditya@tomoacademy.com",
-      skills: ["Social Media", "Engagement"],
-      stats: { videos: 23, tasks: 56, rating: 4.7 },
-      image: "https://randomuser.me/api/portraits/men/6.jpg",
-      bio: "Aditya is a social media expert with a passion for building online communities. With a background in digital marketing and community management, Aditya helps students learn how to create engaging social media content that grows their audience.",
-      availability: "mentoring",
-      education: "BS in Marketing, Business School • Certificate in Social Media Marketing, Digital Media Institute",
-      experience: 5,
-      location: "Austin, TX",
-      availabilityHours: "Tue-Fri, 10AM-6PM EST",
-      contributions: [
-        "Social Media Strategy - 7 episodes",
-        "Community Building Techniques - 5 episodes",
-        "Content Creation for Social Platforms - 6 episodes"
-      ],
-      content: [
-        { title: "Social Media Strategy", duration: "16:30", views: "4.1K", date: "2023-05-12" },
-        { title: "Community Building Techniques", duration: "14:15", views: "3.2K", date: "2023-05-28" },
-        { title: "Content Creation for Social Platforms", duration: "18:45", views: "2.9K", date: "2023-06-15" }
-      ],
-      employeeId: "TA0006",
-      since: 2020,
-      cardVariant: "business"
-    },
-    {
-      id: "EMP007",
-      name: "Dev",
-      role: "Full Stack Developer",
-      department: "Engineering",
-      email: "dev@tomoacademy.com",
-      skills: ["React", "Python", "AWS", "Docker"],
-      stats: { videos: 12, tasks: 89, rating: 4.8 },
-      image: "https://randomuser.me/api/portraits/men/7.jpg",
-      bio: "Dev is a full-stack developer with expertise in modern web technologies and cloud computing. With a background in software engineering and DevOps, Dev helps students learn how to build scalable applications using industry-standard tools.",
-      availability: "available",
-      education: "MS in Computer Science, University of Excellence • BS in Software Engineering, State University",
-      experience: 6,
-      location: "Seattle, WA",
-      availabilityHours: "Mon-Wed, 11AM-7PM EST",
-      contributions: [
-        "Full Stack Development with React - 8 episodes",
-        "Python for Web Development - 6 episodes",
-        "AWS Cloud Services - 5 episodes"
-      ],
-      content: [
-        { title: "Full Stack Development with React", duration: "22:15", views: "3.8K", date: "2023-05-18" },
-        { title: "Python for Web Development", duration: "18:30", views: "2.9K", date: "2023-06-05" },
-        { title: "AWS Cloud Services", duration: "20:45", views: "2.4K", date: "2023-06-20" }
-      ],
-      employeeId: "TA0007",
-      since: 2021,
-      cardVariant: "tech"
-    },
-    {
-      id: "EMP008",
-      name: "Nithyasri",
-      role: "Content Writer",
-      department: "Content",
-      email: "nithyasri@tomoacademy.com",
-      skills: ["Writing", "Research", "Editing"],
-      stats: { videos: 56, tasks: 112, rating: 4.7 },
-      image: "https://randomuser.me/api/portraits/women/1.jpg",
-      bio: "Nithyasri is a talented content writer with expertise in research and editing. With a background in journalism and creative writing, Nithyasri helps students learn how to create compelling content that engages and informs their audience.",
-      availability: "recent",
-      education: "MA in Journalism, University of Excellence • BA in English Literature, State University",
-      experience: 4,
-      location: "Portland, OR",
-      availabilityHours: "Thu-Sat, 10AM-6PM EST",
-      contributions: [
-        "Content Writing Fundamentals - 10 episodes",
-        "Research Techniques for Writers - 7 episodes",
-        "Editing and Proofreading - 6 episodes"
-      ],
-      content: [
-        { title: "Content Writing Fundamentals", duration: "18:45", views: "4.5K", date: "2023-05-08" },
-        { title: "Research Techniques for Writers", duration: "15:30", views: "3.6K", date: "2023-05-25" },
-        { title: "Editing and Proofreading", duration: "12:15", views: "2.8K", date: "2023-06-12" }
-      ],
-      employeeId: "TA0008",
-      since: 2022,
-      cardVariant: "arts"
-    },
-    {
-      id: "EMP009",
-      name: "Raaj Nikitaa",
-      role: "Graphic Designer",
-      department: "Design",
-      email: "raaj@tomoacademy.com",
-      skills: ["Photoshop", "Illustrator"],
-      stats: { videos: 78, tasks: 134, rating: 4.9 },
-      image: "https://randomuser.me/api/portraits/women/2.jpg",
-      bio: "Raaj is a creative graphic designer with expertise in digital illustration and branding. With a background in visual arts and marketing, Raaj helps students learn how to create stunning graphics that communicate their message effectively.",
-      availability: "available",
-      education: "BFA in Graphic Design, School of Visual Arts • Certificate in Digital Illustration, Art Institute",
-      experience: 5,
-      location: "Miami, FL",
-      availabilityHours: "Mon-Thu, 10AM-6PM EST",
-      contributions: [
-        "Photoshop Basics - 12 episodes",
-        "Illustrator Techniques - 10 episodes",
-        "Digital Illustration Fundamentals - 8 episodes"
-      ],
-      content: [
-        { title: "Photoshop Basics", duration: "20:30", views: "5.8K", date: "2023-05-03" },
-        { title: "Illustrator Techniques", duration: "18:15", views: "4.7K", date: "2023-05-20" },
-        { title: "Digital Illustration Fundamentals", duration: "16:45", views: "3.9K", date: "2023-06-08" }
-      ],
-      employeeId: "TA0009",
-      since: 2020,
-      cardVariant: "arts"
-    },
-    {
-      id: "EMP010",
-      name: "Indhumathi",
-      role: "Project Manager",
-      department: "Operations",
-      email: "indhumathi@tomoacademy.com",
-      skills: ["Project Management", "Agile"],
-      stats: { videos: 29, tasks: 156, rating: 4.8 },
-      image: "https://randomuser.me/api/portraits/women/3.jpg",
-      bio: "Indhumathi is an experienced project manager with expertise in agile methodologies. With a background in business administration and operations, Indhumathi helps students learn how to manage projects effectively and deliver results on time.",
-      availability: "mentoring",
-      education: "MBA in Project Management, Business School • BA in Business Administration, State University",
-      experience: 9,
-      location: "Denver, CO",
-      availabilityHours: "Mon-Fri, 9AM-5PM EST",
-      contributions: [
-        "Project Management Fundamentals - 9 episodes",
-        "Agile Methodologies - 7 episodes",
-        "Team Leadership Techniques - 6 episodes"
-      ],
-      content: [
-        { title: "Project Management Fundamentals", duration: "22:15", views: "4.2K", date: "2023-05-10" },
-        { title: "Agile Methodologies", duration: "18:30", views: "3.5K", date: "2023-05-28" },
-        { title: "Team Leadership Techniques", duration: "16:45", views: "2.9K", date: "2023-06-15" }
-      ],
-      employeeId: "TA0010",
-      since: 2018,
-      cardVariant: "business"
-    },
-    {
-      id: "EMP011",
-      name: "Kavyashree",
-      role: "Research Analyst",
-      department: "Content",
-      email: "kavyashree@tomoacademy.com",
-      skills: ["Research", "Analytics"],
-      stats: { videos: 18, tasks: 67, rating: 4.6 },
-      image: "https://randomuser.me/api/portraits/women/4.jpg",
-      bio: "Kavyashree is a detail-oriented research analyst with expertise in data analysis and market research. With a background in statistics and business analytics, Kavyashree helps students learn how to gather, analyze, and interpret data to make informed decisions.",
-      availability: "recent",
-      education: "MS in Data Analytics, University of Excellence • BS in Statistics, State University",
-      experience: 3,
-      location: "Phoenix, AZ",
-      availabilityHours: "Tue-Fri, 11AM-7PM EST",
-      contributions: [
-        "Research Methodology - 6 episodes",
-        "Data Analysis Fundamentals - 5 episodes",
-        "Market Research Techniques - 4 episodes"
-      ],
-      content: [
-        { title: "Research Methodology", duration: "18:45", views: "2.8K", date: "2023-05-15" },
-        { title: "Data Analysis Fundamentals", duration: "16:30", views: "2.2K", date: "2023-06-02" },
-        { title: "Market Research Techniques", duration: "14:15", views: "1.9K", date: "2023-06-18" }
-      ],
-      employeeId: "TA0011",
-      since: 2022,
-      cardVariant: "science"
-    },
-    {
-      id: "EMP012",
-      name: "Keerthana",
-      role: "QA Specialist",
-      department: "Quality",
-      email: "keerthana@tomoacademy.com",
-      skills: ["Quality Assurance", "Testing"],
-      stats: { videos: 41, tasks: 98, rating: 4.7 },
-      image: "https://randomuser.me/api/portraits/women/5.jpg",
-      bio: "Keerthana is a meticulous QA specialist with expertise in software testing and quality assurance. With a background in computer science and software engineering, Keerthana helps students learn how to ensure the quality and reliability of software products.",
-      availability: "available",
-      education: "MS in Software Engineering, University of Excellence • BS in Computer Science, State University",
-      experience: 5,
-      location: "Atlanta, GA",
-      availabilityHours: "Mon-Thu, 10AM-6PM EST",
-      contributions: [
-        "Software Testing Fundamentals - 8 episodes",
-        "Quality Assurance Methodologies - 6 episodes",
-        "Automation Testing Techniques - 5 episodes"
-      ],
-      content: [
-        { title: "Software Testing Fundamentals", duration: "20:15", views: "3.9K", date: "2023-05-05" },
-        { title: "Quality Assurance Methodologies", duration: "17:30", views: "3.1K", date: "2023-05-22" },
-        { title: "Automation Testing Techniques", duration: "15:45", views: "2.6K", date: "2023-06-10" }
-      ],
-      employeeId: "TA0012",
-      since: 2021,
-      cardVariant: "tech"
-    },
-    {
-      id: "EMP013",
-      name: "Monika",
-      role: "Marketing Coordinator",
-      department: "Marketing",
-      email: "monika@tomoacademy.com",
-      skills: ["Marketing", "Campaigns"],
-      stats: { videos: 27, tasks: 72, rating: 4.8 },
-      image: "https://randomuser.me/api/portraits/women/6.jpg",
-      bio: "Monika is a creative marketing coordinator with expertise in campaign management and brand promotion. With a background in marketing and communications, Monika helps students learn how to create effective marketing campaigns that drive engagement and conversions.",
-      availability: "mentoring",
-      education: "BS in Marketing, Business School • Certificate in Digital Marketing, Digital Media Institute",
-      experience: 4,
-      location: "Nashville, TN",
-      availabilityHours: "Wed-Fri, 10AM-6PM EST",
-      contributions: [
-        "Marketing Campaign Fundamentals - 7 episodes",
-        "Brand Promotion Strategies - 5 episodes",
-        "Digital Marketing Techniques - 6 episodes"
-      ],
-      content: [
-        { title: "Marketing Campaign Fundamentals", duration: "18:30", views: "3.4K", date: "2023-05-12" },
-        { title: "Brand Promotion Strategies", duration: "16:15", views: "2.8K", date: "2023-05-30" },
-        { title: "Digital Marketing Techniques", duration: "19:45", views: "2.5K", date: "2023-06-15" }
-      ],
-      employeeId: "TA0013",
-      since: 2022,
-      cardVariant: "business"
-    },
-    {
-      id: "EMP014",
-      name: "Prawin Krishnan",
-      role: "Technical Lead",
-      department: "Engineering",
-      email: "prawin@tomoacademy.com",
-      skills: ["Leadership", "Architecture"],
-      stats: { videos: 15, tasks: 103, rating: 4.9 },
-      image: "https://randomuser.me/api/portraits/men/8.jpg",
-      bio: "Prawin is an experienced technical lead with expertise in software architecture and team leadership. With a background in computer science and software engineering, Prawin helps students learn how to design scalable systems and lead technical teams effectively.",
-      availability: "available",
-      education: "MS in Computer Science, University of Excellence • BS in Software Engineering, State University",
-      experience: 10,
-      location: "San Jose, CA",
-      availabilityHours: "Mon-Wed, 9AM-5PM EST",
-      contributions: [
-        "Software Architecture Fundamentals - 6 episodes",
-        "Technical Leadership Techniques - 5 episodes",
-        "System Design Principles - 4 episodes"
-      ],
-      content: [
-        { title: "Software Architecture Fundamentals", duration: "22:30", views: "3.7K", date: "2023-05-08" },
-        { title: "Technical Leadership Techniques", duration: "18:15", views: "2.9K", date: "2023-05-25" },
-        { title: "System Design Principles", duration: "20:45", views: "2.4K", date: "2023-06-12" }
-      ],
-      employeeId: "TA0014",
-      since: 2017,
-      cardVariant: "tech"
-    }
-  ];
-
-  // Initialize Firebase data
+  // Load initial data
   useEffect(() => {
-    initializeFirebaseData();
-  }, []);
-
-  // Initialize Firebase with team members data
-  const initializeFirebaseData = async () => {
-    try {
-      setLoading(true);
-      
-      // Check if team members collection exists
-      const teamMembersRef = collection(db, "teamMembers");
-      const snapshot = await getDocs(teamMembersRef);
-      
-      if (snapshot.empty) {
-        // If no data exists, add initial team members
-        console.log("No team members found, adding initial data...");
-        
-        for (const member of initialTeamMembers) {
-          const memberWithTimestamp = {
-            ...member,
-            createdAt: Timestamp.now(),
-            updatedAt: Timestamp.now()
-          };
-          await addDoc(teamMembersRef, memberWithTimestamp);
-        }
-        
-        // Fetch the newly added data
-        const newSnapshot = await getDocs(teamMembersRef);
-        const members: TeamMember[] = [];
-        newSnapshot.forEach(doc => {
-          members.push({ id: doc.id, ...doc.data() } as TeamMember);
-        });
-        setTeamMembers(members);
-      } else {
-        // Data exists, fetch from Firestore
-        const members: TeamMember[] = [];
-        snapshot.forEach(doc => {
-          members.push({ id: doc.id, ...doc.data() } as TeamMember);
-        });
-        setTeamMembers(members);
+    const loadData = () => {
+      try {
+        setLoading(true);
+        // For now, we'll just use the initial data
+        setTeamMembers(initialTeamMembers);
+      } catch (error) {
+        console.error("Error loading data:", error);
+        setError(error as Error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error initializing Firebase data:", error);
-      // Fallback to local data
-      setTeamMembers(initialTeamMembers);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    loadData();
+  }, []);
 
   // Filter team members based on search and filters
   const filteredMembers = teamMembers.filter(member => {
@@ -582,6 +291,36 @@ const Team = () => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  // Handle contact form submission
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedMember) return;
+    
+    setSubmittingContact(true);
+    
+    try {
+      const formData = new FormData(e.currentTarget);
+      const contactMessage: ContactMessage = {
+        to: selectedMember.email,
+        from: formData.get("email") as string,
+        name: formData.get("name") as string,
+        subject: formData.get("subject") as string,
+        message: formData.get("message") as string,
+        timestamp: new Date()
+      };
+      
+      // Here you would normally save to Firebase, for now just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      showNotification("Message sent successfully!", "success");
+      e.currentTarget.reset();
+    } catch (error) {
+      console.error("Error sending message:", error);
+      showNotification("Error sending message. Please try again.", "error");
+    } finally {
+      setSubmittingContact(false);
+    }
+  };
+
   // Download ID card
   const downloadIdCard = () => {
     if (!selectedMember || !idCardRef.current) return;
@@ -589,7 +328,6 @@ const Team = () => {
     // Create a canvas from the ID card
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const cardElement = idCardRef.current;
     
     if (!ctx) return;
     
@@ -652,19 +390,6 @@ const Team = () => {
     ctx.fillText(`Department: ${selectedMember.department}`, 40, 245);
     ctx.fillText(`Since: ${selectedMember.since || 2020}`, 40, 270);
     
-    // Add profile image placeholder
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(600, 120, 150, 150);
-    
-    // Add QR code placeholder
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(615, 285, 120, 120);
-    
-    // Add QR code text
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '12px Arial';
-    ctx.fillText('QR Code', 640, 350);
-    
     // Download the canvas
     canvas.toBlob((blob) => {
       if (blob) {
@@ -697,38 +422,6 @@ const Team = () => {
         navigator.clipboard.writeText(`https://tomoacademy.com/team/${selectedMember.id}`);
         showNotification("ID Card link copied to clipboard!", "success");
       }
-    }
-  };
-
-  // Handle contact form submission
-  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!selectedMember) return;
-    
-    setSubmittingContact(true);
-    
-    try {
-      const formData = new FormData(e.currentTarget);
-      const contactMessage: ContactMessage = {
-        to: selectedMember.email,
-        from: formData.get("email") as string,
-        name: formData.get("name") as string,
-        subject: formData.get("subject") as string,
-        message: formData.get("message") as string,
-        timestamp: Timestamp.now()
-      };
-      
-      // Save to Firestore
-      const docRef = await addDoc(collection(db, "contactMessages"), contactMessage);
-      console.log("Contact message saved with ID: ", docRef.id);
-      
-      showNotification("Message sent successfully!", "success");
-      e.currentTarget.reset();
-    } catch (error) {
-      console.error("Error sending message:", error);
-      showNotification("Error sending message. Please try again.", "error");
-    } finally {
-      setSubmittingContact(false);
     }
   };
 
@@ -793,107 +486,94 @@ const Team = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 mb-4">Error loading team members</div>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-6">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              {teamMembers.length} Expert Educators • 50,000+ Students Impacted
-            </div>
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Meet the minds behind
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> educational innovation</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Our diverse team of dedicated educators, content creators, and technology innovators work together to bridge traditional learning with modern digital solutions. Each member brings unique expertise and passion for empowering students.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => document.getElementById("team-section")?.scrollIntoView({ behavior: "smooth" })}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4"
-              >
-                <Users className="w-5 h-5 mr-2" />
-                Explore Team
-              </Button>
-              <Button 
-                variant="outline"
-                className="text-lg px-8 py-4"
-              >
-                <PlayCircle className="w-5 h-5 mr-2" />
-                View Content
-              </Button>
-            </div>
-          </div>
+      {/* Toast Notification */}
+      {showToast && (
+        <div className={`fixed top-20 right-4 z-50 px-4 py-3 rounded-lg shadow-lg ${
+          toastType === "success" ? "bg-green-500 text-white" :
+          toastType === "error" ? "bg-red-500 text-white" :
+          "bg-blue-500 text-white"
+        }`}>
+          {toastMessage}
         </div>
-      </section>
-
-      {/* Team Statistics */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl lg:text-5xl font-bold text-blue-600 mb-2">{teamMembers.length}</div>
-              <div className="text-gray-600">Expert Educators</div>
-            </div>
-            <div>
-              <div className="text-4xl lg:text-5xl font-bold text-purple-600 mb-2">
-                {teamMembers.reduce((acc, member) => acc + member.stats.videos, 0)}
-              </div>
-              <div className="text-gray-600">Educational Videos</div>
-            </div>
-            <div>
-              <div className="text-4xl lg:text-5xl font-bold text-amber-600 mb-2">50<span className="text-lg">K+</span></div>
-              <div className="text-gray-600">Students Helped</div>
-            </div>
-            <div>
-              <div className="text-4xl lg:text-5xl font-bold text-green-600 mb-2">
-                {(teamMembers.reduce((acc, member) => acc + member.stats.rating, 0) / teamMembers.length).toFixed(1)}
-              </div>
-              <div className="text-gray-600">Avg Performance</div>
-            </div>
-          </div>
+      )}
+      
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4">Meet Our Team</h1>
+          <p className="text-xl opacity-90">Get to know the talented individuals who make Tomo Academy exceptional</p>
         </div>
-      </section>
-
-      {/* Filter & Search Section */}
-      <section id="team-section" className="py-16 bg-gradient-to-r from-blue-50 to-purple-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Find the perfect mentor for your journey
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Filter by expertise, content type, or collaboration availability to connect with the right team member.
-            </p>
+      </div>
+      
+      {/* Search and Filter Section */}
+      <div className="bg-white shadow-sm sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search Bar */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search by name, role, department, or skills..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            {/* Filter Toggle Button */}
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+            </Button>
+            
+            {/* View Mode Toggle */}
+            <div className="flex border border-gray-300 rounded-lg">
+              <Button
+                variant={viewMode === "grid" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className="rounded-r-none"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="rounded-l-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-
-          {/* Search and Filter Controls */}
-          <Card className="p-6 mb-12">
-            <div className="grid md:grid-cols-4 gap-4">
-              {/* Search Bar */}
-              <div className="md:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Search by name, role, or skills..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Role Filter */}
+          
+          {/* Filter Options */}
+          {showFilters && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
                 >
@@ -902,11 +582,11 @@ const Team = () => {
                   ))}
                 </select>
               </div>
-
-              {/* Department Filter */}
+              
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={departmentFilter}
                   onChange={(e) => setDepartmentFilter(e.target.value)}
                 >
@@ -915,515 +595,407 @@ const Team = () => {
                   ))}
                 </select>
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={availabilityFilter}
+                  onChange={(e) => setAvailabilityFilter(e.target.value)}
+                >
+                  <option value="All">All</option>
+                  <option value="available">Available</option>
+                  <option value="mentoring">Mentoring</option>
+                  <option value="recent">Active</option>
+                </select>
+              </div>
             </div>
-
-            {/* Filter Tags */}
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Button
-                variant={availabilityFilter === "available" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAvailabilityFilter(availabilityFilter === "available" ? "All" : "available")}
-                className="flex items-center"
-              >
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Available for Collaboration
-              </Button>
-              <Button
-                variant={availabilityFilter === "mentoring" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAvailabilityFilter(availabilityFilter === "mentoring" ? "All" : "mentoring")}
-                className="flex items-center"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Accepting Mentees
-              </Button>
-              <Button
-                variant={availabilityFilter === "recent" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAvailabilityFilter(availabilityFilter === "recent" ? "All" : "recent")}
-                className="flex items-center"
-              >
-                <Clock className="w-4 h-4 mr-2" />
-                Recently Active
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSearchTerm("");
-                  setRoleFilter("All Roles");
-                  setDepartmentFilter("All Departments");
-                  setAvailabilityFilter("All");
-                }}
-                className="flex items-center"
-              >
-                <X className="w-4 h-4 mr-2" />
-                Clear All
-              </Button>
-            </div>
-          </Card>
-
-          {/* View Toggle */}
-          <div className="flex justify-end mb-4">
-            <div className="inline-flex rounded-md shadow-sm" role="group">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="rounded-r-none"
-              >
-                <Th className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="rounded-l-none"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Team Members Grid/List */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {filteredMembers.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No team members found matching your criteria.</p>
           </div>
-
-          {/* Team Members Grid/List */}
-          <div className={viewMode === "grid" ? "grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "space-y-4"}>
-            {filteredMembers.map((member) => (
-              <Card
-                key={member.id}
-                className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                onClick={() => setSelectedMember(member)}
-              >
-                <div className="relative">
-                  <img
-                    src={member.image || `https://picsum.photos/seed/${member.id}/400/300.jpg`}
-                    alt={member.name}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = `https://picsum.photos/seed/${member.id}/400/300.jpg`;
-                    }}
-                  />
-                  <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityBadge(member.availability)}`}>
-                    {getAvailabilityText(member.availability)}
-                  </div>
-                </div>
+        ) : (
+          <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
+            {filteredMembers.map(member => (
+              <Card key={member.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <div className="p-6">
-                  <div className="flex items-center mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold mr-3">
-                      {getInitials(member.name)}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3 bg-gradient-to-r ${getIdCardVariant(member.cardVariant)}`}>
+                        {getInitials(member.name)}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">{member.name}</h3>
+                        <p className="text-gray-600">{member.role}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-bold text-lg">{member.name}</h3>
-                      <p className="text-sm text-gray-500">{member.id}</p>
-                    </div>
+                    <Badge className={getAvailabilityBadge(member.availability)}>
+                      {getAvailabilityText(member.availability)}
+                    </Badge>
                   </div>
-                  <p className="font-medium text-sm mb-1">{member.role}</p>
-                  <Badge variant="secondary" className="text-xs mb-4">
-                    {member.department}
-                  </Badge>
-                  <div className="flex items-center text-xs text-gray-500 mb-4">
-                    <Mail className="w-3 h-3 mr-1" />
-                    <span className="truncate">{member.email}</span>
-                  </div>
-                  <div className="grid grid grid-cols-3 gap-2 mb-4 py-3 border-y border-gray-200">
-                    <div className="text-center">
-                      <p className="text-lg font-bold">{member.stats.videos}</p>
-                      <p className="text-xs text-gray-500">Videos</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-bold">{member.stats.tasks}</p>
-                      <p className="text-xs text-gray-500">Tasks</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-bold flex items-center justify-center gap-1">
-                        <Award className="w-4 h-4 text-amber-500" />
-                        {member.stats.rating}
-                      </p>
-                      <p className="text-xs text-gray-500">Rating</p>
-                    </div>
-                  </div>
+                  
                   <div className="mb-4">
+                    <p className="text-gray-700 text-sm">{member.bio}</p>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <p className="text-gray-600 text-sm mb-1">{member.department}</p>
                     <div className="flex flex-wrap gap-1">
-                      {member.skills.slice(0, 3).map((skill, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs px-2 py-0">
+                      {member.skills.slice(0, 3).map((skill, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
                           {skill}
                         </Badge>
                       ))}
                       {member.skills.length > 3 && (
-                        <Badge variant="outline" className="text-xs px-2 py-0">
-                          +{member.skills.length - 3}
+                        <Badge variant="outline" className="text-xs">
+                          +{member.skills.length - 3} more
                         </Badge>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center text-blue-600 font-medium group-hover:text-blue-800">
-                    <span>View Profile</span>
-                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {member.location}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Star className="h-4 w-4 mr-1 text-yellow-500" />
+                      {member.stats.rating}
+                    </div>
                   </div>
+                  
+                  <Button
+                    className="w-full"
+                    onClick={() => setSelectedMember(member)}
+                  >
+                    View Profile
+                  </Button>
                 </div>
               </Card>
             ))}
           </div>
-
-          {/* Load More Button */}
-          <div className="text-center mt-12">
-            <Button variant="outline" className="px-8 py-4">
-              <Plus className="w-5 h-5 mr-2" />
-              Load More Team Members
-            </Button>
-          </div>
-        </div>
-      </section>
-
+        )}
+      </div>
+      
       {/* Member Detail Modal */}
       {selectedMember && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-screen overflow-y-auto">
-            <div className="p-8">
-              {/* Modal Header */}
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center">
-                  <img
-                    src={selectedMember.image || `https://picsum.photos/seed/${selectedMember.id}/200/200.jpg`}
-                    alt={selectedMember.name}
-                    className="w-20 h-20 rounded-full object-cover mr-6"
-                    onError={(e) => {
-                      e.currentTarget.src = `https://picsum.photos/seed/${selectedMember.id}/200/200.jpg`;
-                    }}
-                  />
-                  <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedMember.name}</h2>
-                    <p className="text-xl text-blue-600 font-medium mb-2">{selectedMember.role}</p>
-                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getAvailabilityBadge(selectedMember.availability)}`}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Team Member Profile</h2>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedMember(null)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              {/* Member Header */}
+              <div className="flex flex-col md:flex-row gap-6 mb-6">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-2xl bg-gradient-to-r ${getIdCardVariant(selectedMember.cardVariant)}`}>
+                  {getInitials(selectedMember.name)}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-1">{selectedMember.name}</h3>
+                  <p className="text-lg text-gray-600 mb-2">{selectedMember.role}</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Badge className={getAvailabilityBadge(selectedMember.availability)}>
                       {getAvailabilityText(selectedMember.availability)}
+                    </Badge>
+                    <Badge variant="outline">{selectedMember.department}</Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <Mail className="h-4 w-4 mr-1" />
+                      {selectedMember.email}
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {selectedMember.location}
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {selectedMember.availabilityHours}
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSelectedMember(null)}
-                >
-                  <X className="w-6 h-6" />
-                </Button>
               </div>
-
-              {/* Tab Navigation */}
-              <div className="flex border-b border-gray-200 mb-6">
-                <Button
-                  variant={activeTab === "about" ? "default" : "ghost"}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                  onClick={() => setActiveTab("about")}
-                >
-                  About
-                </Button>
-                <Button
-                  variant={activeTab === "content" ? "default" : "ghost"}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                  onClick={() => setActiveTab("content")}
-                >
-                  Content
-                </Button>
-                <Button
-                  variant={activeTab === "contact" ? "default" : "ghost"}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                  onClick={() => setActiveTab("contact")}
-                >
-                  Contact
-                </Button>
-                <Button
-                  variant={activeTab === "idcard" ? "default" : "ghost"}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                  onClick={() => setActiveTab("idcard")}
-                >
-                  ID Card
-                </Button>
+              
+              {/* Tabs */}
+              <div className="border-b mb-6">
+                <div className="flex space-x-8">
+                  <button
+                    className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === "about"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("about")}
+                  >
+                    About
+                  </button>
+                  <button
+                    className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === "content"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("content")}
+                  >
+                    Content
+                  </button>
+                  <button
+                    className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === "contact"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("contact")}
+                  >
+                    Contact
+                  </button>
+                  <button
+                    className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === "idcard"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("idcard")}
+                  >
+                    ID Card
+                  </button>
+                </div>
               </div>
-
+              
               {/* Tab Content */}
-              <div>
-                {/* About Tab */}
-                {activeTab === "about" && (
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Left Column */}
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Biography</h3>
-                      <p className="text-gray-600 mb-6">{selectedMember.bio}</p>
-
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Expertise</h3>
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {selectedMember.skills.map((skill, idx) => (
-                          <Badge key={idx} variant="outline" className="px-3 py-1">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Education</h3>
-                      <p className="text-gray-600 mb-6">{selectedMember.education}</p>
-                    </div>
-
-                    {/* Right Column */}
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Performance Metrics</h3>
-                      <div className="grid grid grid-cols-2 gap-4 mb-6">
-                        <div className="text-center p-4 bg-gray-50 rounded-lg">
-                          <div className="text-2xl font-bold text-blue-600 mb-1">{selectedMember.stats.videos}</div>
-                          <div className="text-sm text-gray-600">Videos Created</div>
-                        </div>
-                        <div className="text-center p-4 bg-gray-50 rounded-lg">
-                          <div className="text-2xl font-bold text-amber-600 mb-1">{selectedMember.stats.rating}/5</div>
-                          <div className="text-sm text-gray-600">Average Rating</div>
-                        </div>
-                        <div className="text-center p-4 bg-gray-50 rounded-lg">
-                          <div className="text-2xl font-bold text-purple-600 mb-1">{selectedMember.stats.tasks}</div>
-                          <div className="text-sm text-gray-600">Tasks Completed</div>
-                        </div>
-                        <div className="text-center p-4 bg-gray-50 rounded-lg">
-                          <div className="text-2xl font-bold text-green-600 mb-1">{selectedMember.experience || 5}+</div>
-                          <div className="text-sm text-gray-600">Years Experience</div>
-                        </div>
-                      </div>
-
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent Contributions</h3>
-                      <div className="space-y-3 mb-6">
-                        {selectedMember.contributions?.map((contribution, idx) => (
-                          <div key={idx} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                            <Video className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
-                            <span className="text-sm text-gray-600">{contribution}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex gap-4">
-                        <Button className="flex-1">
-                          <PlayCircle className="w-5 h-5 mr-2" />
-                          View Content
-                        </Button>
-                        <Button variant="outline" className="flex-1">
-                          <Mail className="w-5 h-5 mr-2" />
-                          Contact
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Content Tab */}
-                {activeTab === "content" && (
+              {activeTab === "about" && (
+                <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Latest Content</h3>
-                    <div className="space-y-4 mb-6">
-                      {selectedMember.content?.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center">
-                            <PlayCircle className="w-5 h-5 text-blue-600 mr-4" />
-                            <div>
-                              <div className="font-medium text-gray-900">{item.title}</div>
-                              <div className="text-sm text-gray-600">{item.duration} • {formatDate(item.date)}</div>
-                            </div>
-                          </div>
-                          <div className="text-sm text-gray-600">{item.views} views</div>
-                        </div>
+                    <h4 className="font-semibold text-lg mb-2">Biography</h4>
+                    <p className="text-gray-700">{selectedMember.bio}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Education</h4>
+                    <p className="text-gray-700">{selectedMember.education}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Experience</h4>
+                    <p className="text-gray-700">{selectedMember.experience} years</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Skills</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary">
+                          {skill}
+                        </Badge>
                       ))}
                     </div>
-
-                    <div className="flex justify-center">
-                      <Button>
-                        <Th className="w-5 h-5 mr-2" />
-                        View All Content
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Contributions</h4>
+                    <ul className="list-disc list-inside text-gray-700">
+                      {selectedMember.contributions?.map((contribution, index) => (
+                        <li key={index}>{contribution}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Statistics</h4>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center p-4 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{selectedMember.stats.videos}</div>
+                        <div className="text-sm text-gray-600">Videos</div>
+                      </div>
+                      <div className="text-center p-4 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">{selectedMember.stats.tasks}</div>
+                        <div className="text-sm text-gray-600">Tasks</div>
+                      </div>
+                      <div className="text-center p-4 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-yellow-600">{selectedMember.stats.rating}</div>
+                        <div className="text-sm text-gray-600">Rating</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === "content" && (
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-lg mb-2">Recent Content</h4>
+                  {selectedMember.content?.map((item, index) => (
+                    <div key={index} className="border rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h5 className="font-medium mb-1">{item.title}</h5>
+                          <div className="flex items-center text-sm text-gray-600 gap-4">
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {item.duration}
+                            </div>
+                            <div className="flex items-center">
+                              <Users className="h-4 w-4 mr-1" />
+                              {item.views} views
+                            </div>
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 mr-1" />
+                              {formatDate(item.date)}
+                            </div>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          <PlayCircle className="h-4 w-4 mr-1" />
+                          Watch
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {activeTab === "contact" && (
+                <div>
+                  <h4 className="font-semibold text-lg mb-4">Send a Message</h4>
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                        <input
+                          type="text"
+                          name="name"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                        <input
+                          type="email"
+                          name="email"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                      <input
+                        type="text"
+                        name="subject"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                      <textarea
+                        name="message"
+                        rows={5}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      ></textarea>
+                    </div>
+                    <Button type="submit" disabled={submittingContact} className="w-full">
+                      {submittingContact ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <PaperPlane className="h-4 w-4 mr-2" />
+                          Send Message
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </div>
+              )}
+              
+              {activeTab === "idcard" && (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="font-semibold text-lg">ID Card</h4>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={downloadIdCard}>
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                      <Button variant="outline" onClick={shareIdCard}>
+                        <Share2 className="h-4 w-4 mr-1" />
+                        Share
                       </Button>
                     </div>
                   </div>
-                )}
-
-                {/* Contact Tab */}
-                {activeTab === "contact" && (
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Contact Information</h3>
-                      <div className="space-y-4 mb-6">
-                        <div className="flex items-center">
-                          <Mail className="w-5 h-5 text-blue-600 mr-3" />
-                          <span className="text-gray-600">{selectedMember.email}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="w-5 h-5 text-blue-600 mr-3" />
-                          <span className="text-gray-600">{selectedMember.availabilityHours || "Mon-Fri, 9AM-5PM EST"}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin className="w-5 h-5 text-blue-600 mr-3" />
-                          <span className="text-gray-600">{selectedMember.location || "Remote"}</span>
-                        </div>
-                      </div>
-
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Social Media</h3>
-                      <div className="flex space-x-4 mb-6">
-                        <Button variant="ghost" size="icon">
-                          <Twitter className="w-5 h-5" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Linkedin className="w-5 h-5" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Youtube className="w-5 h-5" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Github className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Send a Message</h3>
-                      <form onSubmit={handleContactSubmit} className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-900 mb-2">Your Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter your name"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-900 mb-2">Email Address</label>
-                          <input
-                            type="email"
-                            name="email"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter your email"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-900 mb-2">Subject</label>
-                          <input
-                            type="text"
-                            name="subject"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter subject"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-900 mb-2">Message</label>
-                          <textarea
-                            name="message"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            rows={4}
-                            placeholder="Enter your message"
-                            required
-                          ></textarea>
-                        </div>
-                        <Button type="submit" className="w-full" disabled={submittingContact}>
-                          {submittingContact ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              Sending...
-                            </>
-                          ) : (
-                            <>
-                              <PaperPlane className="w-5 h-5 mr-2" />
-                              Send Message
-                            </>
-                          )}
-                        </Button>
-                      </form>
-                    </div>
-                  </div>
-                )}
-
-                {/* ID Card Tab */}
-                {activeTab === "idcard" && (
-                  <div className="flex flex-col items-center">
-                    <div
-                      ref={idCardRef}
-                      className={`w-full max-w-md h-64 bg-gradient-to-br ${getIdCardVariant(selectedMember.cardVariant)} rounded-2xl shadow-xl p-6 text-white relative overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
-                    >
-                      {/* Decorative elements */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
-                      
-                      {/* Card content */}
-                      <div className="relative z-10 h-full flex flex flex-col justify-between">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-xl font-bold">TOMO ACADEMY</h3>
-                            <p className="text-xs opacity-80">ID CARD</p>
-                          </div>
-                          <div className="bg-white bg-opacity-20 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium flex items-center">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            VERIFIED
-                          </div>
-                        </div>
-                        
-                        <div className="flex justify-between items-end">
-                          <div>
-                            <h4 className="text-lg font-bold">{selectedMember.name}</h4>
-                            <p className="text-sm opacity-90">{selectedMember.role}</p>
-                            <div className="mt-2 space-y-1 text-xs">
-                              <div className="flex items-center">
-                                <span className="opacity-70 mr-2">ID:</span>
-                                <span>{selectedMember.employeeId || selectedMember.id}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <span className="opacity-70 mr-2">Dept:</span>
-                                <span>{selectedMember.department}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <span className="opacity-70 mr-2">Since:</span>
-                                <span>{selectedMember.since || 2020}</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-col items-center">
-                            <img
-                              src={selectedMember.image || `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`}
-                              alt={selectedMember.name}
-                              className="w-16 h-16 rounded-full object-cover border-2 border-white border-opacity-30 mb-2"
-                              onError={(e) => {
-                                e.currentTarget.src = `https://picsum.photos/seed/${selectedMember.id}/100/100.jpg`;
-                              }}
-                            />
-                            <div className="w-12 h-12 bg-white bg-opacity-20 rounded flex items-center justify-center">
-                              <div className="grid grid-cols-3 gap-0.5">
-                                {[...Array(9)].map((_, i) => (
-                                  <div key={i} className={`w-1 h-1 ${i % 2 === 0 ? 'bg-white' : 'bg-transparent'}`}></div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  
+                  <div ref={idCardRef} className={`bg-gradient-to-r ${getIdCardVariant(selectedMember.cardVariant)} rounded-lg p-8 text-white relative overflow-hidden`}>
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
                     
-                    <div className="flex gap-4 mt-6">
-                      <Button onClick={downloadIdCard} className="flex items-center">
-                        <Download className="w-5 h-5 mr-2" />
-                        Download ID Card
-                      </Button>
-                      <Button variant="outline" onClick={shareIdCard} className="flex items-center">
-                        <Share2 className="w-5 h-5 mr-2" />
-                        Share ID Card
-                      </Button>
+                    {/* Card Content */}
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-6">
+                        <div>
+                          <h3 className="text-3xl font-bold mb-1">TOMO ACADEMY</h3>
+                          <p className="text-sm opacity-80">ID CARD</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm opacity-80">VALID THRU</p>
+                          <p className="text-lg font-semibold">12/25</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-6 mb-6">
+                        <div className={`w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-2xl bg-white bg-opacity-20`}>
+                          {getInitials(selectedMember.name)}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-2xl font-bold mb-1">{selectedMember.name}</h4>
+                          <p className="text-lg opacity-90 mb-2">{selectedMember.role}</p>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="opacity-70">ID:</span> {selectedMember.employeeId || selectedMember.id}
+                            </div>
+                            <div>
+                              <span className="opacity-70">Dept:</span> {selectedMember.department}
+                            </div>
+                            <div>
+                              <span className="opacity-70">Since:</span> {selectedMember.since || 2020}
+                            </div>
+                            <div>
+                              <span className="opacity-70">Status:</span> {getAvailabilityText(selectedMember.availability)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-end">
+                        <div className="text-sm opacity-70">
+                          <p>{selectedMember.email}</p>
+                          <p>{selectedMember.location}</p>
+                        </div>
+                        <div className="bg-white bg-opacity-20 px-3 py-1 rounded text-sm">
+                          {selectedMember.education?.split(',')[1]?.trim() || 'University'}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Toast Notification */}
-      {showToast && (
-        <div className={`fixed bottom-6 right-6 px-6 py-3 rounded-lg shadow-lg text-white z-50 ${
-          toastType === "success" ? "bg-green-600" :
-          toastType === "error" ? "bg-red-600" : "bg-blue-600"
-        }`}>
-          {toastMessage}
         </div>
       )}
     </div>
