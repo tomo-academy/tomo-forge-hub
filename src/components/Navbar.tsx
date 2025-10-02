@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Youtube } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Menu, X, Youtube, Zap, Bell, User } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,24 +20,49 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-fast">
-              Dashboard
-            </Link>
-            <Link to="/team" className="text-muted-foreground hover:text-foreground transition-fast">
-              Team
-            </Link>
-            <Link to="/videos" className="text-muted-foreground hover:text-foreground transition-fast">
-              Videos
-            </Link>
-            <Link to="/tasks" className="text-muted-foreground hover:text-foreground transition-fast">
-              Tasks
-            </Link>
-            <Link to="/resources" className="text-muted-foreground hover:text-foreground transition-fast">
-              Resources
-            </Link>
-            <Button variant="default" size="sm" className="bg-primary hover:bg-primary-hover shadow-glow">
-              Login
-            </Button>
+            <div className="flex items-center gap-4">
+              <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-fast font-medium relative group">
+                Dashboard
+                <Badge variant="secondary" className="absolute -top-2 -right-8 text-xs animate-pulse">
+                  Live
+                </Badge>
+              </Link>
+              <Link to="/team" className="text-muted-foreground hover:text-foreground transition-fast font-medium">
+                Team
+              </Link>
+              <Link to="/videos" className="text-muted-foreground hover:text-foreground transition-fast font-medium relative group">
+                Videos
+                <Badge variant="outline" className="absolute -top-2 -right-6 text-xs bg-primary/10">
+                  Pro
+                </Badge>
+              </Link>
+              <Link to="/tasks" className="text-muted-foreground hover:text-foreground transition-fast font-medium">
+                Tasks
+              </Link>
+              <Link to="/resources" className="text-muted-foreground hover:text-foreground transition-fast font-medium">
+                Resources
+              </Link>
+            </div>
+            
+            <div className="flex items-center gap-3 ml-4 border-l border-border pl-4">
+              <ThemeToggle />
+              
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-4 h-4" />
+                <Badge variant="secondary" className="absolute -top-1 -right-1 h-4 w-4 rounded-full text-xs bg-primary text-primary-foreground">
+                  3
+                </Badge>
+              </Button>
+              
+              <Button variant="ghost" size="icon">
+                <User className="w-4 h-4" />
+              </Button>
+              
+              <Button variant="default" size="sm" className="bg-primary hover:bg-primary-hover shadow-glow">
+                <Zap className="w-3 h-3 mr-1" />
+                Premium
+              </Button>
+            </div>
           </div>
 
           <button
