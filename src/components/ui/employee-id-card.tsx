@@ -190,77 +190,68 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Main Content - Perfectly Fitted Layout */}
-          <div className="flex-1 p-3 flex">
+          {/* Main Content - Essential Information Only */}
+          <div className="flex-1 p-4 flex">
             {isLandscape ? (
-              // Landscape Layout - Perfectly Organized
+              // Landscape Layout - Clean & Essential
               <>
-                {/* Left Section - Employee Photo & Basic Info */}
-                <div className="w-32 flex flex-col items-center justify-center">
-                  <div className="relative mb-2">
-                    {/* Employee Photo Placeholder */}
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-4 border-white shadow-lg">
-                      {employee.avatar || employee.name.split(' ').map(n => n[0]).join('')}
+                {/* Left Section - Profile Photo */}
+                <div className="w-28 flex flex-col items-center justify-center">
+                  <div className="relative mb-3">
+                    {/* Profile Photo Placeholder */}
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-3 border-white shadow-lg overflow-hidden">
+                      {/* Placeholder for actual photo */}
+                      <div className="w-full h-full bg-muted/20 flex items-center justify-center">
+                        {employee.avatar || employee.name.split(' ').map(n => n[0]).join('')}
+                      </div>
                     </div>
-                    <div className={cn(
-                      "absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white",
-                      getAvailabilityColor()
-                    )} />
                   </div>
                   
                   <div className="text-center">
-                    <h2 className="font-bold text-sm leading-tight">{employee.name}</h2>
-                    <p className="text-xs text-muted-foreground leading-tight mt-0.5">{employee.role}</p>
-                    <Badge variant="outline" className="text-xs mt-1 px-1 py-0">
-                      {employee.department}
-                    </Badge>
+                    <h2 className="font-bold text-base leading-tight">{employee.name}</h2>
+                    <p className="text-xs text-muted-foreground leading-tight mt-1">{employee.role}</p>
                   </div>
                 </div>
 
-                {/* Middle Section - Details & Stats */}
-                <div className="flex-1 flex flex-col justify-between px-2">
-                  {/* Employee Details */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <Shield className="w-3 h-3 text-primary flex-shrink-0" />
-                      <span className="font-mono font-bold">{employee.employeeId}</span>
+                {/* Middle Section - Essential Details */}
+                <div className="flex-1 flex flex-col justify-center px-3">
+                  <div className="space-y-2">
+                    {/* TOMO Number */}
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">TOMO No.</p>
+                        <p className="font-mono font-bold text-sm">{employee.employeeId}</p>
+                      </div>
                     </div>
                     
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Calendar className="w-3 h-3 flex-shrink-0" />
-                      <span>Since {new Date(employee.joinDate).getFullYear()}</span>
+                    {/* Since */}
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-accent flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Since</p>
+                        <p className="font-semibold text-sm">{new Date(employee.joinDate).getFullYear()}</p>
+                      </div>
                     </div>
                     
+                    {/* Location */}
                     {employee.location && (
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <MapPin className="w-3 h-3 flex-shrink-0" />
-                        <span className="truncate">{employee.location}</span>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-success flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Location</p>
+                          <p className="font-semibold text-sm">{employee.location}</p>
+                        </div>
                       </div>
                     )}
 
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Mail className="w-3 h-3 flex-shrink-0" />
-                      <span className="truncate">{employee.email}</span>
-                    </div>
-                  </div>
-
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 gap-1.5 mt-2">
-                    <div className="text-center p-1.5 bg-primary/10 rounded text-xs">
-                      <div className="font-bold text-primary text-sm">{employee.stats.videos}</div>
-                      <div className="text-muted-foreground text-xs">Videos</div>
-                    </div>
-                    <div className="text-center p-1.5 bg-accent/10 rounded text-xs">
-                      <div className="font-bold text-accent text-sm">{employee.stats.tasks}</div>
-                      <div className="text-muted-foreground text-xs">Tasks</div>
-                    </div>
-                    <div className="text-center p-1.5 bg-success/10 rounded text-xs">
-                      <div className="font-bold text-success text-sm">{employee.stats.projects}</div>
-                      <div className="text-muted-foreground text-xs">Projects</div>
-                    </div>
-                    <div className="text-center p-1.5 bg-warning/10 rounded text-xs">
-                      <div className="font-bold text-warning text-sm">{employee.stats.rating}</div>
-                      <div className="text-muted-foreground text-xs">Rating</div>
+                    {/* Email */}
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-warning flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-muted-foreground">Email</p>
+                        <p className="font-semibold text-xs truncate">{employee.email}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -268,85 +259,85 @@ END:VCARD`;
                 {/* Right Section - QR Code */}
                 {showQR && (
                   <div className="w-24 flex flex-col items-center justify-center">
-                    <div className="p-1.5 bg-white rounded-lg shadow-md">
+                    <div className="p-2 bg-white rounded-lg shadow-md">
                       <QRCode
                         value={qrData}
-                        size={80}
+                        size={75}
                         style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground text-center mt-1 leading-tight">Scan for details</p>
+                    <p className="text-xs text-muted-foreground text-center mt-1 leading-tight">
+                      Scan Profile
+                    </p>
                   </div>
                 )}
               </>
             ) : (
-              // Portrait Layout
+              // Portrait Layout - Essential Info Only
               <div className="w-full flex flex-col justify-between">
-                {/* Avatar and Basic Info */}
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
-                      {employee.avatar || employee.name.split(' ').map(n => n[0]).join('')}
+                {/* Profile Photo & Name */}
+                <div className="text-center mb-4">
+                  <div className="relative mx-auto mb-3">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg border-3 border-white shadow-lg overflow-hidden">
+                      {/* Placeholder for actual photo */}
+                      <div className="w-full h-full bg-muted/20 flex items-center justify-center">
+                        {employee.avatar || employee.name.split(' ').map(n => n[0]).join('')}
+                      </div>
                     </div>
-                    <div className={cn(
-                      "absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white",
-                      getAvailabilityColor()
-                    )} />
                   </div>
                   
-                  <div className="flex-1">
-                    <h2 className="font-bold text-lg leading-tight">{employee.name}</h2>
-                    <p className="text-sm text-muted-foreground">{employee.role}</p>
-                    <Badge variant="outline" className="text-xs mt-1">
-                      {employee.department}
-                    </Badge>
-                  </div>
+                  <h2 className="font-bold text-lg leading-tight">{employee.name}</h2>
+                  <p className="text-sm text-muted-foreground leading-tight">{employee.role}</p>
                 </div>
 
-                {/* Employee Details */}
-                <div className="space-y-2 flex-1 py-3">
-                  <div className="flex items-center gap-2 text-xs">
-                    <Shield className="w-3 h-3 text-primary" />
-                    <span className="font-mono font-bold">{employee.employeeId}</span>
+                {/* Essential Details */}
+                <div className="space-y-3 flex-1">
+                  {/* TOMO Number */}
+                  <div className="flex items-center gap-2 justify-center">
+                    <Shield className="w-4 h-4 text-primary" />
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">TOMO No.</p>
+                      <p className="font-mono font-bold">{employee.employeeId}</p>
+                    </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    <span>Since {new Date(employee.joinDate).getFullYear()}</span>
+                  {/* Since & Location */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center">
+                      <Calendar className="w-4 h-4 text-accent mx-auto mb-1" />
+                      <p className="text-xs text-muted-foreground">Since</p>
+                      <p className="font-semibold text-sm">{new Date(employee.joinDate).getFullYear()}</p>
+                    </div>
+                    
+                    {employee.location && (
+                      <div className="text-center">
+                        <MapPin className="w-4 h-4 text-success mx-auto mb-1" />
+                        <p className="text-xs text-muted-foreground">Location</p>
+                        <p className="font-semibold text-xs">{employee.location.split(',')[0]}</p>
+                      </div>
+                    )}
                   </div>
-                  
-                  {employee.location && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <MapPin className="w-3 h-3" />
-                      <span>{employee.location}</span>
+
+                  {/* Email */}
+                  <div className="text-center">
+                    <Mail className="w-4 h-4 text-warning mx-auto mb-1" />
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="font-semibold text-xs">{employee.email}</p>
+                  </div>
+
+                  {/* QR Code */}
+                  {showQR && (
+                    <div className="flex justify-center pt-2">
+                      <div className="p-2 bg-white rounded-lg shadow-md">
+                        <QRCode
+                          value={qrData}
+                          size={80}
+                          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="text-center p-2 bg-primary/10 rounded">
-                    <div className="font-bold text-primary">{employee.stats.videos}</div>
-                    <div className="text-xs text-muted-foreground">Videos</div>
-                  </div>
-                  <div className="text-center p-2 bg-accent/10 rounded">
-                    <div className="font-bold text-accent">{employee.stats.tasks}</div>
-                    <div className="text-xs text-muted-foreground">Tasks</div>
-                  </div>
-                </div>
-
-                {/* QR Code for Portrait */}
-                {showQR && (
-                  <div className="flex justify-center pt-2">
-                    <div className="p-2 bg-white rounded-lg shadow-md">
-                      <QRCode
-                        value={qrData}
-                        size={60}
-                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -368,7 +359,7 @@ END:VCARD`;
           )}
         </Card>
 
-        {/* Back Side - Perfectly Fitted */}
+        {/* Back Side - QR Code Focus */}
         <Card className={cn(
           "absolute inset-0 backface-hidden rotate-y-180 overflow-hidden",
           "bg-gradient-to-br from-accent/20 to-primary/5",
@@ -376,145 +367,36 @@ END:VCARD`;
         )}>
           {/* Header */}
           <div className="h-12 bg-gradient-to-r from-accent to-primary text-white flex items-center justify-center">
-            <h3 className="font-bold text-sm">Contact Information</h3>
+            <h3 className="font-bold text-sm">{employee.name} - Profile</h3>
           </div>
 
-          {/* Content - Perfectly Organized */}
-          <div className="flex-1 p-3 flex flex-col justify-between" style={{ height: 'calc(100% - 48px)' }}>
-            {isLandscape ? (
-              // Landscape Back Layout
-              <div className="flex h-full gap-3">
-                {/* Left - Contact Info */}
-                <div className="flex-1 flex flex-col justify-between">
-                  <div className="text-center mb-2">
-                    <p className="font-semibold text-sm leading-tight">{employee.name}</p>
-                    <p className="text-xs text-muted-foreground leading-tight">{employee.role}</p>
-                  </div>
-                  
-                  <div className="space-y-1.5 flex-1">
-                    <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
-                      <Mail className="w-3 h-3 text-primary flex-shrink-0" />
-                      <span className="truncate">{employee.email}</span>
-                    </div>
-                    
-                    {employee.phone && (
-                      <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
-                        <Phone className="w-3 h-3 text-accent flex-shrink-0" />
-                        <span>{employee.phone}</span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
-                      <Shield className="w-3 h-3 text-primary flex-shrink-0" />
-                      <span className="font-mono">{employee.employeeId}</span>
-                    </div>
-
-                    {employee.location && (
-                      <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
-                        <MapPin className="w-3 h-3 text-success flex-shrink-0" />
-                        <span className="truncate">{employee.location}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-1 mt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-xs p-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        downloadVCard();
-                      }}
-                    >
-                      <Download className="w-3 h-3" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-xs p-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        shareProfile();
-                      }}
-                    >
-                      <Share2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Right - QR Code */}
-                {showQR && (
-                  <div className="w-24 flex flex-col items-center justify-center">
-                    <div className="p-1.5 bg-white rounded-lg shadow-md">
-                      <QRCode
-                        value={qrData}
-                        size={80}
-                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground text-center mt-1 leading-tight">
-                      Scan for profile
-                    </p>
-                    <Button 
-                      variant="default" 
-                      size="sm" 
-                      className="w-full mt-1 bg-primary hover:bg-primary-hover text-xs p-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(`/profile/${employee.id}`, '_blank');
-                      }}
-                    >
-                      <Eye className="w-3 h-3" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              // Portrait Back Layout
-              <div className="flex flex-col h-full justify-between">
-                <div className="text-center mb-3">
-                  <p className="font-semibold">{employee.name}</p>
-                  <p className="text-sm text-muted-foreground">{employee.role}</p>
+          {/* QR Code Centered */}
+          <div className="flex-1 flex flex-col items-center justify-center p-6">
+            {showQR && (
+              <div className="text-center">
+                <div className="p-4 bg-white rounded-xl shadow-lg mb-4">
+                  <QRCode
+                    value={qrData}
+                    size={isLandscape ? 140 : 160}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  />
                 </div>
                 
-                <div className="space-y-3 flex-1">
-                  <div className="flex items-center gap-3 p-2 bg-background/50 rounded">
-                    <Mail className="w-4 h-4 text-primary" />
-                    <span className="text-sm">{employee.email}</span>
-                  </div>
-                  
-                  {employee.phone && (
-                    <div className="flex items-center gap-3 p-2 bg-background/50 rounded">
-                      <Phone className="w-4 h-4 text-accent" />
-                      <span className="text-sm">{employee.phone}</span>
-                    </div>
-                  )}
-
-                  {/* QR Code */}
-                  {showQR && (
-                    <div className="flex flex-col items-center gap-2 mt-4">
-                      <div className="p-3 bg-white rounded-lg shadow-lg">
-                        <QRCode
-                          value={qrData}
-                          size={120}
-                          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground text-center">
-                        Scan to view profile
-                      </p>
-                    </div>
-                  )}
+                <div className="space-y-2">
+                  <p className="font-semibold text-sm">Scan for Full Profile</p>
+                  <p className="text-xs text-muted-foreground">
+                    Use your mobile camera to scan
+                  </p>
+                  <p className="text-xs font-mono text-muted-foreground">
+                    ID: {employee.employeeId}
+                  </p>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-2">
+                {/* Quick Actions */}
+                <div className="flex gap-2 mt-4 justify-center">
                   <Button 
                     variant="outline" 
-                    size="sm" 
-                    className="flex-1"
+                    size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadVCard();
@@ -524,31 +406,18 @@ END:VCARD`;
                     Download
                   </Button>
                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
+                    variant="default" 
+                    size="sm"
+                    className="bg-primary hover:bg-primary-hover"
                     onClick={(e) => {
                       e.stopPropagation();
-                      shareProfile();
+                      window.open(`/profile/${employee.id}`, '_blank');
                     }}
                   >
-                    <Share2 className="w-3 h-3 mr-1" />
-                    Share
+                    <Eye className="w-3 h-3 mr-1" />
+                    View Profile
                   </Button>
                 </div>
-                
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="w-full mt-2 bg-primary hover:bg-primary-hover"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`/profile/${employee.id}`, '_blank');
-                  }}
-                >
-                  <Eye className="w-3 h-3 mr-1" />
-                  View Profile
-                </Button>
               </div>
             )}
           </div>
