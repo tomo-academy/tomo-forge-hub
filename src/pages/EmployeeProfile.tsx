@@ -52,7 +52,7 @@ const EmployeeProfile = () => {
     );
   }
 
-  const qrData = `https://tomoacademy.com/profile/${employee.id}`;
+  const qrData = `https://tomo-forge-hub.vercel.app/profile/${employee.id}`;
 
   const getAvailabilityColor = () => {
     switch (employee.availability) {

@@ -313,8 +313,8 @@ const EnhancedTeam = () => {
       <Navbar />
       
       <LoadingSpinnerOverlay isLoading={isLoading}>
-        <div className="pt-24 px-4 pb-12">
-          <div className="max-w-7xl mx-auto space-y-8">
+        <div className="pt-24 px-4 pb-12 min-h-screen">
+          <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -341,7 +341,7 @@ const EnhancedTeam = () => {
             </div>
 
             {/* Team Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatsCard
                 title="Total Members"
                 value={employees.length}

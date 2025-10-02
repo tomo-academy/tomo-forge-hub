@@ -103,8 +103,8 @@ const Tasks = () => {
       <Navbar />
       
       <LoadingSpinnerOverlay isLoading={isLoading}>
-        <div className="pt-24 px-4 pb-12">
-          <div className="max-w-[1600px] mx-auto space-y-8">
+        <div className="pt-24 px-4 pb-12 min-h-screen">
+          <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -131,7 +131,7 @@ const Tasks = () => {
             </div>
 
             {/* Real-time Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
               <StatsCard
                 title="Backlog"
                 value={taskStats?.backlog || 0}
@@ -190,9 +190,9 @@ const Tasks = () => {
             </div>
 
             {/* Kanban Board */}
-            <div className="flex gap-4 overflow-x-auto pb-4">
+            <div className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5 md:overflow-x-visible">
               {columns.map((column) => (
-                <div key={column.id} className="flex-shrink-0 w-80">
+                <div key={column.id} className="flex-shrink-0 w-72 md:w-auto md:flex-shrink">
                   <AnimatedCard className="p-4 h-full">
                     {/* Column Header */}
                     <div className="flex items-center justify-between mb-4">

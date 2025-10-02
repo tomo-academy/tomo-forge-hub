@@ -104,7 +104,7 @@ const Home = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mt-16 md:mt-20">
             {stats.map((stat, index) => (
               <AnimatedCard key={index} hoverEffect="glow" className="p-6 text-center bg-card/50 backdrop-blur border-border">
                 <div className="text-4xl font-bold text-primary">
@@ -136,7 +136,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {features.map((feature, index) => (
               <AnimatedCard 
                 key={index}

@@ -104,8 +104,8 @@ const EnhancedDashboard = () => {
       <Navbar />
       
       <LoadingSpinnerOverlay isLoading={isLoading}>
-        <div className="pt-24 px-4 pb-12">
-          <div className="max-w-7xl mx-auto space-y-8">
+        <div className="pt-24 px-4 pb-12 min-h-screen">
+          <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -129,7 +129,7 @@ const EnhancedDashboard = () => {
             </div>
 
             {/* Live Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               <StatsCard
                 title="Subscribers"
                 value={channelInfo?.subscriberCount || 125000}
@@ -171,7 +171,7 @@ const EnhancedDashboard = () => {
             </div>
 
             {/* Revenue & Performance */}
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               <GlowCard className="lg:col-span-1" glowColor="success">
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-4">
@@ -305,7 +305,7 @@ const EnhancedDashboard = () => {
             </div>
 
             {/* Main Content Grid */}
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               {/* Recent Activity */}
               <AnimatedCard className="lg:col-span-2" hoverEffect="lift">
                 <div className="p-6">
@@ -397,7 +397,7 @@ const EnhancedDashboard = () => {
                     </div>
                   </div>
                   
-                  <div className="grid md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {analytics.topVideos.slice(0, 3).map((video, index) => (
                       <AnimatedCard key={video.id} hoverEffect="scale">
                         <div className="relative aspect-video overflow-hidden bg-muted rounded-t-lg">

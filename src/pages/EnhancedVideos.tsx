@@ -67,8 +67,8 @@ const EnhancedVideos = () => {
       <Navbar />
       
       <LoadingSpinnerOverlay isLoading={isLoading}>
-        <div className="pt-24 px-4 pb-12">
-          <div className="max-w-7xl mx-auto space-y-8">
+        <div className="pt-24 px-4 pb-12 min-h-screen">
+          <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -92,7 +92,7 @@ const EnhancedVideos = () => {
             </div>
 
             {/* Live Stats Overview */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatsCard
                 title="Total Videos"
                 value={videos?.length || 234}
@@ -134,7 +134,7 @@ const EnhancedVideos = () => {
             </div>
 
             {/* Performance Analytics */}
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               <GlowCard className="lg:col-span-2" glowColor="primary">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-6">
@@ -229,7 +229,7 @@ const EnhancedVideos = () => {
             </div>
 
             {/* Videos Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredVideos.map((video, index) => (
                 <AnimatedCard 
                   key={video.id}

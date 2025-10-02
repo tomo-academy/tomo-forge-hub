@@ -162,8 +162,8 @@ const EnhancedResources = () => {
       <Navbar />
       
       <LoadingSpinnerOverlay isLoading={isLoading}>
-        <div className="pt-24 px-4 pb-12">
-          <div className="max-w-7xl mx-auto space-y-8">
+        <div className="pt-24 px-4 pb-12 min-h-screen">
+          <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -187,7 +187,7 @@ const EnhancedResources = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatsCard
                 title="Total Resources"
                 value={resourceStats?.total || 0}
@@ -266,7 +266,7 @@ const EnhancedResources = () => {
             </div>
 
             {/* Resources Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredResources.map((resource) => {
                 const TypeIcon = getTypeIcon(resource.type);
                 
@@ -414,7 +414,7 @@ const EnhancedResources = () => {
             <GlowCard glowColor="primary">
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-6">Resource Categories</h2>
-                <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {Object.entries(resourceStats?.byCategory || {}).map(([category, count]) => (
                     <AnimatedCard key={category} hoverEffect="glow" className="text-center p-4">
                       <div className="w-10 h-10 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center mx-auto mb-2">

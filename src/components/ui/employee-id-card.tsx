@@ -86,7 +86,7 @@ export function EmployeeIDCard({
   };
 
   // Create QR data that links to the profile page
-  const profileUrl = `${window.location.origin}/profile/${employee.id}`;
+  const profileUrl = `https://tomo-forge-hub.vercel.app/profile/${employee.id}`;
   const qrData = profileUrl;
 
   const downloadVCard = () => {
@@ -99,7 +99,7 @@ EMAIL:${employee.email}
 ${employee.phone ? `TEL:${employee.phone}` : ''}
 ${employee.location ? `ADR:;;${employee.location};;;;` : ''}
 NOTE:Employee ID: ${employee.employeeId} | Department: ${employee.department}
-URL:https://tomoacademy.com/team/${employee.id}
+URL:https://tomo-forge-hub.vercel.app/profile/${employee.id}
 END:VCARD`;
 
     const blob = new Blob([vcard], { type: 'text/vcard' });
@@ -119,7 +119,7 @@ END:VCARD`;
         await navigator.share({
           title: `${employee.name} - TOMO Academy`,
           text: `Check out ${employee.name}'s profile at TOMO Academy - ${employee.role}`,
-          url: `https://tomoacademy.com/team/${employee.id}`
+          url: `https://tomo-forge-hub.vercel.app/profile/${employee.id}`
         });
       } catch (err) {
         console.error('Error sharing:', err);
@@ -127,7 +127,7 @@ END:VCARD`;
     } else {
       // Fallback to copying URL
       try {
-        await navigator.clipboard.writeText(`https://tomoacademy.com/team/${employee.id}`);
+        await navigator.clipboard.writeText(`https://tomo-forge-hub.vercel.app/profile/${employee.id}`);
         // You could add a toast notification here
       } catch (err) {
         console.error('Failed to copy URL:', err);
@@ -368,91 +368,189 @@ END:VCARD`;
           )}
         </Card>
 
-        {/* Back Side */}
+        {/* Back Side - Perfectly Fitted */}
         <Card className={cn(
           "absolute inset-0 backface-hidden rotate-y-180 overflow-hidden",
           "bg-gradient-to-br from-accent/20 to-primary/5",
           premium && "shadow-2xl border-2 border-accent/20"
         )}>
-          <div className="p-4 h-full flex flex-col">
-            {/* Header */}
-            <div className="text-center mb-4">
-              <h3 className="font-bold text-lg">Contact Information</h3>
-              <p className="text-sm text-muted-foreground">{employee.name}</p>
-            </div>
+          {/* Header */}
+          <div className="h-12 bg-gradient-to-r from-accent to-primary text-white flex items-center justify-center">
+            <h3 className="font-bold text-sm">Contact Information</h3>
+          </div>
 
-            {/* Contact Details */}
-            <div className="space-y-3 flex-1">
-              <div className="flex items-center gap-3 p-2 bg-background/50 rounded">
-                <Mail className="w-4 h-4 text-primary" />
-                <span className="text-sm">{employee.email}</span>
-              </div>
-              
-              {employee.phone && (
-                <div className="flex items-center gap-3 p-2 bg-background/50 rounded">
-                  <Phone className="w-4 h-4 text-accent" />
-                  <span className="text-sm">{employee.phone}</span>
-                </div>
-              )}
-
-              {/* Large QR Code */}
-              {showQR && (
-                <div className="flex flex-col items-center gap-2 mt-4">
-                  <div className="p-3 bg-white rounded-lg shadow-lg">
-                    <QRCode
-                      value={qrData}
-                      size={isLandscape ? 120 : 160}
-                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                    />
+          {/* Content - Perfectly Organized */}
+          <div className="flex-1 p-3 flex flex-col justify-between" style={{ height: 'calc(100% - 48px)' }}>
+            {isLandscape ? (
+              // Landscape Back Layout
+              <div className="flex h-full gap-3">
+                {/* Left - Contact Info */}
+                <div className="flex-1 flex flex-col justify-between">
+                  <div className="text-center mb-2">
+                    <p className="font-semibold text-sm leading-tight">{employee.name}</p>
+                    <p className="text-xs text-muted-foreground leading-tight">{employee.role}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
-                    Scan to view full profile
-                  </p>
-                </div>
-              )}
-            </div>
+                  
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
+                      <Mail className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="truncate">{employee.email}</span>
+                    </div>
+                    
+                    {employee.phone && (
+                      <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
+                        <Phone className="w-3 h-3 text-accent flex-shrink-0" />
+                        <span>{employee.phone}</span>
+                      </div>
+                    )}
 
-            {/* Actions */}
-            <div className="flex gap-2 mt-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  downloadVCard();
-                }}
-              >
-                <Download className="w-3 h-3 mr-1" />
-                Download
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  shareProfile();
-                }}
-              >
-                <Share2 className="w-3 h-3 mr-1" />
-                Share
-              </Button>
-            </div>
-            
-            {/* View Details Button */}
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="w-full mt-2 bg-primary hover:bg-primary-hover"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowDetailModal(true);
-              }}
-            >
-              <Eye className="w-3 h-3 mr-1" />
-              View Full Details
-            </Button>
+                    <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
+                      <Shield className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="font-mono">{employee.employeeId}</span>
+                    </div>
+
+                    {employee.location && (
+                      <div className="flex items-center gap-2 p-1.5 bg-background/50 rounded text-xs">
+                        <MapPin className="w-3 h-3 text-success flex-shrink-0" />
+                        <span className="truncate">{employee.location}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-2 gap-1 mt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs p-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadVCard();
+                      }}
+                    >
+                      <Download className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs p-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        shareProfile();
+                      }}
+                    >
+                      <Share2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Right - QR Code */}
+                {showQR && (
+                  <div className="w-24 flex flex-col items-center justify-center">
+                    <div className="p-1.5 bg-white rounded-lg shadow-md">
+                      <QRCode
+                        value={qrData}
+                        size={80}
+                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center mt-1 leading-tight">
+                      Scan for profile
+                    </p>
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      className="w-full mt-1 bg-primary hover:bg-primary-hover text-xs p-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDetailModal(true);
+                      }}
+                    >
+                      <Eye className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Portrait Back Layout
+              <div className="flex flex-col h-full justify-between">
+                <div className="text-center mb-3">
+                  <p className="font-semibold">{employee.name}</p>
+                  <p className="text-sm text-muted-foreground">{employee.role}</p>
+                </div>
+                
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-3 p-2 bg-background/50 rounded">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <span className="text-sm">{employee.email}</span>
+                  </div>
+                  
+                  {employee.phone && (
+                    <div className="flex items-center gap-3 p-2 bg-background/50 rounded">
+                      <Phone className="w-4 h-4 text-accent" />
+                      <span className="text-sm">{employee.phone}</span>
+                    </div>
+                  )}
+
+                  {/* QR Code */}
+                  {showQR && (
+                    <div className="flex flex-col items-center gap-2 mt-4">
+                      <div className="p-3 bg-white rounded-lg shadow-lg">
+                        <QRCode
+                          value={qrData}
+                          size={120}
+                          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Scan to view profile
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadVCard();
+                    }}
+                  >
+                    <Download className="w-3 h-3 mr-1" />
+                    Download
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      shareProfile();
+                    }}
+                  >
+                    <Share2 className="w-3 h-3 mr-1" />
+                    Share
+                  </Button>
+                </div>
+                
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="w-full mt-2 bg-primary hover:bg-primary-hover"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetailModal(true);
+                  }}
+                >
+                  <Eye className="w-3 h-3 mr-1" />
+                  View Details
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
       </div>
