@@ -85,8 +85,8 @@ export function EmployeeIDCard({
     }
   };
 
-  // Create QR data that links to the test profile page (working)
-  const profileUrl = `https://tomo-forge-hub.vercel.app/test-profile`;
+  // Create QR data that links to individual profile page
+  const profileUrl = `https://tomo-forge-hub.vercel.app/profile/${employee.id}`;
   const qrData = profileUrl;
 
   const downloadVCard = () => {
@@ -359,67 +359,113 @@ END:VCARD`;
           )}
         </Card>
 
-        {/* Back Side - QR Code Focus */}
+        {/* Back Side - Perfect QR with TOMO Branding */}
         <Card className={cn(
           "absolute inset-0 backface-hidden rotate-y-180 overflow-hidden",
           "bg-gradient-to-br from-accent/20 to-primary/5",
           premium && "shadow-2xl border-2 border-accent/20"
         )}>
-          {/* Header */}
-          <div className="h-12 bg-gradient-to-r from-accent to-primary text-white flex items-center justify-center">
-            <h3 className="font-bold text-sm">{employee.name} - Profile</h3>
+          {/* TOMO Academy Header */}
+          <div className="h-16 bg-gradient-to-r from-primary to-accent text-white flex items-center justify-center relative">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/TOMO.svg" 
+                  alt="TOMO Academy"
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling!.style.display = 'block';
+                  }}
+                />
+                <Youtube className="w-6 h-6 text-primary hidden" />
+              </div>
+              <div className="text-center">
+                <h3 className="font-bold text-base leading-tight">TOMO Academy</h3>
+                <p className="text-xs opacity-90 leading-tight">Digital Platform</p>
+              </div>
+            </div>
+            
+            {/* Decorative elements */}
+            <div className="absolute top-2 right-4 w-2 h-2 bg-white/30 rounded-full animate-pulse" />
+            <div className="absolute bottom-2 left-4 w-1 h-1 bg-white/40 rounded-full animate-ping" />
           </div>
 
-          {/* QR Code Centered */}
-          <div className="flex-1 flex flex-col items-center justify-center p-6">
+          {/* Main Content - QR Code Focus */}
+          <div className="flex-1 flex flex-col items-center justify-center p-4" style={{ height: 'calc(100% - 64px - 32px)' }}>
             {showQR && (
-              <div className="text-center">
-                <div className="p-4 bg-white rounded-xl shadow-lg mb-4">
-                  <QRCode
-                    value={qrData}
-                    size={isLandscape ? 140 : 160}
-                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                  />
+              <div className="text-center w-full">
+                {/* Employee Name */}
+                <div className="mb-4">
+                  <h2 className="font-bold text-lg text-foreground">{employee.name}</h2>
+                  <p className="text-sm text-muted-foreground">{employee.role}</p>
+                  <p className="text-xs font-mono text-primary mt-1">{employee.employeeId}</p>
+                </div>
+
+                {/* Large QR Code */}
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-white rounded-xl shadow-lg border-2 border-primary/10">
+                    <QRCode
+                      value={qrData}
+                      size={isLandscape ? 120 : 140}
+                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    />
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <p className="font-semibold text-sm">Scan for Full Profile</p>
+                {/* Instructions */}
+                <div className="space-y-1 mb-4">
+                  <p className="font-semibold text-sm text-foreground">Scan for Full Profile</p>
                   <p className="text-xs text-muted-foreground">
-                    Use your mobile camera to scan
-                  </p>
-                  <p className="text-xs font-mono text-muted-foreground">
-                    ID: {employee.employeeId}
+                    Use mobile camera to view complete details
                   </p>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="flex gap-2 mt-4 justify-center">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      downloadVCard();
-                    }}
-                  >
-                    <Download className="w-3 h-3 mr-1" />
-                    Download
-                  </Button>
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    className="bg-primary hover:bg-primary-hover"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                        window.open(`/test-profile`, '_blank');
-                    }}
-                  >
-                    <Eye className="w-3 h-3 mr-1" />
-                    View Profile
-                  </Button>
+                {/* Quick Contact */}
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="flex items-center justify-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    {employee.email.split('@')[0]}@...
+                  </p>
+                  {employee.location && (
+                    <p className="flex items-center justify-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {employee.location.split(',')[0]}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Footer with Actions */}
+          <div className="h-8 bg-gradient-to-r from-primary/10 to-accent/10 border-t border-border flex items-center justify-center">
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  downloadVCard();
+                }}
+              >
+                <Download className="w-3 h-3 mr-1" />
+                Download
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-6 px-2 text-xs text-primary hover:text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(`/profile/${employee.id}`, '_blank');
+                }}
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                View Profile
+              </Button>
+            </div>
           </div>
         </Card>
       </div>

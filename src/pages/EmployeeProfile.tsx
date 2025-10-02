@@ -16,7 +16,7 @@ import {
   Building2, Users, Target, Activity
 } from "lucide-react";
 
-// Hardcoded employee data to avoid import issues
+// Complete employee data for all 14 members
 const employeeData = [
   {
     id: "kanish-sj",
@@ -46,7 +46,7 @@ const employeeData = [
     location: "Bangalore, India",
     availability: "busy",
     stats: { videos: 156, tasks: 89, rating: 4.8, projects: 45 },
-    bio: "Multi-talented video editor and UI designer."
+    bio: "Multi-talented video editor and UI designer with expertise in creating engaging educational content."
   },
   {
     id: "aditya-chaurasiya",
@@ -61,7 +61,7 @@ const employeeData = [
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 134, tasks: 76, rating: 4.7, projects: 38 },
-    bio: "Creative video editor specializing in social media content."
+    bio: "Creative video editor specializing in social media content and cross-platform optimization."
   },
   {
     id: "kavyashree",
@@ -76,7 +76,157 @@ const employeeData = [
     location: "Hyderabad, India",
     availability: "available",
     stats: { videos: 98, tasks: 67, rating: 4.6, projects: 29 },
-    bio: "Talented video editor and content creator."
+    bio: "Talented video editor and content creator with a passion for storytelling."
+  },
+  {
+    id: "monika",
+    name: "Monika",
+    role: "Video Editor & Graphics Designer",
+    department: "Content Production",
+    email: "monika@tomoacademy.com",
+    phone: "+91 98765 43214",
+    employeeId: "TOMO-005",
+    joinDate: "2022-01-20",
+    avatar: "M",
+    location: "Chennai, India",
+    availability: "busy",
+    stats: { videos: 87, tasks: 54, rating: 4.5, projects: 31 },
+    bio: "Creative video editor and graphics designer specializing in visual storytelling."
+  },
+  {
+    id: "ajay-krithick",
+    name: "Ajay Krithick",
+    role: "Content Strategist & Script Writer",
+    department: "Content Strategy",
+    email: "ajay.krithick@tomoacademy.com",
+    phone: "+91 98765 43215",
+    employeeId: "TOMO-006",
+    joinDate: "2021-03-10",
+    avatar: "AK",
+    location: "Mumbai, India",
+    availability: "available",
+    stats: { videos: 89, tasks: 134, rating: 4.7, projects: 32 },
+    bio: "Content strategist with a passion for creating engaging educational material."
+  },
+  {
+    id: "haridharuson-lj",
+    name: "Haridharuson L.J",
+    role: "Technical Writer & Research Analyst",
+    department: "Content Strategy",
+    email: "haridharuson.lj@tomoacademy.com",
+    phone: "+91 98765 43216",
+    employeeId: "TOMO-007",
+    joinDate: "2021-07-05",
+    avatar: "HL",
+    location: "Coimbatore, India",
+    availability: "available",
+    stats: { videos: 45, tasks: 98, rating: 4.6, projects: 28 },
+    bio: "Technical writer and research analyst specializing in emerging technologies."
+  },
+  {
+    id: "nithish",
+    name: "Nithish",
+    role: "Senior Full Stack Developer",
+    department: "Technology",
+    email: "nithish@tomoacademy.com",
+    phone: "+91 98765 43217",
+    employeeId: "TOMO-008",
+    joinDate: "2020-08-20",
+    avatar: "N",
+    location: "Bangalore, India",
+    availability: "busy",
+    stats: { videos: 12, tasks: 156, rating: 4.8, projects: 42 },
+    bio: "Senior full-stack developer with expertise in modern web technologies."
+  },
+  {
+    id: "dev",
+    name: "Dev",
+    role: "Full Stack Developer",
+    department: "Technology",
+    email: "dev@tomoacademy.com",
+    phone: "+91 98765 43218",
+    employeeId: "TOMO-009",
+    joinDate: "2022-05-01",
+    avatar: "D",
+    location: "Pune, India",
+    availability: "available",
+    stats: { videos: 8, tasks: 76, rating: 4.5, projects: 18 },
+    bio: "Full-stack developer specializing in modern web technologies and API development."
+  },
+  {
+    id: "raaj-nikitaa",
+    name: "Raaj Nikitaa",
+    role: "Lead Designer & Brand Manager",
+    department: "Design",
+    email: "raaj.nikitaa@tomoacademy.com",
+    phone: "+91 98765 43219",
+    employeeId: "TOMO-010",
+    joinDate: "2020-08-20",
+    avatar: "RN",
+    location: "Hyderabad, India",
+    availability: "available",
+    stats: { videos: 234, tasks: 98, rating: 4.9, projects: 67 },
+    bio: "Creative lead designer specializing in thumbnails, UI/UX, and brand identity."
+  },
+  {
+    id: "nithyasri",
+    name: "Nithyasri",
+    role: "Content Writer & Social Media Specialist",
+    department: "Marketing",
+    email: "nithyasri@tomoacademy.com",
+    phone: "+91 98765 43220",
+    employeeId: "TOMO-011",
+    joinDate: "2021-11-15",
+    avatar: "NS",
+    location: "Chennai, India",
+    availability: "available",
+    stats: { videos: 67, tasks: 89, rating: 4.6, projects: 34 },
+    bio: "Content writer and social media specialist focused on creating engaging content."
+  },
+  {
+    id: "indhumathi",
+    name: "Indhumathi",
+    role: "Marketing Manager & Content Planner",
+    department: "Marketing",
+    email: "indhumathi@tomoacademy.com",
+    phone: "+91 98765 43221",
+    employeeId: "TOMO-012",
+    joinDate: "2021-09-10",
+    avatar: "I",
+    location: "Coimbatore, India",
+    availability: "busy",
+    stats: { videos: 45, tasks: 112, rating: 4.7, projects: 29 },
+    bio: "Marketing manager with expertise in content planning and campaign management."
+  },
+  {
+    id: "keerthana",
+    name: "Keerthana",
+    role: "Content Verifier & Quality Analyst",
+    department: "Quality Assurance",
+    email: "keerthana@tomoacademy.com",
+    phone: "+91 98765 43222",
+    employeeId: "TOMO-013",
+    joinDate: "2022-03-01",
+    avatar: "KT",
+    location: "Chennai, India",
+    availability: "available",
+    stats: { videos: 189, tasks: 145, rating: 4.8, projects: 23 },
+    bio: "Content verifier and quality analyst ensuring all educational content meets high standards."
+  },
+  {
+    id: "prawin-krishnan",
+    name: "Prawin Krishnan",
+    role: "Finance Manager & Operations Head",
+    department: "Finance",
+    email: "prawin.krishnan@tomoacademy.com",
+    phone: "+91 98765 43223",
+    employeeId: "TOMO-014",
+    joinDate: "2020-11-01",
+    avatar: "PK",
+    location: "Mumbai, India",
+    availability: "available",
+    stats: { videos: 15, tasks: 87, rating: 4.9, projects: 19 },
+    bio: "Finance manager and operations head overseeing financial planning and operational efficiency."
   }
 ];
 
@@ -209,17 +359,18 @@ END:VCARD`;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header - Mobile Optimized */}
       <div className="bg-gradient-to-r from-primary to-accent text-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+          {/* Navigation */}
+          <div className="flex items-center gap-3 mb-6">
             <Link to="/team">
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
             
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden">
               <img 
                 src="/TOMO.svg" 
                 alt="TOMO Academy"
@@ -232,29 +383,30 @@ END:VCARD`;
               <Youtube className="w-6 h-6 text-primary hidden" />
             </div>
             
-            <div>
-              <h1 className="text-2xl font-bold">TOMO Academy</h1>
-              <p className="text-white/90">Employee Profile</p>
+            <div className="flex-1">
+              <h1 className="text-xl md:text-2xl font-bold">TOMO Academy</h1>
+              <p className="text-white/90 text-sm">Employee Profile</p>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-start gap-6">
+          {/* Employee Info - Mobile Stacked */}
+          <div className="text-center">
             {/* Employee Avatar */}
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-4xl border-4 border-white shadow-lg">
+            <div className="relative inline-block mb-4">
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-2xl md:text-4xl border-4 border-white shadow-lg">
                 {employee.avatar || employee.name.split(' ').map((n: string) => n[0]).join('')}
               </div>
-              <div className={`absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-4 border-white ${
+              <div className={`absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full border-3 md:border-4 border-white ${
                 employee.availability === 'available' ? 'bg-success' :
                 employee.availability === 'busy' ? 'bg-warning' : 'bg-muted'
               }`} />
             </div>
 
             {/* Basic Info */}
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{employee.name}</h1>
-              <p className="text-xl text-white/90 mb-3">{employee.role}</p>
-              <div className="flex flex-wrap gap-2 mb-4">
+            <div className="mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2">{employee.name}</h1>
+              <p className="text-lg md:text-xl text-white/90 mb-3">{employee.role}</p>
+              <div className="flex flex-wrap justify-center gap-2">
                 <Badge variant="secondary" className="bg-white/20 text-white">
                   {employee.department}
                 </Badge>
@@ -262,59 +414,59 @@ END:VCARD`;
                   {employee.availability}
                 </Badge>
                 <Badge variant="outline" className="border-white/30 text-white">
-                  ID: {employee.employeeId}
+                  {employee.employeeId}
                 </Badge>
               </div>
-              
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{employee.stats.videos}</div>
-                  <div className="text-sm text-white/80">Videos</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{employee.stats.tasks}</div>
-                  <div className="text-sm text-white/80">Tasks</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{employee.stats.projects}</div>
-                  <div className="text-sm text-white/80">Projects</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{employee.stats.rating}</div>
-                  <div className="text-sm text-white/80">Rating</div>
-                </div>
+            </div>
+            
+            {/* Quick Stats - Mobile Friendly */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-xl md:text-2xl font-bold">{employee.stats.videos}</div>
+                <div className="text-sm text-white/80">Videos</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl md:text-2xl font-bold">{employee.stats.tasks}</div>
+                <div className="text-sm text-white/80">Tasks</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl md:text-2xl font-bold">{employee.stats.projects}</div>
+                <div className="text-sm text-white/80">Projects</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl md:text-2xl font-bold">{employee.stats.rating}</div>
+                <div className="text-sm text-white/80">Rating</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Button onClick={downloadVCard} className="gap-2">
+      {/* Content - Mobile Optimized */}
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
+        {/* Action Buttons - Mobile Friendly */}
+        <div className="grid grid-cols-2 md:flex md:flex-wrap gap-3 justify-center">
+          <Button onClick={downloadVCard} className="gap-2" size="sm">
             <Download className="w-4 h-4" />
-            Download Contact
+            Download
           </Button>
-          <Button variant="outline" onClick={shareProfile} className="gap-2">
+          <Button variant="outline" onClick={shareProfile} className="gap-2" size="sm">
             <Share2 className="w-4 h-4" />
-            Share Profile
+            Share
           </Button>
-          <Button variant="outline" onClick={() => navigator.clipboard.writeText(employee.email)} className="gap-2">
+          <Button variant="outline" onClick={() => navigator.clipboard.writeText(employee.email)} className="gap-2" size="sm">
             <Copy className="w-4 h-4" />
             Copy Email
           </Button>
           <Link to="/team">
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" size="sm">
               <Users className="w-4 h-4" />
-              View Team
+              Back to Team
             </Button>
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* Main Info */}
           <div className="md:col-span-2 space-y-6">
             {/* About */}
