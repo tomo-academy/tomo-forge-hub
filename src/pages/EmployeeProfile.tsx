@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
-import { employees } from "@/data/employees";
 import QRCode from "react-qr-code";
 import { 
   ArrowLeft, Mail, Phone, MapPin, Calendar, Star, 
@@ -17,17 +16,82 @@ import {
   Building2, Users, Target, Activity
 } from "lucide-react";
 
+// Hardcoded employee data to avoid import issues
+const employeeData = [
+  {
+    id: "kanish-sj",
+    name: "Kanish SJ",
+    role: "Lead Developer & Channel Manager",
+    department: "Technology",
+    email: "kanish.sj@tomoacademy.com",
+    phone: "+91 98765 43210",
+    employeeId: "TOMO-001",
+    joinDate: "2020-01-15",
+    avatar: "KS",
+    location: "Chennai, India",
+    availability: "available",
+    stats: { videos: 28, tasks: 165, rating: 4.9, projects: 24 },
+    bio: "Full-stack developer and channel manager leading the technical vision for TOMO Academy."
+  },
+  {
+    id: "kamesh",
+    name: "Kamesh",
+    role: "Senior Video Editor & UI Designer",
+    department: "Content Production",
+    email: "kamesh@tomoacademy.com",
+    phone: "+91 98765 43211",
+    employeeId: "TOMO-002",
+    joinDate: "2020-06-01",
+    avatar: "K",
+    location: "Bangalore, India",
+    availability: "busy",
+    stats: { videos: 156, tasks: 89, rating: 4.8, projects: 45 },
+    bio: "Multi-talented video editor and UI designer."
+  },
+  {
+    id: "aditya-chaurasiya",
+    name: "Aditya Chaurasiya",
+    role: "Video Editor & Social Media Manager",
+    department: "Content Production",
+    email: "aditya.chaurasiya@tomoacademy.com",
+    phone: "+91 98765 43212",
+    employeeId: "TOMO-003",
+    joinDate: "2021-02-10",
+    avatar: "AC",
+    location: "Mumbai, India",
+    availability: "available",
+    stats: { videos: 134, tasks: 76, rating: 4.7, projects: 38 },
+    bio: "Creative video editor specializing in social media content."
+  },
+  {
+    id: "kavyashree",
+    name: "Kavyashree",
+    role: "Video Editor & Content Creator",
+    department: "Content Production",
+    email: "kavyashree@tomoacademy.com",
+    phone: "+91 98765 43213",
+    employeeId: "TOMO-004",
+    joinDate: "2021-08-15",
+    avatar: "KV",
+    location: "Hyderabad, India",
+    availability: "available",
+    stats: { videos: 98, tasks: 67, rating: 4.6, projects: 29 },
+    bio: "Talented video editor and content creator."
+  }
+];
+
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
   const [employee, setEmployee] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('Profile page loaded');
     console.log('Looking for employee ID:', employeeId);
-    console.log('Available employees:', employees.map(emp => emp.id));
+    console.log('Available employees:', employeeData.map(emp => emp.id));
     
     // Find employee by ID
-    const foundEmployee = employees.find(emp => emp.id === employeeId);
+    const foundEmployee = employeeData.find(emp => emp.id === employeeId);
     console.log('Found employee:', foundEmployee);
     
     setEmployee(foundEmployee);
@@ -50,7 +114,7 @@ const EmployeeProfile = () => {
           <div className="mb-6">
             <h3 className="font-semibold mb-3">Available Employee IDs:</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              {employees.map(emp => (
+              {employeeData.map(emp => (
                 <Link 
                   key={emp.id} 
                   to={`/profile/${emp.id}`}
@@ -70,7 +134,7 @@ const EmployeeProfile = () => {
                 View All Team Members
               </Button>
             </Link>
-            <Link to={`/profile/${employees[0].id}`}>
+            <Link to={`/profile/${employeeData[0].id}`}>
               <Button variant="outline">
                 <Eye className="w-4 h-4 mr-2" />
                 View Sample Profile

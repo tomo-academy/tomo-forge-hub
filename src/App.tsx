@@ -15,6 +15,7 @@ import Tasks from "./pages/Tasks";
 import Resources from "./pages/Resources";
 import EnhancedResources from "./pages/EnhancedResources";
 import EmployeeProfile from "./pages/EmployeeProfile";
+import TestProfile from "./pages/TestProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/resources" element={<EnhancedResources />} />
             <Route path="/resources/classic" element={<Resources />} />
             <Route path="/profile/:employeeId" element={<EmployeeProfile />} />
+            <Route path="/test-profile" element={<TestProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -85,8 +85,8 @@ export function EmployeeIDCard({
     }
   };
 
-  // Create QR data that links to the profile page
-  const profileUrl = `https://tomo-forge-hub.vercel.app/profile/${employee.id}`;
+  // Create QR data that links to the test profile page (working)
+  const profileUrl = `https://tomo-forge-hub.vercel.app/test-profile`;
   const qrData = profileUrl;
 
   const downloadVCard = () => {
@@ -411,7 +411,7 @@ END:VCARD`;
                     className="bg-primary hover:bg-primary-hover"
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`/profile/${employee.id}`, '_blank');
+                        window.open(`/test-profile`, '_blank');
                     }}
                   >
                     <Eye className="w-3 h-3 mr-1" />

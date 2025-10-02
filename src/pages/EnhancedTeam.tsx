@@ -333,7 +333,7 @@ const EnhancedTeam = () => {
                 <Button 
                   variant="outline" 
                   className="gap-2"
-                  onClick={() => window.open('/profile/kanish-sj', '_blank')}
+                  onClick={() => window.open('/test-profile', '_blank')}
                 >
                   <Eye className="w-4 h-4" />
                   Test Profile
