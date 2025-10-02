@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NotificationDropdown } from "@/components/ui/notifications";
 import { Menu, X, Youtube } from "lucide-react";
 
 const Navbar = () => {
@@ -33,6 +35,8 @@ const Navbar = () => {
             <Link to="/resources" className="text-muted-foreground hover:text-foreground transition-fast">
               Resources
             </Link>
+            <NotificationDropdown />
+            <ThemeToggle />
             <Button variant="default" size="sm" className="bg-primary hover:bg-primary-hover shadow-glow">
               Login
             </Button>
