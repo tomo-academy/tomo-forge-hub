@@ -1,56 +1,97 @@
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/ui/stats-card";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { LoadingSpinner, LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
+import { ProgressRing, DonutChart, TrendLine } from "@/components/ui/charts";
 import Navbar from "@/components/Navbar";
 import { 
   Users, Video, CheckCircle, TrendingUp, 
   Calendar, Clock, Award, PlayCircle, Eye,
   ThumbsUp, MessageSquare, DollarSign,
-  BarChart3, Zap, Target, Activity
+  BarChart3, Zap, Target, Activity, Database,
+  Wifi, RefreshCw
 } from "lucide-react";
 import { useChannelInfo, useYouTubeAnalytics, youtubeService } from "@/services/youtube";
+import { firebaseService, FirebaseRevenue, FirebaseActivity, FirebaseAnalytics } from "@/services/firebase";
 
 const EnhancedDashboard = () => {
+  // State for Firebase real-time data
+  const [revenue, setRevenue] = useState<FirebaseRevenue | null>(null);
+  const [activities, setActivities] = useState<FirebaseActivity[]>([]);
+  const [firebaseAnalytics, setFirebaseAnalytics] = useState<FirebaseAnalytics | null>(null);
+  const [isFirebaseLoading, setIsFirebaseLoading] = useState(true);
+
   // Fetch live YouTube data
   const { data: channelInfo, isLoading: channelLoading } = useQuery(useChannelInfo());
   const { data: analytics, isLoading: analyticsLoading } = useQuery(useYouTubeAnalytics());
 
-  const isLoading = channelLoading || analyticsLoading;
+  const isLoading = channelLoading || analyticsLoading || isFirebaseLoading;
 
-  // Mock real-time data for team activities
-  const recentActivity = [
-    {
-      user: "Kanish SJ",
-      action: "uploaded new video",
-      title: "Firebase Tutorial - Part 5",
-      time: "2 hours ago",
-      avatar: "KS",
-    },
-    {
-      user: "Kamesh",
-      action: "completed design task",
-      title: "Thumbnail for Tech Review",
-      time: "4 hours ago",
-      avatar: "K",
-    },
-    {
-      user: "Ajay Krithick",
-      action: "reviewed and approved",
-      title: "Script: AI in Education",
-      time: "5 hours ago",
-      avatar: "AK",
-    },
-    {
-      user: "Nithish",
-      action: "started working on",
-      title: "Video Editing Project",
-      time: "6 hours ago",
-      avatar: "N",
-    },
-  ];
+  // Initialize Firebase data and set up real-time listeners
+  useEffect(() => {
+    const initializeFirebaseData = async () => {
+      try {
+        // Initialize default data if needed
+        await firebaseService.initializeDefaultData();
+        
+        // Fetch initial data
+        const [revenueData, activitiesData, analyticsData] = await Promise.all([
+          firebaseService.getCurrentMonthRevenue(),
+          firebaseService.getRecentActivities(10),
+          firebaseService.getTodayAnalytics()
+        ]);
+
+        setRevenue(revenueData);
+        setActivities(activitiesData);
+        setFirebaseAnalytics(analyticsData);
+      } catch (error) {
+        console.error('Failed to initialize Firebase data:', error);
+      } finally {
+        setIsFirebaseLoading(false);
+      }
+    };
+
+    initializeFirebaseData();
+
+    // Set up real-time listeners
+    const unsubscribeActivities = firebaseService.onActivitiesChange(setActivities);
+    const unsubscribeAnalytics = firebaseService.onAnalyticsChange(setFirebaseAnalytics);
+
+    return () => {
+      unsubscribeActivities();
+      unsubscribeAnalytics();
+    };
+  }, []);
+
+  // Format Firebase activities for display
+  const formatActivities = (activities: FirebaseActivity[]) => {
+    return activities.map(activity => ({
+      user: activity.userName,
+      action: activity.action,
+      title: activity.title,
+      time: formatTimeAgo(activity.timestamp.toDate()),
+      avatar: activity.userName.split(' ').map(n => n[0]).join(''),
+      type: activity.type
+    }));
+  };
+
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
+    return 'Just now';
+  };
+
+  const recentActivity = formatActivities(activities);
 
   const upcomingDeadlines = [
     { task: "Edit: React Tutorial Series", due: "Today, 5:00 PM", priority: "high" },
@@ -139,26 +180,49 @@ const EnhancedDashboard = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-bold">Monthly Revenue</h3>
-                      <p className="text-sm text-muted-foreground">Live tracking</p>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Database className="w-3 h-3" />
+                        Firebase Live Data
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div className="text-3xl font-bold text-success">
-                      ${analytics?.revenue?.toLocaleString() || '3,247'}
+                      ${revenue?.totalRevenue?.toLocaleString() || '3,247'}
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Ad Revenue</span>
-                        <span className="font-medium">$2,156</span>
+                        <span className="font-medium">${revenue?.adRevenue?.toLocaleString() || '2,156'}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Sponsorships</span>
-                        <span className="font-medium">$891</span>
+                        <span className="font-medium">${revenue?.sponsorships?.toLocaleString() || '891'}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Memberships</span>
-                        <span className="font-medium">$200</span>
+                        <span className="font-medium">${revenue?.memberships?.toLocaleString() || '200'}</span>
                       </div>
+                      {revenue?.courses && revenue.courses > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span>Courses</span>
+                          <span className="font-medium">${revenue.courses.toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Revenue Chart */}
+                    <div className="pt-4 border-t border-border">
+                      <DonutChart
+                        data={[
+                          { label: 'Ad Revenue', value: revenue?.adRevenue || 2156, color: 'hsl(var(--success))' },
+                          { label: 'Sponsorships', value: revenue?.sponsorships || 891, color: 'hsl(var(--primary))' },
+                          { label: 'Memberships', value: revenue?.memberships || 200, color: 'hsl(var(--accent))' },
+                          { label: 'Courses', value: revenue?.courses || 0, color: 'hsl(var(--warning))' }
+                        ]}
+                        size={120}
+                        showLabels={false}
+                      />
                     </div>
                   </div>
                 </div>
@@ -170,28 +234,71 @@ const EnhancedDashboard = () => {
                     <BarChart3 className="w-5 h-5 text-primary" />
                     <h2 className="text-2xl font-bold">Performance Metrics</h2>
                     <div className="ml-auto flex items-center gap-2 text-xs text-success">
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                      Live
+                      <Wifi className="w-3 h-3 animate-pulse" />
+                      Firebase Live
                     </div>
                   </div>
                   
                   <div className="grid md:grid-cols-3 gap-6">
-                    <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10">
+                    <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 relative overflow-hidden">
                       <div className="text-3xl font-bold text-primary mb-2">
-                        {analytics?.topVideos?.length || 8}
+                        {firebaseAnalytics?.videosPublished || channelInfo?.videoCount || 234}
                       </div>
-                      <p className="text-sm text-muted-foreground">Videos This Week</p>
+                      <p className="text-sm text-muted-foreground">Total Videos</p>
+                      <div className="absolute top-2 right-2">
+                        <ProgressRing 
+                          value={firebaseAnalytics?.videosPublished || 234} 
+                          max={300} 
+                          size={40} 
+                          strokeWidth={3}
+                        />
+                      </div>
                     </div>
-                    <div className="text-center p-4 rounded-lg bg-gradient-to-br from-accent/10 to-success/10">
-                      <div className="text-3xl font-bold text-accent mb-2">47</div>
+                    <div className="text-center p-4 rounded-lg bg-gradient-to-br from-accent/10 to-success/10 relative overflow-hidden">
+                      <div className="text-3xl font-bold text-accent mb-2">
+                        {firebaseAnalytics?.tasksCompleted || 89}
+                      </div>
                       <p className="text-sm text-muted-foreground">Tasks Completed</p>
-                    </div>
-                    <div className="text-center p-4 rounded-lg bg-gradient-to-br from-success/10 to-warning/10">
-                      <div className="text-3xl font-bold text-success mb-2">
-                        {youtubeService.formatNumber(analytics?.watchTime || 156000)}
+                      <div className="absolute top-2 right-2">
+                        <ProgressRing 
+                          value={firebaseAnalytics?.tasksCompleted || 89} 
+                          max={100} 
+                          size={40} 
+                          strokeWidth={3}
+                        />
                       </div>
-                      <p className="text-sm text-muted-foreground">Watch Time (mins)</p>
                     </div>
+                    <div className="text-center p-4 rounded-lg bg-gradient-to-br from-success/10 to-warning/10 relative overflow-hidden">
+                      <div className="text-3xl font-bold text-success mb-2">
+                        {firebaseAnalytics?.teamProductivity?.toFixed(1) || '92.3'}%
+                      </div>
+                      <p className="text-sm text-muted-foreground">Team Productivity</p>
+                      <div className="absolute top-2 right-2">
+                        <ProgressRing 
+                          value={firebaseAnalytics?.teamProductivity || 92.3} 
+                          max={100} 
+                          size={40} 
+                          strokeWidth={3}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Analytics Trend */}
+                  <div className="mt-6 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold">Weekly Trend</h3>
+                      <Button variant="ghost" size="sm" className="gap-2">
+                        <RefreshCw className="w-3 h-3" />
+                        Refresh
+                      </Button>
+                    </div>
+                    <TrendLine 
+                      data={[65, 72, 68, 85, 89, 92, firebaseAnalytics?.teamProductivity || 92]} 
+                      width={400} 
+                      height={60}
+                      color="hsl(var(--primary))"
+                    />
                   </div>
                 </div>
               </AnimatedCard>

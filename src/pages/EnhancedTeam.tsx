@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { StatsCard } from "@/components/ui/stats-card";
+import { EmployeeIDCard, EmployeeIDCardsGrid } from "@/components/ui/employee-id-card";
+import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import Navbar from "@/components/Navbar";
+import { employees, departments, roles } from "@/data/employees";
+import { firebaseService } from "@/services/firebase";
 import { 
   Users, Search, Filter, Mail, Award, MapPin, 
   Calendar, Clock, Video, CheckCircle, Star,
   Github, Linkedin, Twitter, Globe, Phone,
   Briefcase, GraduationCap, Trophy, Target,
   Activity, TrendingUp, Eye, MessageSquare,
-  Plus, MoreVertical, Edit, Share2, Download
+  Plus, MoreVertical, Edit, Share2, Download,
+  CreditCard, Grid, List, Building2, UserCheck
 } from "lucide-react";
 
 // Team member interface
@@ -231,11 +236,12 @@ const teamMembers: TeamMember[] = [
 const EnhancedTeam = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"cards" | "grid" | "list">("cards");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const departments = ["all", "Technology", "Content Production", "Content Strategy", "Design"];
+  const departmentList = ["all", ...Object.keys(departments)];
 
-  const filteredMembers = teamMembers.filter(member => {
+  const filteredMembers = employees.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          member.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -244,6 +250,22 @@ const EnhancedTeam = () => {
     
     return matchesSearch && matchesDepartment;
   });
+
+  // Initialize Firebase data on component mount
+  useEffect(() => {
+    const initializeData = async () => {
+      setIsLoading(true);
+      try {
+        await firebaseService.initializeDefaultData();
+      } catch (error) {
+        console.error('Failed to initialize data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeData();
+  }, []);
 
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
@@ -275,237 +297,354 @@ const EnhancedTeam = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="pt-24 px-4 pb-12">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Team Management
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                Meet our talented team of creators, developers, and designers
-              </p>
+      <LoadingSpinnerOverlay isLoading={isLoading}>
+        <div className="pt-24 px-4 pb-12">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  TOMO Academy Team
+                </h1>
+                <p className="text-muted-foreground text-lg">
+                  Meet our talented team of {employees.length} creators, developers, and designers
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  Export IDs
+                </Button>
+                <Button className="bg-primary hover:bg-primary-hover shadow-glow gap-2">
+                  <Plus className="w-4 h-4" />
+                  Add Member
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="gap-2">
-                <Download className="w-4 h-4" />
-                Export
-              </Button>
-              <Button className="bg-primary hover:bg-primary-hover shadow-glow gap-2">
-                <Plus className="w-4 h-4" />
-                Add Member
-              </Button>
-            </div>
-          </div>
 
-          {/* Team Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatsCard
-              title="Total Members"
-              value={teamMembers.length}
-              change={{ value: 2, label: "this month", isPositive: true }}
-              icon={Users}
-              iconColor="text-primary"
-              iconBgColor="bg-primary/10"
-            />
-            
-            <StatsCard
-              title="Active Projects"
-              value={teamMembers.reduce((sum, member) => sum + member.stats.projects, 0)}
-              change={{ value: 8, label: "this week", isPositive: true }}
-              icon={Briefcase}
-              iconColor="text-accent"
-              iconBgColor="bg-accent/10"
-            />
-            
-            <StatsCard
-              title="Completed Tasks"
-              value={teamMembers.reduce((sum, member) => sum + member.stats.tasks, 0)}
-              change={{ value: 23, label: "this week", isPositive: true }}
-              icon={CheckCircle}
-              iconColor="text-success"
-              iconBgColor="bg-success/10"
-            />
-            
-            <StatsCard
-              title="Avg Rating"
-              value={4.7}
-              change={{ value: 0.2, label: "vs last month", isPositive: true }}
-              icon={Star}
-              iconColor="text-warning"
-              iconBgColor="bg-warning/10"
-              suffix="/5"
-            />
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, role, or skills..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+            {/* Team Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatsCard
+                title="Total Members"
+                value={employees.length}
+                change={{ value: 2, label: "this month", isPositive: true }}
+                icon={Users}
+                iconColor="text-primary"
+                iconBgColor="bg-primary/10"
+              />
+              
+              <StatsCard
+                title="Active Projects"
+                value={employees.reduce((sum, member) => sum + member.stats.projects, 0)}
+                change={{ value: 8, label: "this week", isPositive: true }}
+                icon={Briefcase}
+                iconColor="text-accent"
+                iconBgColor="bg-accent/10"
+              />
+              
+              <StatsCard
+                title="Completed Tasks"
+                value={employees.reduce((sum, member) => sum + member.stats.tasks, 0)}
+                change={{ value: 23, label: "this week", isPositive: true }}
+                icon={CheckCircle}
+                iconColor="text-success"
+                iconBgColor="bg-success/10"
+              />
+              
+              <StatsCard
+                title="Avg Rating"
+                value={4.7}
+                change={{ value: 0.2, label: "vs last month", isPositive: true }}
+                icon={Star}
+                iconColor="text-warning"
+                iconBgColor="bg-warning/10"
+                suffix="/5"
               />
             </div>
-            
-            <div className="flex gap-2">
-              {departments.map((dept) => (
+
+            {/* Filters & View Toggle */}
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, role, or skills..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                {departmentList.map((dept) => (
+                  <Button
+                    key={dept}
+                    variant={selectedDepartment === dept ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedDepartment(dept)}
+                    className="capitalize"
+                  >
+                    {dept === "all" ? "All Departments" : dept}
+                  </Button>
+                ))}
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex gap-1 p-1 bg-muted rounded-lg">
                 <Button
-                  key={dept}
-                  variant={selectedDepartment === dept ? "default" : "outline"}
+                  variant={viewMode === "cards" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setSelectedDepartment(dept)}
-                  className="capitalize"
+                  onClick={() => setViewMode("cards")}
+                  className="gap-2"
                 >
-                  {dept}
+                  <CreditCard className="w-4 h-4" />
+                  ID Cards
                 </Button>
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="gap-2"
+                >
+                  <Grid className="w-4 h-4" />
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="gap-2"
+                >
+                  <List className="w-4 h-4" />
+                  List
+                </Button>
+              </div>
+            </div>
+
+            {/* Dynamic Content Based on View Mode */}
+            {viewMode === "cards" && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold mb-2">Premium Employee ID Cards</h2>
+                  <p className="text-muted-foreground">Click any card to flip and view contact details</p>
+                </div>
+                <EmployeeIDCardsGrid 
+                  employees={filteredMembers} 
+                  variant="landscape" 
+                  columns={2}
+                />
+              </div>
+            )}
+
+            {viewMode === "grid" && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredMembers.map((member) => (
+                  <AnimatedCard key={member.id} hoverEffect="lift" className="overflow-hidden">
+                    <div className="p-6 space-y-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
+                            {member.avatar}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg">{member.name}</h3>
+                            <p className="text-sm text-muted-foreground">{member.role}</p>
+                          </div>
+                        </div>
+                        <Badge className={getAvailabilityColor(member.availability)}>
+                          {getAvailabilityIcon(member.availability)}
+                          <span className="ml-1 capitalize">{member.availability}</span>
+                        </Badge>
+                      </div>
+
+                      {/* Bio */}
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {member.bio}
+                      </p>
+
+                      {/* Stats */}
+                      <div className="grid grid-cols-2 gap-4 py-3 border-y border-border">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary">{member.stats.videos}</div>
+                          <div className="text-xs text-muted-foreground">Videos</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-accent">{member.stats.tasks}</div>
+                          <div className="text-xs text-muted-foreground">Tasks</div>
+                        </div>
+                      </div>
+
+                      {/* Skills */}
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Skills</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {member.skills.slice(0, 4).map((skill, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                          {member.skills.length > 4 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{member.skills.length - 4}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Contact & Social */}
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Mail className="w-4 h-4" />
+                          </Button>
+                          {member.social?.linkedin && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Linkedin className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {member.social?.github && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Github className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {member.social?.website && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Globe className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </AnimatedCard>
+                ))}
+              </div>
+            )}
+
+            {viewMode === "list" && (
+              <div className="space-y-4">
+                {filteredMembers.map((member) => (
+                  <AnimatedCard key={member.id} hoverEffect="border" className="p-6">
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">
+                        {member.avatar}
+                      </div>
+                      
+                      <div className="flex-1 grid md:grid-cols-4 gap-4">
+                        <div>
+                          <h3 className="font-bold text-lg">{member.name}</h3>
+                          <p className="text-sm text-muted-foreground">{member.role}</p>
+                          <Badge variant="outline" className="text-xs mt-1">{member.department}</Badge>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">Contact</p>
+                          <p className="text-xs text-muted-foreground">{member.email}</p>
+                          <p className="text-xs text-muted-foreground">{member.employeeId}</p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">Stats</p>
+                          <p className="text-xs text-muted-foreground">{member.stats.videos} videos</p>
+                          <p className="text-xs text-muted-foreground">{member.stats.rating}/5.0 rating</p>
+                        </div>
+                        
+                        <div className="flex items-center justify-end gap-2">
+                          <Badge className={getAvailabilityColor(member.availability)}>
+                            {getAvailabilityIcon(member.availability)}
+                            <span className="ml-1 capitalize">{member.availability}</span>
+                          </Badge>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </AnimatedCard>
+                ))}
+              </div>
+            )}
+
+            {/* Department Overview */}
+            <GlowCard glowColor="primary">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Building2 className="w-6 h-6 text-primary" />
+                  <h2 className="text-2xl font-bold">Department Overview</h2>
+                </div>
+                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {Object.entries(departments).map(([deptName, deptMembers]) => {
+                    const totalVideos = deptMembers.reduce((sum, m) => sum + m.stats.videos, 0);
+                    const avgRating = deptMembers.reduce((sum, m) => sum + m.stats.rating, 0) / deptMembers.length;
+                    
+                    return (
+                      <AnimatedCard key={deptName} hoverEffect="glow" className="text-center p-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <UserCheck className="w-6 h-6 text-primary" />
+                        </div>
+                        <h3 className="font-semibold mb-3 text-sm">{deptName}</h3>
+                        <div className="space-y-2">
+                          <div>
+                            <div className="text-2xl font-bold text-primary">{deptMembers.length}</div>
+                            <div className="text-xs text-muted-foreground">Members</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-semibold text-accent">{totalVideos}</div>
+                            <div className="text-xs text-muted-foreground">Total Videos</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-semibold text-success">{avgRating.toFixed(1)}</div>
+                            <div className="text-xs text-muted-foreground">Avg Rating</div>
+                          </div>
+                        </div>
+                      </AnimatedCard>
+                    );
+                  })}
+                </div>
+              </div>
+            </GlowCard>
+
+            {/* Role-based Teams */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.entries(roles).map(([roleName, roleMembers]) => (
+                <AnimatedCard key={roleName} hoverEffect="lift" className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg flex items-center justify-center">
+                      <Trophy className="w-5 h-5 text-accent" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold">{roleName}</h3>
+                      <p className="text-sm text-muted-foreground">{roleMembers.length} members</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {roleMembers.slice(0, 3).map((member) => (
+                      <div key={member.id} className="flex items-center gap-2 text-sm">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-xs font-bold">
+                          {member.avatar}
+                        </div>
+                        <span className="flex-1 truncate">{member.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {member.stats.rating}⭐
+                        </Badge>
+                      </div>
+                    ))}
+                    {roleMembers.length > 3 && (
+                      <p className="text-xs text-muted-foreground text-center pt-2">
+                        +{roleMembers.length - 3} more members
+                      </p>
+                    )}
+                  </div>
+                </AnimatedCard>
               ))}
             </div>
           </div>
-
-          {/* Team Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMembers.map((member) => (
-              <AnimatedCard key={member.id} hoverEffect="lift" className="overflow-hidden">
-                <div className="p-6 space-y-4">
-                  {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
-                        {member.avatar}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg">{member.name}</h3>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
-                      </div>
-                    </div>
-                    <Badge className={getAvailabilityColor(member.availability)}>
-                      {getAvailabilityIcon(member.availability)}
-                      <span className="ml-1 capitalize">{member.availability}</span>
-                    </Badge>
-                  </div>
-
-                  {/* Bio */}
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {member.bio}
-                  </p>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 py-3 border-y border-border">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{member.stats.videos}</div>
-                      <div className="text-xs text-muted-foreground">Videos</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-accent">{member.stats.tasks}</div>
-                      <div className="text-xs text-muted-foreground">Tasks</div>
-                    </div>
-                  </div>
-
-                  {/* Skills */}
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Skills</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {member.skills.slice(0, 4).map((skill, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                      {member.skills.length > 4 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{member.skills.length - 4}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Contact & Social */}
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Mail className="w-4 h-4" />
-                      </Button>
-                      {member.social?.linkedin && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Linkedin className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {member.social?.github && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Github className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {member.social?.website && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Globe className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                    
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  {/* Recent Work */}
-                  {member.recentWork && member.recentWork.length > 0 && (
-                    <div className="pt-3 border-t border-border">
-                      <h4 className="text-sm font-medium mb-2">Recent Work</h4>
-                      <div className="space-y-1">
-                        {member.recentWork.slice(0, 2).map((work, index) => (
-                          <div key={index} className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground truncate">{work.title}</span>
-                            <span className="text-muted-foreground ml-2">
-                              {new Date(work.date).toLocaleDateString()}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </AnimatedCard>
-            ))}
-          </div>
-
-          {/* Department Overview */}
-          <GlowCard glowColor="primary">
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-6">Department Overview</h2>
-              <div className="grid md:grid-cols-4 gap-6">
-                {departments.slice(1).map((dept) => {
-                  const deptMembers = teamMembers.filter(m => m.department === dept);
-                  const totalVideos = deptMembers.reduce((sum, m) => sum + m.stats.videos, 0);
-                  const avgRating = deptMembers.reduce((sum, m) => sum + m.stats.rating, 0) / deptMembers.length;
-                  
-                  return (
-                    <div key={dept} className="text-center p-4 rounded-lg bg-muted/30">
-                      <h3 className="font-semibold mb-2">{dept}</h3>
-                      <div className="space-y-2">
-                        <div>
-                          <div className="text-2xl font-bold text-primary">{deptMembers.length}</div>
-                          <div className="text-xs text-muted-foreground">Members</div>
-                        </div>
-                        <div>
-                          <div className="text-lg font-semibold text-accent">{totalVideos}</div>
-                          <div className="text-xs text-muted-foreground">Total Videos</div>
-                        </div>
-                        <div>
-                          <div className="text-lg font-semibold text-success">{avgRating.toFixed(1)}</div>
-                          <div className="text-xs text-muted-foreground">Avg Rating</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </GlowCard>
         </div>
-      </div>
+      </LoadingSpinnerOverlay>
     </div>
   );
 };
