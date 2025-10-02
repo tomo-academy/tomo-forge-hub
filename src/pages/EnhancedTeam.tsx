@@ -7,6 +7,7 @@ import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { StatsCard } from "@/components/ui/stats-card";
 import { EmployeeIDCard, EmployeeIDCardsGrid } from "@/components/ui/employee-id-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
+import { AddMemberModal } from "@/components/ui/add-member-modal";
 import Navbar from "@/components/Navbar";
 import { employees, departments, roles } from "@/data/employees";
 import { firebaseService } from "@/services/firebase";
@@ -238,10 +239,12 @@ const EnhancedTeam = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [viewMode, setViewMode] = useState<"cards" | "grid" | "list">("cards");
   const [isLoading, setIsLoading] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [teamData, setTeamData] = useState(employees);
 
   const departmentList = ["all", ...Object.keys(departments)];
 
-  const filteredMembers = employees.filter(member => {
+  const filteredMembers = teamData.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          member.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -250,6 +253,18 @@ const EnhancedTeam = () => {
     
     return matchesSearch && matchesDepartment;
   });
+
+  const handleMemberAdded = async () => {
+    // Refresh team data from Firebase
+    try {
+      const updatedEmployees = await firebaseService.getEmployees();
+      if (updatedEmployees.length > 0) {
+        setTeamData(updatedEmployees);
+      }
+    } catch (error) {
+      console.error('Failed to refresh team data:', error);
+    }
+  };
 
   // Initialize Firebase data on component mount
   useEffect(() => {
@@ -315,10 +330,13 @@ const EnhancedTeam = () => {
                   <Download className="w-4 h-4" />
                   Export IDs
                 </Button>
-                <Button className="bg-primary hover:bg-primary-hover shadow-glow gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Member
-                </Button>
+              <Button 
+                className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
+                onClick={() => setShowAddMember(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Add Member
+              </Button>
               </div>
             </div>
 
@@ -645,6 +663,13 @@ const EnhancedTeam = () => {
           </div>
         </div>
       </LoadingSpinnerOverlay>
+
+      {/* Add Member Modal */}
+      <AddMemberModal
+        isOpen={showAddMember}
+        onClose={() => setShowAddMember(false)}
+        onMemberAdded={handleMemberAdded}
+      />
     </div>
   );
 };
