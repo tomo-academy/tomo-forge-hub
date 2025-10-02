@@ -12,15 +12,22 @@ import {
   Video, Search, Upload, Calendar, Eye, ThumbsUp, 
   MessageSquare, TrendingUp, Filter, MoreVertical,
   Play, Clock, CheckCircle, AlertCircle, Activity,
-  BarChart3, Zap, Target, DollarSign
+  BarChart3, Zap, Target, DollarSign, Copy, Share2
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useChannelVideos, useYouTubeAnalytics, youtubeService } from "@/services/youtube";
 
 const EnhancedVideos = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [maxResults, setMaxResults] = useState(20);
   
   // Fetch live YouTube data
-  const { data: videos, isLoading: videosLoading } = useQuery(useChannelVideos(20));
+  const { data: videos, isLoading: videosLoading, refetch } = useQuery(useChannelVideos(maxResults));
   const { data: analytics, isLoading: analyticsLoading } = useQuery(useYouTubeAnalytics());
 
   const isLoading = videosLoading || analyticsLoading;
@@ -299,12 +306,42 @@ const EnhancedVideos = () => {
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-2">
-                      <Button variant="outline" size="sm" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => window.open(`https://youtube.com/watch?v=${video.id}`, '_blank')}
+                      >
                         View Analytics
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => window.open(`https://youtube.com/watch?v=${video.id}`, '_blank')}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            Watch Video
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.open(`https://studio.youtube.com/video/${video.id}/analytics`, '_blank')}>
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            YouTube Analytics
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(`https://youtube.com/watch?v=${video.id}`)}>
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy Link
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigator.share?.({ 
+                            title: video.title, 
+                            url: `https://youtube.com/watch?v=${video.id}` 
+                          })}>
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Share Video
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </AnimatedCard>
@@ -314,7 +351,15 @@ const EnhancedVideos = () => {
             {/* Load More */}
             {filteredVideos.length > 0 && (
               <div className="text-center">
-                <Button variant="outline" size="lg" className="gap-2">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="gap-2"
+                  onClick={() => {
+                    setMaxResults(prev => prev + 10);
+                    refetch();
+                  }}
+                >
                   <Zap className="w-4 h-4" />
                   Load More Videos
                 </Button>

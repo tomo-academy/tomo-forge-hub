@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationDropdown } from "@/components/ui/notifications";
+import { LoginModal } from "@/components/ui/login-modal";
 import { Menu, X, Youtube } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -37,7 +39,12 @@ const Navbar = () => {
             </Link>
             <NotificationDropdown />
             <ThemeToggle />
-            <Button variant="default" size="sm" className="bg-primary hover:bg-primary-hover shadow-glow">
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="bg-primary hover:bg-primary-hover shadow-glow"
+              onClick={() => setShowLogin(true)}
+            >
               Login
             </Button>
           </div>
@@ -83,13 +90,27 @@ const Navbar = () => {
               Resources
             </Link>
             <div className="px-4">
-              <Button variant="default" className="w-full bg-primary hover:bg-primary-hover">
+              <Button 
+                variant="default" 
+                className="w-full bg-primary hover:bg-primary-hover"
+                onClick={() => setShowLogin(true)}
+              >
                 Login
               </Button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        onLoginSuccess={() => {
+          setShowLogin(false);
+          // You could add user state management here
+        }}
+      />
     </nav>
   );
 };

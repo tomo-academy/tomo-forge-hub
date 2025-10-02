@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmployeeDetailModal } from "./employee-detail-modal";
+import { EmployeeMenu } from "./employee-menu";
 import { 
   Download, 
   Share2, 
@@ -16,7 +17,8 @@ import {
   Verified,
   Youtube,
   Eye,
-  ExternalLink
+  ExternalLink,
+  MoreVertical
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -83,24 +85,20 @@ export function EmployeeIDCard({
     }
   };
 
-  const qrData = JSON.stringify({
-    id: employee.id,
-    name: employee.name,
-    role: employee.role,
-    department: employee.department,
-    employeeId: employee.employeeId,
-    email: employee.email,
-    phone: employee.phone,
-    company: 'TOMO Academy',
-    verified: true,
-    profileUrl: `https://tomoacademy.com/team/${employee.id}`,
-    joinDate: employee.joinDate,
-    location: employee.location,
-    stats: employee.stats,
-    skills: employee.skills?.join(', ') || '',
-    avatar: employee.avatar,
-    cardColor: employee.cardColor
-  });
+  // Create a simple, scannable QR data format
+  const qrData = `TOMO Academy Employee
+Name: ${employee.name}
+Role: ${employee.role}
+Department: ${employee.department}
+ID: ${employee.employeeId}
+Email: ${employee.email}
+${employee.phone ? `Phone: ${employee.phone}` : ''}
+${employee.location ? `Location: ${employee.location}` : ''}
+Profile: https://tomoacademy.com/team/${employee.id}
+Verified: ✓ TOMO Academy
+Skills: ${employee.skills?.join(', ') || 'N/A'}
+Rating: ${employee.stats.rating}/5.0
+Videos: ${employee.stats.videos} | Tasks: ${employee.stats.tasks}`;
 
   const downloadVCard = () => {
     const vcard = `BEGIN:VCARD
@@ -154,7 +152,7 @@ END:VCARD`;
     <>
       <div className={cn(
         "relative group perspective-1000",
-        isLandscape ? "w-96 h-60" : "w-72 h-96"
+        isLandscape ? "w-[400px] h-[250px]" : "w-[280px] h-[400px]"
       )}>
         <div 
           className={cn(
@@ -170,110 +168,123 @@ END:VCARD`;
           premium && "shadow-2xl border-2 border-primary/20"
         )}>
           {/* Header with TOMO Academy Logo */}
-          <div className="relative p-3 bg-gradient-to-r from-primary to-accent text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/TOMO.svg" 
-                    alt="TOMO Academy"
-                    className="w-full h-full object-cover rounded-full"
-                    onError={(e) => {
-                      // Fallback to YouTube icon if image fails to load
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling!.style.display = 'block';
-                    }}
-                  />
-                  <Youtube className="w-5 h-5 text-primary hidden" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm">TOMO Academy</h3>
-                  <p className="text-xs opacity-90">Digital Platform</p>
-                </div>
+          <div className="relative h-12 bg-gradient-to-r from-primary to-accent text-white flex items-center px-3">
+            <div className="flex items-center gap-2 flex-1">
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/TOMO.svg" 
+                  alt="TOMO Academy"
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling!.style.display = 'block';
+                  }}
+                />
+                <Youtube className="w-5 h-5 text-primary hidden" />
               </div>
-              <div className="flex items-center gap-1">
-                <Verified className="w-4 h-4" />
-                <Shield className="w-4 h-4" />
+              <div className="flex-1">
+                <h3 className="font-bold text-sm leading-tight">TOMO Academy</h3>
+                <p className="text-xs opacity-90 leading-tight">Digital Platform</p>
               </div>
             </div>
-            
-            {/* Floating elements */}
-            <div className="absolute top-2 right-16 w-2 h-2 bg-white/30 rounded-full animate-pulse" />
-            <div className="absolute bottom-2 left-20 w-1 h-1 bg-white/40 rounded-full animate-ping" />
+            <div className="flex items-center gap-1">
+              <Verified className="w-4 h-4" />
+              <Shield className="w-4 h-4" />
+              <EmployeeMenu
+                employee={employee}
+                onViewDetails={() => setShowDetailModal(true)}
+                onDownload={downloadVCard}
+                onShare={shareProfile}
+              />
+            </div>
           </div>
 
           {/* Main Content - Perfectly Fitted Layout */}
-          <div className="p-3 h-[calc(100%-120px)] flex">
+          <div className="flex-1 p-3 flex">
             {isLandscape ? (
-              // Landscape Layout
+              // Landscape Layout - Perfectly Organized
               <>
-                {/* Left Section - Employee Info */}
-                <div className="flex-1 flex flex-col justify-between">
-                  {/* Avatar and Basic Info */}
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
-                        {employee.avatar || employee.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div className={cn(
-                        "absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white",
-                        getAvailabilityColor()
-                      )} />
+                {/* Left Section - Employee Photo & Basic Info */}
+                <div className="w-32 flex flex-col items-center justify-center">
+                  <div className="relative mb-2">
+                    {/* Employee Photo Placeholder */}
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-4 border-white shadow-lg">
+                      {employee.avatar || employee.name.split(' ').map(n => n[0]).join('')}
                     </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h2 className="font-bold text-base leading-tight truncate">{employee.name}</h2>
-                      <p className="text-xs text-muted-foreground truncate">{employee.role}</p>
-                      <Badge variant="outline" className="text-xs mt-1">
-                        {employee.department}
-                      </Badge>
-                    </div>
+                    <div className={cn(
+                      "absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white",
+                      getAvailabilityColor()
+                    )} />
                   </div>
+                  
+                  <div className="text-center">
+                    <h2 className="font-bold text-sm leading-tight">{employee.name}</h2>
+                    <p className="text-xs text-muted-foreground leading-tight mt-0.5">{employee.role}</p>
+                    <Badge variant="outline" className="text-xs mt-1 px-1 py-0">
+                      {employee.department}
+                    </Badge>
+                  </div>
+                </div>
 
+                {/* Middle Section - Details & Stats */}
+                <div className="flex-1 flex flex-col justify-between px-2">
                   {/* Employee Details */}
-                  <div className="space-y-1.5 flex-1 py-2">
-                    <div className="flex items-center gap-2 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs">
                       <Shield className="w-3 h-3 text-primary flex-shrink-0" />
                       <span className="font-mono font-bold">{employee.employeeId}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Calendar className="w-3 h-3 flex-shrink-0" />
                       <span>Since {new Date(employee.joinDate).getFullYear()}</span>
                     </div>
                     
                     {employee.location && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <MapPin className="w-3 h-3 flex-shrink-0" />
                         <span className="truncate">{employee.location}</span>
                       </div>
                     )}
+
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Mail className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">{employee.email}</span>
+                    </div>
                   </div>
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 gap-1.5 mt-2">
                     <div className="text-center p-1.5 bg-primary/10 rounded text-xs">
                       <div className="font-bold text-primary text-sm">{employee.stats.videos}</div>
-                      <div className="text-muted-foreground">Videos</div>
+                      <div className="text-muted-foreground text-xs">Videos</div>
                     </div>
                     <div className="text-center p-1.5 bg-accent/10 rounded text-xs">
                       <div className="font-bold text-accent text-sm">{employee.stats.tasks}</div>
-                      <div className="text-muted-foreground">Tasks</div>
+                      <div className="text-muted-foreground text-xs">Tasks</div>
+                    </div>
+                    <div className="text-center p-1.5 bg-success/10 rounded text-xs">
+                      <div className="font-bold text-success text-sm">{employee.stats.projects}</div>
+                      <div className="text-muted-foreground text-xs">Projects</div>
+                    </div>
+                    <div className="text-center p-1.5 bg-warning/10 rounded text-xs">
+                      <div className="font-bold text-warning text-sm">{employee.stats.rating}</div>
+                      <div className="text-muted-foreground text-xs">Rating</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Right Section - QR Code */}
                 {showQR && (
-                  <div className="flex flex-col items-center justify-center px-3">
-                    <div className="p-2 bg-white rounded-lg shadow-md">
+                  <div className="w-24 flex flex-col items-center justify-center">
+                    <div className="p-1.5 bg-white rounded-lg shadow-md">
                       <QRCode
                         value={qrData}
-                        size={70}
+                        size={80}
                         style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground text-center mt-1">Scan for details</p>
+                    <p className="text-xs text-muted-foreground text-center mt-1 leading-tight">Scan for details</p>
                   </div>
                 )}
               </>
@@ -350,15 +361,13 @@ END:VCARD`;
           </div>
 
           {/* Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-r from-primary/10 to-accent/10 border-t border-border">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-warning fill-warning" />
-                <span className="font-medium">{employee.stats.rating}/5.0</span>
-              </div>
-              <div className="text-muted-foreground">
-                ID: {employee.employeeId}
-              </div>
+          <div className="h-8 bg-gradient-to-r from-primary/10 to-accent/10 border-t border-border flex items-center justify-between px-3">
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 text-warning fill-warning" />
+              <span className="font-medium text-xs">{employee.stats.rating}/5.0</span>
+            </div>
+            <div className="text-muted-foreground text-xs font-mono">
+              {employee.employeeId}
             </div>
           </div>
 
@@ -487,10 +496,10 @@ export function EmployeeIDCardsGrid({
 }: EmployeeIDCardsGridProps) {
   return (
     <div className={cn(
-      "grid gap-6",
-      columns === 2 && "grid-cols-1 md:grid-cols-2",
-      columns === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-      columns === 4 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      "grid gap-4 justify-items-center",
+      variant === 'landscape' 
+        ? "grid-cols-1 lg:grid-cols-2 xl:grid-cols-3" 
+        : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
     )}>
       {employees.map((employee) => (
         <EmployeeIDCard

@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { 
   X, Plus, UserPlus, Save, AlertCircle, CheckCircle,
   Mail, Phone, MapPin, Calendar, Building2, User,
-  Briefcase, Star, Video, CheckSquare
+  Briefcase, Star, Video, CheckSquare, Upload, Camera
 } from "lucide-react";
 import { firebaseService } from "@/services/firebase";
 import { cn } from "@/lib/utils";
@@ -57,6 +57,7 @@ export function AddMemberModal({ isOpen, onClose, onMemberAdded }: AddMemberModa
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [currentSkill, setCurrentSkill] = useState('');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<NewMember>({
     name: '',
@@ -76,6 +77,22 @@ export function AddMemberModal({ isOpen, onClose, onMemberAdded }: AddMemberModa
       instagram: ''
     }
   });
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError('Image size must be less than 5MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -97,6 +114,7 @@ export function AddMemberModal({ isOpen, onClose, onMemberAdded }: AddMemberModa
       }
     });
     setCurrentSkill('');
+    setProfileImage(null);
     setError(null);
     setSuccess(false);
   };
@@ -233,6 +251,40 @@ export function AddMemberModal({ isOpen, onClose, onMemberAdded }: AddMemberModa
               <User className="w-4 h-4" />
               Basic Information
             </h3>
+            
+            {/* Profile Image Upload */}
+            <div className="mb-4">
+              <Label>Profile Photo</Label>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+                  {profileImage ? (
+                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    formData.name ? formData.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="profile-image"
+                  />
+                  <label htmlFor="profile-image">
+                    <Button type="button" variant="outline" size="sm" className="cursor-pointer" asChild>
+                      <span>
+                        <Camera className="w-4 h-4 mr-2" />
+                        Upload Photo
+                      </span>
+                    </Button>
+                  </label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Max 5MB. JPG, PNG, or GIF format.
+                  </p>
+                </div>
+              </div>
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>

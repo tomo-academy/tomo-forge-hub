@@ -1,13 +1,25 @@
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatsCard } from "@/components/ui/stats-card";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import Navbar from "@/components/Navbar";
+import { taskService, Task, TaskStats } from "@/services/tasks";
 import { 
   Plus, MoreVertical, Calendar, User, Flag,
-  Clock, CheckCircle, AlertCircle, Circle
+  Clock, CheckCircle, AlertCircle, Circle,
+  Filter, Search, BarChart3, TrendingUp,
+  Target, Activity
 } from "lucide-react";
 
 const Tasks = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskStats, setTaskStats] = useState<TaskStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const columns = [
     { id: "backlog", title: "Backlog", color: "text-muted-foreground" },
     { id: "todo", title: "To Do", color: "text-accent" },
@@ -16,120 +28,51 @@ const Tasks = () => {
     { id: "done", title: "Done", color: "text-success" },
   ];
 
-  const tasks = {
-    backlog: [
-      {
-        id: "TASK-045",
-        title: "Research AI video editing tools",
-        description: "Explore automation options for video production",
-        assignee: "Haridharuson L.J",
-        priority: "low",
-        dueDate: "2025-10-20",
-        tags: ["research", "ai"],
-      },
-      {
-        id: "TASK-046",
-        title: "Update brand guidelines",
-        description: "Refresh color palette and typography standards",
-        assignee: "Kamesh",
-        priority: "medium",
-        dueDate: "2025-10-18",
-        tags: ["design", "branding"],
-      },
-    ],
-    todo: [
-      {
-        id: "TASK-042",
-        title: "Create thumbnail for TypeScript tutorial",
-        description: "Design eye-catching thumbnail with code snippets",
-        assignee: "Raaj Nikitaa",
-        priority: "high",
-        dueDate: "2025-10-03",
-        tags: ["design", "thumbnail"],
-      },
-      {
-        id: "TASK-043",
-        title: "Write script for Next.js deployment video",
-        description: "Cover Vercel, Netlify, and custom hosting",
-        assignee: "Nithyasri",
-        priority: "high",
-        dueDate: "2025-10-04",
-        tags: ["script", "web-dev"],
-      },
-      {
-        id: "TASK-044",
-        title: "Plan December content calendar",
-        description: "Schedule videos and coordinate with team",
-        assignee: "Indhumathi",
-        priority: "medium",
-        dueDate: "2025-10-08",
-        tags: ["planning", "content"],
-      },
-    ],
-    in_progress: [
-      {
-        id: "TASK-039",
-        title: "Edit React Hooks video",
-        description: "Add transitions, color grading, and captions",
-        assignee: "Nithish",
-        priority: "urgent",
-        dueDate: "2025-10-02",
-        tags: ["editing", "react"],
-        progress: 65,
-      },
-      {
-        id: "TASK-040",
-        title: "Develop analytics dashboard",
-        description: "Build real-time channel metrics view",
-        assignee: "Dev",
-        priority: "high",
-        dueDate: "2025-10-05",
-        tags: ["development", "analytics"],
-        progress: 40,
-      },
-    ],
-    review: [
-      {
-        id: "TASK-037",
-        title: "Firebase tutorial thumbnail",
-        description: "Final review before publishing",
-        assignee: "Kamesh",
-        priority: "high",
-        dueDate: "2025-10-02",
-        tags: ["design", "review"],
-        reviewer: "Kanish SJ",
-      },
-      {
-        id: "TASK-038",
-        title: "Web3 explainer script",
-        description: "Technical accuracy check needed",
-        assignee: "Haridharuson L.J",
-        priority: "medium",
-        dueDate: "2025-10-03",
-        tags: ["script", "review"],
-        reviewer: "Prawin Krishnan",
-      },
-    ],
-    done: [
-      {
-        id: "TASK-035",
-        title: "Upload CSS Grid tutorial",
-        description: "Published successfully with SEO optimization",
-        assignee: "Ajay Krithick",
-        priority: "high",
-        completedDate: "2025-09-28",
-        tags: ["upload", "css"],
-      },
-      {
-        id: "TASK-036",
-        title: "Create Q4 social media strategy",
-        description: "Cross-platform promotion plan finalized",
-        assignee: "Aditya Chaurasiya",
-        priority: "medium",
-        completedDate: "2025-09-27",
-        tags: ["marketing", "strategy"],
-      },
-    ],
+  // Load tasks and stats
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        await taskService.initializeDefaultTasks();
+        const [tasksData, statsData] = await Promise.all([
+          taskService.getTasks(),
+          taskService.getTaskStats()
+        ]);
+        setTasks(tasksData);
+        setTaskStats(statsData);
+      } catch (error) {
+        console.error('Failed to load tasks:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Group tasks by status
+  const tasksByStatus = tasks.reduce((acc, task) => {
+    if (!acc[task.status]) {
+      acc[task.status] = [];
+    }
+    acc[task.status].push(task);
+    return acc;
+  }, {} as { [key: string]: Task[] });
+
+  // Filter tasks based on search
+  const filteredTasksByStatus = Object.keys(tasksByStatus).reduce((acc, status) => {
+    acc[status] = tasksByStatus[status].filter(task =>
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.assignee.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+    return acc;
+  }, {} as { [key: string]: Task[] });
+
+  // Create new task
+  const handleCreateTask = async () => {
+    // This would open a create task modal
+    console.log('Create new task');
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -159,72 +102,120 @@ const Tasks = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="pt-24 px-4 pb-12">
-        <div className="max-w-[1600px] mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">Task Board</h1>
-              <p className="text-muted-foreground text-lg">
-                Manage projects and track team progress
-              </p>
+      <LoadingSpinnerOverlay isLoading={isLoading}>
+        <div className="pt-24 px-4 pb-12">
+          <div className="max-w-[1600px] mx-auto space-y-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Task Management
+                </h1>
+                <p className="text-muted-foreground text-lg">
+                  Manage projects and track team progress with real-time data
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="gap-2">
+                  <Activity className="w-4 h-4" />
+                  Live Data
+                </Button>
+                <Button 
+                  className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
+                  onClick={handleCreateTask}
+                >
+                  <Plus className="w-4 h-4" />
+                  New Task
+                </Button>
+              </div>
             </div>
-            <Button className="bg-primary hover:bg-primary-hover shadow-glow">
-              <Plus className="mr-2 w-4 h-4" />
-              New Task
-            </Button>
-          </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Card className="p-4 text-center">
-              <p className="text-2xl font-bold text-muted-foreground">{tasks.backlog.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">Backlog</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <p className="text-2xl font-bold text-accent">{tasks.todo.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">To Do</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <p className="text-2xl font-bold text-warning">{tasks.in_progress.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">In Progress</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <p className="text-2xl font-bold text-primary">{tasks.review.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">Review</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <p className="text-2xl font-bold text-success">{tasks.done.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">Done</p>
-            </Card>
-          </div>
+            {/* Real-time Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <StatsCard
+                title="Backlog"
+                value={taskStats?.backlog || 0}
+                icon={Circle}
+                iconColor="text-muted-foreground"
+                iconBgColor="bg-muted/10"
+              />
+              <StatsCard
+                title="To Do"
+                value={taskStats?.todo || 0}
+                change={{ value: 3, label: "new this week", isPositive: true }}
+                icon={Target}
+                iconColor="text-accent"
+                iconBgColor="bg-accent/10"
+              />
+              <StatsCard
+                title="In Progress"
+                value={taskStats?.inProgress || 0}
+                icon={Activity}
+                iconColor="text-warning"
+                iconBgColor="bg-warning/10"
+              />
+              <StatsCard
+                title="Review"
+                value={taskStats?.review || 0}
+                icon={CheckCircle}
+                iconColor="text-primary"
+                iconBgColor="bg-primary/10"
+              />
+              <StatsCard
+                title="Completed"
+                value={taskStats?.done || 0}
+                change={{ value: taskStats?.completedThisWeek || 0, label: "this week", isPositive: true }}
+                icon={CheckCircle}
+                iconColor="text-success"
+                iconBgColor="bg-success/10"
+              />
+            </div>
 
-          {/* Kanban Board */}
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {columns.map((column) => (
-              <div key={column.id} className="flex-shrink-0 w-80">
-                <Card className="p-4 h-full">
-                  {/* Column Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Circle className={`w-4 h-4 ${column.color}`} fill="currentColor" />
-                      <h3 className="font-bold">{column.title}</h3>
-                      <Badge variant="secondary" className="ml-2">
-                        {tasks[column.id as keyof typeof tasks]?.length || 0}
-                      </Badge>
+            {/* Search and Filters */}
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search tasks by title, assignee, or tags..."
+                  className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button variant="outline" className="gap-2">
+                <Filter className="w-4 h-4" />
+                Filters
+              </Button>
+            </div>
+
+            {/* Kanban Board */}
+            <div className="flex gap-4 overflow-x-auto pb-4">
+              {columns.map((column) => (
+                <div key={column.id} className="flex-shrink-0 w-80">
+                  <AnimatedCard className="p-4 h-full">
+                    {/* Column Header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Circle className={`w-4 h-4 ${column.color}`} fill="currentColor" />
+                        <h3 className="font-bold">{column.title}</h3>
+                        <Badge variant="secondary" className="ml-2">
+                          {filteredTasksByStatus[column.id]?.length || 0}
+                        </Badge>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={handleCreateTask}>
+                        <Plus className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="icon">
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
 
-                  {/* Tasks */}
-                  <div className="space-y-3">
-                    {tasks[column.id as keyof typeof tasks]?.map((task) => (
-                      <Card 
-                        key={task.id}
-                        className="p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group"
-                      >
+                    {/* Tasks */}
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      {filteredTasksByStatus[column.id]?.map((task) => (
+                        <AnimatedCard 
+                          key={task.id}
+                          hoverEffect="border"
+                          className="p-4 cursor-pointer group"
+                        >
                         {/* Task Header */}
                         <div className="flex items-start justify-between mb-2">
                           <span className="text-xs font-mono text-muted-foreground">{task.id}</span>
@@ -296,16 +287,17 @@ const Tasks = () => {
                               </div>
                             )}
                           </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            ))}
+                          </div>
+                        </AnimatedCard>
+                      ))}
+                    </div>
+                  </AnimatedCard>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </LoadingSpinnerOverlay>
     </div>
   );
 };
