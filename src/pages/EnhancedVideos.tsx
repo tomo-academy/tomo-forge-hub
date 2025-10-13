@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { StatsCard } from "@/components/ui/stats-card";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
+import { VideoUploadModal } from "@/components/ui/video-upload-modal";
 import Navbar from "@/components/Navbar";
 import { 
   Video, Search, Upload, Calendar, Eye, ThumbsUp, 
@@ -25,12 +26,26 @@ import { useChannelVideos, useYouTubeAnalytics, youtubeService } from "@/service
 const EnhancedVideos = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [maxResults, setMaxResults] = useState(20);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadedVideos, setUploadedVideos] = useState<any[]>([]);
   
   // Fetch live YouTube data
   const { data: videos, isLoading: videosLoading, refetch } = useQuery(useChannelVideos(maxResults));
   const { data: analytics, isLoading: analyticsLoading } = useQuery(useYouTubeAnalytics());
 
   const isLoading = videosLoading || analyticsLoading;
+
+  // Load uploaded videos from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('uploaded_videos');
+    if (stored) {
+      setUploadedVideos(JSON.parse(stored));
+    }
+  }, []);
+
+  const handleVideoUploaded = (newVideo: any) => {
+    setUploadedVideos(prev => [newVideo, ...prev]);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -84,7 +99,10 @@ const EnhancedVideos = () => {
                   <Activity className="w-4 h-4" />
                   Live Analytics
                 </Button>
-                <Button className="bg-primary hover:bg-primary-hover shadow-glow gap-2">
+                <Button 
+                  className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
+                  onClick={() => setShowUploadModal(true)}
+                >
                   <Upload className="w-4 h-4" />
                   Upload Video
                 </Button>
@@ -368,6 +386,13 @@ const EnhancedVideos = () => {
           </div>
         </div>
       </LoadingSpinnerOverlay>
+
+      {/* Video Upload Modal */}
+      <VideoUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onVideoUploaded={handleVideoUploaded}
+      />
     </div>
   );
 };
