@@ -5,22 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { StatsCard } from "@/components/ui/stats-card";
-import { EmployeeIDCardsGridAdvanced } from "@/components/ui/employee-id-card-advanced";
+import { PremiumLandscapeGrid } from "@/components/ui/premium-landscape-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import { AddEmployeeModal } from "@/components/ui/add-employee-modal";
 import Navbar from "@/components/Navbar";
-import { employees } from "@/data/employees";
-
-// Department list
-const departmentList = [
-  "Technology",
-  "Content Production", 
-  "Content Strategy",
-  "Design",
-  "Marketing",
-  "Quality Assurance",
-  "Finance"
-];
+import { allEmployees, departments } from "@/data/employeesComplete";
 import { db } from "@/lib/db";
 import { photoUploadService } from "@/services/photoUpload";
 import { 
@@ -34,7 +23,7 @@ const EnhancedTeamV2 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [teamMembers, setTeamMembers] = useState(employees);
+  const [teamMembers, setTeamMembers] = useState(allEmployees);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -58,8 +47,8 @@ const EnhancedTeamV2 = () => {
       }
     } catch (error) {
       console.error('Error loading team members:', error);
-      // Fallback to static data
-      setTeamMembers(employees);
+        // Fallback to static data
+        setTeamMembers(allEmployees);
     } finally {
       setIsLoading(false);
     }
@@ -199,7 +188,7 @@ const EnhancedTeamV2 = () => {
                   >
                     All
                   </Button>
-                  {departmentList.map((dept) => (
+                  {departments.map((dept) => (
                     <Button
                       key={dept}
                       variant={selectedDepartment === dept ? "default" : "outline"}
@@ -251,7 +240,7 @@ const EnhancedTeamV2 = () => {
 
             {/* Team Members Display */}
             {viewMode === 'grid' ? (
-              <EmployeeIDCardsGridAdvanced 
+              <PremiumLandscapeGrid 
                 employees={filteredMembers}
                 onPhotoUpdate={handlePhotoUpdate}
               />
