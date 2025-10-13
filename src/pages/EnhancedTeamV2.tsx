@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { StatsCard } from "@/components/ui/stats-card";
-import { EmployeeIDCardsGridV2 } from "@/components/ui/employee-id-card-v2";
+import { EmployeeIDCardsGridAdvanced } from "@/components/ui/employee-id-card-advanced";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
+import { AddEmployeeModal } from "@/components/ui/add-employee-modal";
 import Navbar from "@/components/Navbar";
 import { employees } from "@/data/employees";
 
@@ -36,6 +37,7 @@ const EnhancedTeamV2 = () => {
   const [teamMembers, setTeamMembers] = useState(employees);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Load from database
   useEffect(() => {
@@ -131,10 +133,13 @@ const EnhancedTeamV2 = () => {
                   <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
                   Refresh
                 </Button>
-                <Button className="bg-primary hover:bg-primary-hover shadow-glow gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Member
-                </Button>
+                <Button 
+                className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
+                onClick={() => setShowAddModal(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Add Member
+              </Button>
               </div>
             </div>
 
@@ -246,7 +251,7 @@ const EnhancedTeamV2 = () => {
 
             {/* Team Members Display */}
             {viewMode === 'grid' ? (
-              <EmployeeIDCardsGridV2 
+              <EmployeeIDCardsGridAdvanced 
                 employees={filteredMembers}
                 onPhotoUpdate={handlePhotoUpdate}
               />
@@ -347,6 +352,16 @@ const EnhancedTeamV2 = () => {
           </div>
         </div>
       </LoadingSpinnerOverlay>
+
+      {/* Add Employee Modal */}
+      <AddEmployeeModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onEmployeeAdded={(newEmployee) => {
+          setTeamMembers(prev => [newEmployee, ...prev]);
+          loadTeamMembers(); // Refresh from database
+        }}
+      />
     </div>
   );
 };
