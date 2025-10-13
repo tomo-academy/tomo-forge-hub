@@ -105,10 +105,10 @@ END:VCARD`;
   const yearsSince = new Date().getFullYear() - new Date(employee.joinDate).getFullYear();
 
   return (
-    <div className="w-full max-w-[500px] mx-auto perspective-1000">
+    <div className="w-full max-w-[500px] mx-auto perspective-1000 px-2 sm:px-0">
       <div 
         className={cn(
-          "relative w-full h-[280px] transition-all duration-700 transform-style-preserve-3d cursor-pointer",
+          "relative w-full h-[280px] sm:h-[280px] transition-all duration-700 transform-style-preserve-3d cursor-pointer",
           isFlipped && "rotate-y-180"
         )}
         onClick={() => setIsFlipped(!isFlipped)}
@@ -141,7 +141,7 @@ END:VCARD`;
           {/* Main Content - Perfect Landscape Layout */}
           <div className="h-[calc(280px-56px-48px)] flex items-stretch">
             {/* Left: Photo Section */}
-            <div className="w-[140px] flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 border-r border-border p-3">
+            <div className="w-[120px] sm:w-[140px] flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 border-r border-border p-2 sm:p-3">
               <div className="relative group/photo mb-2">
                 <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white font-bold text-2xl border-4 border-white shadow-xl overflow-hidden">
                   {employee.avatar ? (
@@ -180,56 +180,56 @@ END:VCARD`;
                   employee.availability === 'offline' && "bg-gray-400"
                 )} />
               </div>
-              <div className="text-center">
-                <h3 className="font-bold text-sm leading-tight">{employee.name}</h3>
-                <p className="text-xs text-muted-foreground leading-tight mt-0.5">{employee.role}</p>
+              <div className="text-center mt-1.5">
+                <h3 className="font-bold text-xs sm:text-sm leading-tight">{employee.name}</h3>
+                <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight mt-0.5 truncate">{employee.role}</p>
               </div>
             </div>
 
             {/* Middle: Information Section */}
-            <div className="flex-1 p-4 flex flex-col justify-between">
+            <div className="flex-1 p-2 sm:p-4 flex flex-col justify-between">
               <div className="space-y-2">
                 {/* Employee ID */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-4 h-4 text-red-500" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] text-muted-foreground leading-none">Employee ID</p>
-                    <p className="font-mono font-bold text-xs leading-tight">{employee.employeeId}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-none">Employee ID</p>
+                    <p className="font-mono font-bold text-[10px] sm:text-xs leading-tight">{employee.employeeId}</p>
                   </div>
                 </div>
 
                 {/* Department */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                    <Briefcase className="w-4 h-4 text-blue-500" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                    <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] text-muted-foreground leading-none">Department</p>
-                    <p className="font-semibold text-xs leading-tight truncate">{employee.department}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-none">Department</p>
+                    <p className="font-semibold text-[10px] sm:text-xs leading-tight truncate">{employee.department}</p>
                   </div>
                 </div>
 
                 {/* Location */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-green-500" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] text-muted-foreground leading-none">Location</p>
-                    <p className="font-semibold text-xs leading-tight truncate">{employee.location || 'Remote'}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-none">Location</p>
+                    <p className="font-semibold text-[10px] sm:text-xs leading-tight truncate">{employee.location || 'Remote'}</p>
                   </div>
                 </div>
 
                 {/* Experience */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-4 h-4 text-orange-500" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] text-muted-foreground leading-none">Experience</p>
-                    <p className="font-semibold text-xs leading-tight">
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-none">Experience</p>
+                    <p className="font-semibold text-[10px] sm:text-xs leading-tight">
                       {yearsSince > 0 ? `${yearsSince} year${yearsSince > 1 ? 's' : ''}` : 'New'} at TOMO
                     </p>
                   </div>
@@ -254,11 +254,11 @@ END:VCARD`;
             </div>
 
             {/* Right: QR Code Section */}
-            <div className="w-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-accent/5 to-primary/5 border-l border-border p-3">
-              <div className="p-2 bg-white rounded-xl shadow-lg border-2 border-primary/10 mb-2">
-                <QRCode value={profileUrl} size={80} />
+            <div className="w-[100px] sm:w-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-accent/5 to-primary/5 border-l border-border p-2 sm:p-3">
+              <div className="p-1.5 sm:p-2 bg-white rounded-lg sm:rounded-xl shadow-lg border-2 border-primary/10 mb-1.5 sm:mb-2">
+                <QRCode value={profileUrl} size={70} />
               </div>
-              <p className="text-[9px] text-center text-muted-foreground leading-tight">
+              <p className="text-[8px] sm:text-[9px] text-center text-muted-foreground leading-tight">
                 Scan to View<br/>Full Profile
               </p>
             </div>
@@ -295,36 +295,36 @@ END:VCARD`;
             </div>
           </div>
 
-          <div className="h-[calc(280px-64px-52px)] flex flex-col items-center justify-center p-4">
-            <div className="text-center mb-3">
-              <h3 className="font-bold text-base">{employee.name}</h3>
-              <p className="text-sm text-muted-foreground">{employee.role}</p>
-              <p className="text-xs font-mono text-red-600 mt-1">{employee.employeeId}</p>
+          <div className="h-[calc(280px-64px-48px)] flex flex-col items-center justify-center p-3">
+            <div className="text-center mb-2">
+              <h3 className="font-bold text-sm leading-tight">{employee.name}</h3>
+              <p className="text-xs text-muted-foreground leading-tight truncate">{employee.role}</p>
+              <p className="text-[10px] font-mono text-red-600 mt-0.5">{employee.employeeId}</p>
             </div>
 
-            <div className="p-3 bg-white rounded-2xl shadow-xl border-2 border-red-500/20 mb-3">
-              <QRCode value={profileUrl} size={110} />
+            <div className="p-2.5 bg-white rounded-xl shadow-xl border-2 border-red-500/20 mb-2">
+              <QRCode value={profileUrl} size={100} />
             </div>
 
-            <p className="text-xs text-center text-muted-foreground">
-              Scan for complete profile & portfolio
+            <p className="text-[10px] text-center text-muted-foreground leading-tight">
+              Scan for complete profile
             </p>
           </div>
 
-          <div className="h-13 bg-gradient-to-r from-red-500/10 to-orange-500/10 border-t flex items-center justify-center gap-2 px-3">
-            <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={downloadVCard}>
-              <Download className="w-3 h-3 mr-1" />
+          <div className="h-12 bg-gradient-to-r from-red-500/10 to-orange-500/10 border-t flex items-center justify-center gap-1.5 px-2">
+            <Button variant="ghost" size="sm" className="h-7 text-[10px] px-2" onClick={downloadVCard}>
+              <Download className="w-3 h-3 mr-0.5" />
               vCard
             </Button>
-            <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={shareProfile}>
-              <Share2 className="w-3 h-3 mr-1" />
+            <Button variant="ghost" size="sm" className="h-7 text-[10px] px-2" onClick={shareProfile}>
+              <Share2 className="w-3 h-3 mr-0.5" />
               Share
             </Button>
-            <Button variant="default" size="sm" className="h-8 text-xs bg-red-500 hover:bg-red-600" onClick={(e) => {
+            <Button variant="default" size="sm" className="h-7 text-[10px] px-2 bg-red-500 hover:bg-red-600" onClick={(e) => {
               e.stopPropagation();
               window.open(`/profile/${employee.id}`, '_blank');
             }}>
-              <Eye className="w-3 h-3 mr-1" />
+              <Eye className="w-3 h-3 mr-0.5" />
               View
             </Button>
           </div>
