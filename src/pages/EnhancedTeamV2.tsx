@@ -8,7 +8,18 @@ import { StatsCard } from "@/components/ui/stats-card";
 import { EmployeeIDCardsGridV2 } from "@/components/ui/employee-id-card-v2";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import Navbar from "@/components/Navbar";
-import { employees, departments } from "@/data/employees";
+import { employees } from "@/data/employees";
+
+// Department list
+const departmentList = [
+  "Technology",
+  "Content Production", 
+  "Content Strategy",
+  "Design",
+  "Marketing",
+  "Quality Assurance",
+  "Finance"
+];
 import { db } from "@/lib/db";
 import { photoUploadService } from "@/services/photoUpload";
 import { 
@@ -183,7 +194,7 @@ const EnhancedTeamV2 = () => {
                   >
                     All
                   </Button>
-                  {departments.map((dept) => (
+                  {departmentList.map((dept) => (
                     <Button
                       key={dept}
                       variant={selectedDepartment === dept ? "default" : "outline"}
