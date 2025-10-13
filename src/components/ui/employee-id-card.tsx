@@ -163,7 +163,7 @@ END:VCARD`;
             <div className="flex items-center gap-2 flex-1">
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center overflow-hidden">
                 <img 
-                  src="/TOMO.svg" 
+                  src="/TOMO.jpg" 
                   alt="TOMO Academy"
                   className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
@@ -370,7 +370,7 @@ END:VCARD`;
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden">
                 <img 
-                  src="/TOMO.svg" 
+                  src="/TOMO.jpg" 
                   alt="TOMO Academy"
                   className="w-full h-full object-cover rounded-full"
                   onError={(e) => {

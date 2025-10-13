@@ -43,7 +43,7 @@ const TestProfile = () => {
             
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
               <img 
-                src="/TOMO.svg" 
+                src="/TOMO.jpg" 
                 alt="TOMO Academy"
                 className="w-full h-full object-cover rounded-full"
                 onError={(e) => {

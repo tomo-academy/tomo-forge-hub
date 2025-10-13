@@ -126,7 +126,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
         <DialogHeader className="text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-4">
             <img 
-              src="/TOMO.svg" 
+              src="/TOMO.jpg" 
               alt="TOMO Academy"
               className="w-12 h-12"
               onError={(e) => {
