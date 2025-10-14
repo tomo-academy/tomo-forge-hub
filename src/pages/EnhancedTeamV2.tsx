@@ -78,15 +78,24 @@ const EnhancedTeamV2 = () => {
 
   const handlePhotoUpdate = async (employeeId: string, file: File) => {
     try {
+      console.log('📸 Uploading photo for employee:', employeeId);
       const result = await photoUploadService.uploadPhoto(employeeId, file);
+      
       if (result.success && result.url) {
-        // Update local state
+        console.log('✅ Photo uploaded successfully:', result.url);
+        
+        // Update local state immediately
         setTeamMembers(prev => prev.map(emp => 
-          emp.id === employeeId ? { ...emp, avatar: result.url } : emp
+          emp.id === employeeId ? { ...emp, avatar: result.url, avatar_url: result.url } : emp
         ));
+        
+        // Reload from database to ensure consistency
+        await loadTeamMembers();
+      } else {
+        console.error('❌ Photo upload failed:', result);
       }
     } catch (error) {
-      console.error('Photo update error:', error);
+      console.error('❌ Photo update error:', error);
     }
   };
 

@@ -1,5 +1,5 @@
 // NeonDB Service - Replaces Firebase
-import { db } from '@/lib/db';
+import { db, sql } from '@/lib/db';
 
 // Mock data for fallback
 const mockRevenue = {
@@ -110,11 +110,60 @@ class NeonService {
   // Revenue Management
   async getCurrentMonthRevenue(): Promise<Revenue> {
     try {
-      // In a real implementation, this would query the revenue table
-      console.log('📊 Using mock revenue data');
+      const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+      const currentYear = new Date().getFullYear();
+      
+      // Try to fetch from database
+      if (!sql) {
+        console.log('📊 No database connection, using fallback data');
+        return mockRevenue;
+      }
+      
+      const result = await sql`
+        SELECT * FROM revenue 
+        WHERE month = ${currentMonth} AND year = ${currentYear}
+        ORDER BY created_at DESC 
+        LIMIT 1
+      `;
+      
+      if (result && result.length > 0) {
+        const data = result[0];
+        console.log('✅ Loaded real revenue data from database');
+        return {
+          id: data.id,
+          month: data.month,
+          year: data.year,
+          totalRevenue: parseFloat(data.total_revenue) || 0,
+          adRevenue: parseFloat(data.ad_revenue) || 0,
+          sponsorships: parseFloat(data.sponsorships) || 0,
+          memberships: parseFloat(data.memberships) || 0,
+          merchandise: parseFloat(data.merchandise) || 0,
+          courses: parseFloat(data.courses) || 0
+        };
+      }
+      
+      // If no data, create initial record
+      console.log('📊 No revenue data found, creating initial record...');
+      await sql`
+        INSERT INTO revenue (id, month, year, total_revenue, ad_revenue, sponsorships, memberships, merchandise, courses)
+        VALUES (
+          ${'rev-' + Date.now()},
+          ${currentMonth},
+          ${currentYear},
+          ${mockRevenue.totalRevenue},
+          ${mockRevenue.adRevenue},
+          ${mockRevenue.sponsorships},
+          ${mockRevenue.memberships},
+          ${mockRevenue.merchandise},
+          ${mockRevenue.courses}
+        )
+        ON CONFLICT (month, year) DO NOTHING
+      `;
+      
       return mockRevenue;
     } catch (error) {
-      console.error('Error fetching revenue:', error);
+      console.error('❌ Error fetching revenue:', error);
+      console.log('📊 Using fallback revenue data');
       return mockRevenue;
     }
   }
@@ -122,22 +171,84 @@ class NeonService {
   // Activity Feed
   async getRecentActivities(limit: number = 10): Promise<Activity[]> {
     try {
-      // In a real implementation, this would query the activities table
-      console.log('📋 Using mock activities data');
+      if (!sql) {
+        console.log('📋 No database connection, using fallback data');
+        return mockActivities.slice(0, limit);
+      }
+      
+      // Try to fetch from database
+      const result = await sql`
+        SELECT * FROM activities 
+        ORDER BY timestamp DESC 
+        LIMIT ${limit}
+      `;
+      
+      if (result && result.length > 0) {
+        console.log('✅ Loaded real activities from database:', result.length);
+        return result.map((row: any) => ({
+          id: row.id,
+          userId: row.user_id,
+          userName: row.user_name,
+          action: row.action,
+          title: row.title,
+          type: row.type,
+          timestamp: row.timestamp,
+          metadata: row.metadata
+        }));
+      }
+      
+      // If no data, seed some initial activities
+      console.log('📋 No activities found, creating initial activities...');
+      for (const activity of mockActivities) {
+        await sql`
+          INSERT INTO activities (id, user_id, user_name, action, title, type, timestamp)
+          VALUES (
+            ${activity.id},
+            ${activity.userId},
+            ${activity.userName},
+            ${activity.action},
+            ${activity.title},
+            ${activity.type},
+            ${activity.timestamp}
+          )
+          ON CONFLICT (id) DO NOTHING
+        `;
+      }
+      
       return mockActivities.slice(0, limit);
     } catch (error) {
-      console.error('Error fetching activities:', error);
+      console.error('❌ Error fetching activities:', error);
+      console.log('📋 Using fallback activities data');
       return mockActivities.slice(0, limit);
     }
   }
 
   async addActivity(activity: Omit<Activity, 'id' | 'timestamp'>): Promise<string> {
     try {
-      // In a real implementation, this would insert into activities table
-      console.log('➕ Activity added:', activity);
-      return 'activity-' + Date.now();
+      if (!sql) {
+        console.log('📋 No database connection, activity not saved');
+        return 'activity-' + Date.now();
+      }
+      
+      const activityId = 'activity-' + Date.now();
+      
+      await sql`
+        INSERT INTO activities (id, user_id, user_name, action, title, type, metadata)
+        VALUES (
+          ${activityId},
+          ${activity.userId},
+          ${activity.userName},
+          ${activity.action},
+          ${activity.title},
+          ${activity.type},
+          ${JSON.stringify(activity.metadata || {})}
+        )
+      `;
+      
+      console.log('✅ Activity added to database:', activity);
+      return activityId;
     } catch (error) {
-      console.error('Error adding activity:', error);
+      console.error('❌ Error adding activity:', error);
       throw error;
     }
   }
@@ -145,11 +256,60 @@ class NeonService {
   // Analytics
   async getTodayAnalytics(): Promise<Analytics> {
     try {
-      // In a real implementation, this would query the analytics table
-      console.log('📈 Using mock analytics data');
+      if (!sql) {
+        console.log('📈 No database connection, using fallback data');
+        return mockAnalytics;
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Try to fetch from database
+      const result = await sql`
+        SELECT * FROM analytics 
+        WHERE date = ${today}
+        LIMIT 1
+      `;
+      
+      if (result && result.length > 0) {
+        const data = result[0];
+        console.log('✅ Loaded real analytics from database');
+        return {
+          id: data.id,
+          date: data.date,
+          subscribers: data.subscribers || 0,
+          views: data.views || 0,
+          watchTime: data.watch_time || 0,
+          engagement: parseFloat(data.engagement) || 0,
+          revenue: parseFloat(data.revenue) || 0,
+          videosPublished: data.videos_published || 0,
+          tasksCompleted: data.tasks_completed || 0,
+          teamProductivity: parseFloat(data.team_productivity) || 0
+        };
+      }
+      
+      // If no data for today, create initial record
+      console.log('📈 No analytics for today, creating initial record...');
+      await sql`
+        INSERT INTO analytics (id, date, subscribers, views, watch_time, engagement, revenue, videos_published, tasks_completed, team_productivity)
+        VALUES (
+          ${'analytics-' + Date.now()},
+          ${today},
+          ${mockAnalytics.subscribers},
+          ${mockAnalytics.views},
+          ${mockAnalytics.watchTime},
+          ${mockAnalytics.engagement},
+          ${mockAnalytics.revenue},
+          ${mockAnalytics.videosPublished},
+          ${mockAnalytics.tasksCompleted},
+          ${mockAnalytics.teamProductivity}
+        )
+        ON CONFLICT (date) DO NOTHING
+      `;
+      
       return mockAnalytics;
     } catch (error) {
-      console.error('Error fetching analytics:', error);
+      console.error('❌ Error fetching analytics:', error);
+      console.log('📈 Using fallback analytics data');
       return mockAnalytics;
     }
   }
