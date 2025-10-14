@@ -210,7 +210,7 @@ END:VCARD`;
                       <img 
                         src={getImagePath(employee.avatar) || ''} 
                         alt={employee.name}
-                        className="w-full h-full object-cover absolute inset-0"
+                        className="w-full h-full object-contain absolute inset-0 bg-white"
                         onError={(e) => {
                           // Fallback to initials if image fails to load
                           e.currentTarget.style.display = 'none';
