@@ -235,16 +235,16 @@ export const employees: Employee[] = [
   {
     id: "haridharuson-lj",
     name: "Haridharuson L.J",
-    role: "Technical Writer & Research Analyst",
-    department: "Content Strategy",
+    role: "Head Of Content Verification",
+    department: "HoD of Content Verification",
     email: "haridharuson.lj@tomoacademy.com",
-    phone: "+91 98765 43216",
+    phone: "+91 9345304086",
     employeeId: "TOMO-007",
-    joinDate: "2021-07-05",
-    avatar: "public/placeholder.jpg",
+    joinDate: "2025-07-05",
+    avatar: "public/haridharuson.jpg",
     bio: "Technical writer and research analyst specializing in emerging technologies.",
     skills: ["Technical Writing", "Research", "Documentation", "Data Analysis", "Python"],
-    location: "Coimbatore, India",
+    location: "Salem, Tamilnadu, India",
     availability: "available",
     stats: {
       videos: 45,
@@ -299,17 +299,17 @@ export const employees: Employee[] = [
 
   {
     id: "dev",
-    name: "Dev",
-    role: "Full Stack Developer",
-    department: "Technology",
+    name: "Dev M K",
+    role: " Hod Of marketing",
+    department: "Marketing",
     email: "dev@tomoacademy.com",
-    phone: "+91 98765 43218",
+    phone: "+91 8438074241",
     employeeId: "TOMO-009",
-    joinDate: "2022-05-01",
-    avatar: "public/placeholder.jpg",
+    joinDate: "2025-05-01",
+    avatar: "public/dev.jpg",
     bio: "Full-stack developer specializing in modern web technologies and API development.",
     skills: ["JavaScript", "React", "Express", "PostgreSQL", "REST APIs", "Git"],
-    location: "Pune, India",
+    location: "Salem, Ponnamapet, Tamilnadu India",
     availability: "available",
     stats: {
       videos: 8,
@@ -459,6 +459,38 @@ export const employees: Employee[] = [
     ]
   },
 
+   {
+    id: "Gowsika",
+    name: "Gowsika",
+    role: "Joint Editor (Insta)",
+    department: "Editor",
+    email: "Gowsika@tomoacademy.com",
+    phone: "+91 9342247332",
+    employeeId: "TOMO-014",
+    joinDate: "2025-11-15",
+    avatar: "public/placeholder.jpg",
+    bio: "Content writer and social media specialist focused on creating engaging content.",
+    skills: ["Content Writing", "Social Media Marketing", "Copywriting", "SEO", "Community Management"],
+    location: "Thiruchengodu,Tamilnadu India",
+    availability: "available",
+    stats: {
+      videos: 67,
+      tasks: 89,
+      rating: 4.6,
+      projects: 34
+    },
+    social: {
+      linkedin: "https://linkedin.com/in/nithyasri",
+      instagram: "https://instagram.com/nithya_writes"
+    },
+    cardColor: "accent",
+    recentWork: [
+      { title: "Social Media Campaign", type: "Marketing", date: "2025-09-28" },
+      { title: "Blog Content Series", type: "Writing", date: "2025-09-26" },
+      { title: "Instagram Strategy", type: "Strategy", date: "2025-09-24" }
+    ]
+  },
+
   {
     id: "prawin-krishnan",
     name: "Prawin Krishnan",
@@ -466,7 +498,7 @@ export const employees: Employee[] = [
     department: "Finance",
     email: "prawin.krishnan@tomoacademy.com",
     phone: "+91 98765 43223",
-    employeeId: "TOMO-014",
+    employeeId: "TOMO-015",
     joinDate: "2020-11-01",
     avatar: "public/placeholder.jpg",
     bio: "Finance manager and operations head overseeing financial planning and operational efficiency.",
