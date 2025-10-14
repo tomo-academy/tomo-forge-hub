@@ -44,47 +44,43 @@ class EmailService {
     }
 
     try {
+      // Get simplified browser info (not full user agent)
+      const getBrowserName = () => {
+        const ua = navigator.userAgent;
+        if (ua.includes('Chrome')) return 'Chrome';
+        if (ua.includes('Firefox')) return 'Firefox';
+        if (ua.includes('Safari')) return 'Safari';
+        if (ua.includes('Edge')) return 'Edge';
+        return 'Unknown';
+      };
+      
+      const getDeviceType = () => {
+        const ua = navigator.userAgent;
+        if (/mobile/i.test(ua)) return 'Mobile';
+        if (/tablet/i.test(ua)) return 'Tablet';
+        return 'Desktop';
+      };
+      
       const templateParams = {
-        // EmailJS requires these exact parameter names
+        // EmailJS standard parameters (REQUIRED)
         to_name: 'TOMO Academy Admin',
         to_email: this.adminEmail,
         from_name: 'TOMO Academy System',
         reply_to: this.adminEmail,
         
-        // Custom parameters for your template
-        admin_name: this.adminEmail,
+        // Custom parameters (simplified to avoid 414 error)
         adminName: this.adminEmail,
-        subject: notification.subject,
-        message: notification.message,
-        type: notification.type,
-        timestamp: new Date().toLocaleString(),
-        login_time: new Date().toLocaleString(),
         loginTime: new Date().toLocaleString(),
-        browser_info: navigator.userAgent,
-        browserInfo: navigator.userAgent,
-        device_info: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-        deviceInfo: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-        ip_address: 'Client-side detection unavailable',
-        ipAddress: 'Client-side detection unavailable',
-        location: 'Requires server-side detection',
-        
-        // Additional helpful parameters
-        portal_url: window.location.origin + '/admin',
+        browserInfo: getBrowserName(),
+        deviceInfo: getDeviceType(),
+        ipAddress: 'Not available',
+        location: 'Not available',
         portalUrl: window.location.origin + '/admin',
-        admin_settings_url: window.location.origin + '/admin',
-        adminSettingsUrl: window.location.origin + '/admin',
-        last_login_time: 'First login today',
-        lastLoginTime: 'First login today',
-        last_login_admin: this.adminEmail,
-        lastLoginAdmin: this.adminEmail,
-        daily_login_count: '1',
-        dailyLoginCount: '1',
-        recent_action: 'Logged into admin dashboard',
-        recentAction: 'Logged into admin dashboard',
       };
       
       console.log('📧 Sending email with params:', templateParams);
       console.log('📧 Recipient:', this.adminEmail);
+      console.log('📧 to_email parameter:', templateParams.to_email);
       
       // Using EmailJS for client-side email sending
       const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
