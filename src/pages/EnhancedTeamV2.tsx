@@ -98,13 +98,33 @@ const EnhancedTeamV2 = () => {
     avgRating: (teamMembers.reduce((sum, m) => sum + m.stats.rating, 0) / teamMembers.length).toFixed(1)
   };
 
+  // Function to get the correct image path
+  const getImagePath = (avatar?: string) => {
+    if (!avatar) return null;
+    
+    // If it's a public path, remove the 'public/' prefix
+    if (avatar.startsWith('public/')) {
+      return avatar.replace('public/', '/');
+    }
+    
+    // If it already starts with '/', return as is
+    if (avatar.startsWith('/')) {
+      return avatar;
+    }
+    
+    // If it's a relative path without leading '/', add it
+    return `/${avatar}`;
+  };
+
   // Function to render avatar with fallback
   const renderAvatar = (member: any) => {
-    if (member.avatar && !member.avatar.startsWith('public/')) {
+    const imagePath = getImagePath(member.avatar);
+    
+    if (imagePath) {
       // External URL or properly formatted path
       return (
         <img 
-          src={member.avatar} 
+          src={imagePath} 
           alt={member.name}
           className="w-full h-full object-cover"
           onError={(e) => {
@@ -278,7 +298,7 @@ const EnhancedTeamV2 = () => {
                       <div className="relative group">
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-4 border-white shadow-lg overflow-hidden">
                           {renderAvatar(member)}
-                          <span className={member.avatar && !member.avatar.startsWith('public/') ? 'hidden' : ''}>
+                          <span className={!getImagePath(member.avatar) ? '' : 'hidden'}>
                             {member.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
