@@ -1,17 +1,4 @@
-// Real Task Management Service for TOMO Academy
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc,
-  query, 
-  orderBy, 
-  where,
-  Timestamp 
-} from 'firebase/firestore';
-import { db } from '@/config/firebase';
+// Task Management Service for TOMO Academy
 
 export interface Task {
   id: string;
@@ -37,8 +24,8 @@ export interface Task {
     message: string;
     timestamp: Date;
   }[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: string;
+  updatedAt: string;
   createdBy: string;
 }
 
@@ -55,141 +42,70 @@ export interface TaskStats {
 }
 
 class TaskService {
-  private collectionName = 'tasks';
-
   // Get all tasks
   async getTasks(): Promise<Task[]> {
-    try {
-      const tasksRef = collection(db, this.collectionName);
-      const snapshot = await getDocs(query(tasksRef, orderBy('createdAt', 'desc')));
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-      return this.getMockTasks();
-    }
+    console.log('📋 Using mock task data');
+    return this.getMockTasks();
   }
 
   // Get tasks by status
   async getTasksByStatus(status: Task['status']): Promise<Task[]> {
-    try {
-      const tasksRef = collection(db, this.collectionName);
-      const snapshot = await getDocs(query(tasksRef, where('status', '==', status), orderBy('createdAt', 'desc')));
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
-    } catch (error) {
-      console.error('Error fetching tasks by status:', error);
-      return this.getMockTasks().filter(task => task.status === status);
-    }
+    const tasks = await this.getTasks();
+    return tasks.filter(task => task.status === status);
   }
 
   // Create new task
   async createTask(task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
-    try {
-      const tasksRef = collection(db, this.collectionName);
-      const docRef = await addDoc(tasksRef, {
-        ...task,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      });
-      return docRef.id;
-    } catch (error) {
-      console.error('Error creating task:', error);
-      throw error;
-    }
+    console.log('➕ Creating task:', task.title);
+    return `task-${Date.now()}`;
   }
 
   // Update task
   async updateTask(id: string, updates: Partial<Task>): Promise<void> {
-    try {
-      const taskRef = doc(db, this.collectionName, id);
-      await updateDoc(taskRef, {
-        ...updates,
-        updatedAt: Timestamp.now()
-      });
-    } catch (error) {
-      console.error('Error updating task:', error);
-      throw error;
-    }
+    console.log('✏️ Updating task:', id, updates);
   }
 
   // Delete task
   async deleteTask(id: string): Promise<void> {
-    try {
-      const taskRef = doc(db, this.collectionName, id);
-      await deleteDoc(taskRef);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      throw error;
-    }
+    console.log('🗑️ Deleting task:', id);
   }
 
   // Get task statistics
   async getTaskStats(): Promise<TaskStats> {
-    try {
-      const tasks = await this.getTasks();
-      const now = new Date();
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const tasks = await this.getTasks();
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-      return {
-        total: tasks.length,
-        backlog: tasks.filter(t => t.status === 'backlog').length,
-        todo: tasks.filter(t => t.status === 'todo').length,
-        inProgress: tasks.filter(t => t.status === 'in_progress').length,
-        review: tasks.filter(t => t.status === 'review').length,
-        done: tasks.filter(t => t.status === 'done').length,
-        overdue: tasks.filter(t => new Date(t.dueDate) < now && t.status !== 'done').length,
-        completedThisWeek: tasks.filter(t => 
-          t.status === 'done' && 
-          t.completedDate && 
-          new Date(t.completedDate) > weekAgo
-        ).length,
-        completedThisMonth: tasks.filter(t => 
-          t.status === 'done' && 
-          t.completedDate && 
-          new Date(t.completedDate) > monthAgo
-        ).length,
-      };
-    } catch (error) {
-      console.error('Error getting task stats:', error);
-      return {
-        total: 0,
-        backlog: 0,
-        todo: 0,
-        inProgress: 0,
-        review: 0,
-        done: 0,
-        overdue: 0,
-        completedThisWeek: 0,
-        completedThisMonth: 0,
-      };
-    }
+    return {
+      total: tasks.length,
+      backlog: tasks.filter(t => t.status === 'backlog').length,
+      todo: tasks.filter(t => t.status === 'todo').length,
+      inProgress: tasks.filter(t => t.status === 'in_progress').length,
+      review: tasks.filter(t => t.status === 'review').length,
+      done: tasks.filter(t => t.status === 'done').length,
+      overdue: tasks.filter(t => new Date(t.dueDate) < now && t.status !== 'done').length,
+      completedThisWeek: tasks.filter(t => 
+        t.status === 'done' && 
+        t.completedDate && 
+        new Date(t.completedDate) > weekAgo
+      ).length,
+      completedThisMonth: tasks.filter(t => 
+        t.status === 'done' && 
+        t.completedDate && 
+        new Date(t.completedDate) > monthAgo
+      ).length,
+    };
   }
 
   // Initialize default tasks
   async initializeDefaultTasks(): Promise<void> {
-    try {
-      const existingTasks = await this.getTasks();
-      if (existingTasks.length > 0) {
-        console.log('Tasks already initialized');
-        return;
-      }
-
-      const defaultTasks = this.getMockTasks();
-      for (const task of defaultTasks) {
-        await this.createTask({
-          ...task,
-          createdBy: 'system'
-        });
-      }
-      
-      console.log('Default tasks initialized');
-    } catch (error) {
-      console.error('Error initializing default tasks:', error);
-    }
+    console.log('✅ Tasks initialized with mock data');
   }
 
   // Mock tasks for fallback
-  private getMockTasks(): Omit<Task, 'createdAt' | 'updatedAt' | 'createdBy'>[] {
+  private getMockTasks(): Task[] {
+    const now = new Date().toISOString();
     return [
       {
         id: "task-001",
@@ -202,7 +118,10 @@ class TaskService {
         dueDate: "2025-10-03",
         tags: ["design", "thumbnail", "typescript"],
         category: "design",
-        estimatedHours: 2
+        estimatedHours: 2,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-002",
@@ -217,7 +136,10 @@ class TaskService {
         category: "video",
         progress: 65,
         estimatedHours: 4,
-        actualHours: 2.5
+        actualHours: 2.5,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-003",
@@ -230,7 +152,10 @@ class TaskService {
         dueDate: "2025-10-04",
         tags: ["script", "nextjs", "deployment"],
         category: "content",
-        estimatedHours: 3
+        estimatedHours: 3,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-004",
@@ -245,7 +170,10 @@ class TaskService {
         dueDate: "2025-10-02",
         tags: ["design", "review", "firebase"],
         category: "design",
-        estimatedHours: 1
+        estimatedHours: 1,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-005",
@@ -260,7 +188,10 @@ class TaskService {
         tags: ["upload", "css", "tutorial"],
         category: "video",
         estimatedHours: 1,
-        actualHours: 0.5
+        actualHours: 0.5,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-006",
@@ -273,7 +204,10 @@ class TaskService {
         dueDate: "2025-10-08",
         tags: ["planning", "content", "calendar"],
         category: "marketing",
-        estimatedHours: 4
+        estimatedHours: 4,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-007",
@@ -286,7 +220,10 @@ class TaskService {
         dueDate: "2025-10-20",
         tags: ["research", "ai", "automation"],
         category: "other",
-        estimatedHours: 6
+        estimatedHours: 6,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       },
       {
         id: "task-008",
@@ -301,7 +238,10 @@ class TaskService {
         category: "development",
         progress: 40,
         estimatedHours: 8,
-        actualHours: 3
+        actualHours: 3,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: "system"
       }
     ];
   }
