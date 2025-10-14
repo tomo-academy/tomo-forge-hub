@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { StatsCard } from "@/components/ui/stats-card";
 import { PremiumLandscapeGrid } from "@/components/ui/premium-landscape-card";
+import { CompactIDCardGrid } from "@/components/ui/compact-id-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import { AddEmployeeModal } from "@/components/ui/add-employee-modal";
 import Navbar from "@/components/Navbar";
@@ -240,7 +241,7 @@ const EnhancedTeamV2 = () => {
 
             {/* Team Members Display */}
             {viewMode === 'grid' ? (
-              <PremiumLandscapeGrid 
+              <CompactIDCardGrid 
                 employees={filteredMembers}
                 onPhotoUpdate={handlePhotoUpdate}
               />

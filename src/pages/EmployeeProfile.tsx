@@ -13,7 +13,7 @@ import {
   Linkedin, Twitter, Github, Globe, Instagram,
   Download, Share2, Copy, ExternalLink, Youtube,
   User, Clock, TrendingUp, Eye, MessageSquare,
-  Building2, Users, Target, Activity
+  Building2, Users, Target, Activity, BarChart3
 } from "lucide-react";
 
 // Complete employee data for all 14 members
@@ -31,7 +31,12 @@ const employeeData = [
     location: "Chennai, India",
     availability: "available",
     stats: { videos: 28, tasks: 165, rating: 4.9, projects: 24 },
-    bio: "Full-stack developer and channel manager leading the technical vision for TOMO Academy."
+    bio: "Full-stack developer and channel manager leading the technical vision for TOMO Academy.",
+    skills: ["React", "TypeScript", "Node.js", "Firebase", "YouTube API", "Team Leadership"],
+    social: {
+      linkedin: "https://linkedin.com/in/kanish-sj",
+      github: "https://github.com/kanish-sj"
+    }
   },
   {
     id: "kamesh",
@@ -46,7 +51,8 @@ const employeeData = [
     location: "Bangalore, India",
     availability: "busy",
     stats: { videos: 156, tasks: 89, rating: 4.8, projects: 45 },
-    bio: "Multi-talented video editor and UI designer with expertise in creating engaging educational content."
+    bio: "Multi-talented video editor and UI designer with expertise in creating engaging educational content.",
+    skills: ["Video Editing", "UI Design", "Adobe Premiere", "After Effects", "Figma", "Motion Graphics"]
   },
   {
     id: "aditya-chaurasiya",
@@ -61,7 +67,8 @@ const employeeData = [
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 134, tasks: 76, rating: 4.7, projects: 38 },
-    bio: "Creative video editor specializing in social media content and cross-platform optimization."
+    bio: "Creative video editor specializing in social media content and cross-platform optimization.",
+    skills: ["Video Editing", "Social Media", "Content Strategy", "Adobe Creative Suite", "Analytics"]
   },
   {
     id: "kavyashree",
@@ -76,7 +83,8 @@ const employeeData = [
     location: "Hyderabad, India",
     availability: "available",
     stats: { videos: 98, tasks: 67, rating: 4.6, projects: 29 },
-    bio: "Talented video editor and content creator with a passion for storytelling."
+    bio: "Talented video editor and content creator with a passion for storytelling.",
+    skills: ["Video Editing", "Storytelling", "Color Grading", "Sound Design", "DaVinci Resolve"]
   },
   {
     id: "monika",
@@ -91,7 +99,8 @@ const employeeData = [
     location: "Chennai, India",
     availability: "busy",
     stats: { videos: 87, tasks: 54, rating: 4.5, projects: 31 },
-    bio: "Creative video editor and graphics designer specializing in visual storytelling."
+    bio: "Creative video editor and graphics designer specializing in visual storytelling.",
+    skills: ["Video Editing", "Graphic Design", "Photoshop", "Illustrator", "Animation"]
   },
   {
     id: "ajay-krithick",
@@ -106,7 +115,8 @@ const employeeData = [
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 89, tasks: 134, rating: 4.7, projects: 32 },
-    bio: "Content strategist with a passion for creating engaging educational material."
+    bio: "Content strategist with a passion for creating engaging educational material.",
+    skills: ["Content Strategy", "Script Writing", "SEO", "Research", "Educational Design"]
   },
   {
     id: "haridharuson-lj",
@@ -121,7 +131,8 @@ const employeeData = [
     location: "Coimbatore, India",
     availability: "available",
     stats: { videos: 45, tasks: 98, rating: 4.6, projects: 28 },
-    bio: "Technical writer and research analyst specializing in emerging technologies."
+    bio: "Technical writer and research analyst specializing in emerging technologies.",
+    skills: ["Technical Writing", "Research", "Documentation", "Data Analysis", "Python"]
   },
   {
     id: "nithish",
@@ -136,7 +147,8 @@ const employeeData = [
     location: "Bangalore, India",
     availability: "busy",
     stats: { videos: 12, tasks: 156, rating: 4.8, projects: 42 },
-    bio: "Senior full-stack developer with expertise in modern web technologies."
+    bio: "Senior full-stack developer with expertise in modern web technologies.",
+    skills: ["React", "Node.js", "MongoDB", "AWS", "Docker", "Microservices"]
   },
   {
     id: "dev",
@@ -151,7 +163,8 @@ const employeeData = [
     location: "Pune, India",
     availability: "available",
     stats: { videos: 8, tasks: 76, rating: 4.5, projects: 18 },
-    bio: "Full-stack developer specializing in modern web technologies and API development."
+    bio: "Full-stack developer specializing in modern web technologies and API development.",
+    skills: ["JavaScript", "React", "Express", "PostgreSQL", "REST APIs", "Git"]
   },
   {
     id: "raaj-nikitaa",
@@ -166,7 +179,8 @@ const employeeData = [
     location: "Hyderabad, India",
     availability: "available",
     stats: { videos: 234, tasks: 98, rating: 4.9, projects: 67 },
-    bio: "Creative lead designer specializing in thumbnails, UI/UX, and brand identity."
+    bio: "Creative lead designer specializing in thumbnails, UI/UX, and brand identity.",
+    skills: ["UI/UX Design", "Brand Identity", "Thumbnail Design", "Figma", "Adobe XD", "Typography"]
   },
   {
     id: "nithyasri",
@@ -181,7 +195,8 @@ const employeeData = [
     location: "Chennai, India",
     availability: "available",
     stats: { videos: 67, tasks: 89, rating: 4.6, projects: 34 },
-    bio: "Content writer and social media specialist focused on creating engaging content."
+    bio: "Content writer and social media specialist focused on creating engaging content.",
+    skills: ["Content Writing", "Social Media Marketing", "Copywriting", "SEO", "Community Management"]
   },
   {
     id: "indhumathi",
@@ -196,7 +211,8 @@ const employeeData = [
     location: "Coimbatore, India",
     availability: "busy",
     stats: { videos: 45, tasks: 112, rating: 4.7, projects: 29 },
-    bio: "Marketing manager with expertise in content planning and campaign management."
+    bio: "Marketing manager with expertise in content planning and campaign management.",
+    skills: ["Marketing Strategy", "Content Planning", "Campaign Management", "Analytics", "Project Management"]
   },
   {
     id: "keerthana",
@@ -211,7 +227,8 @@ const employeeData = [
     location: "Chennai, India",
     availability: "available",
     stats: { videos: 189, tasks: 145, rating: 4.8, projects: 23 },
-    bio: "Content verifier and quality analyst ensuring all educational content meets high standards."
+    bio: "Content verifier and quality analyst ensuring all educational content meets high standards.",
+    skills: ["Quality Assurance", "Content Review", "Attention to Detail", "Process Improvement", "Documentation"]
   },
   {
     id: "prawin-krishnan",
@@ -226,7 +243,8 @@ const employeeData = [
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 15, tasks: 87, rating: 4.9, projects: 19 },
-    bio: "Finance manager and operations head overseeing financial planning and operational efficiency."
+    bio: "Finance manager and operations head overseeing financial planning and operational efficiency.",
+    skills: ["Financial Planning", "Operations Management", "Budgeting", "Excel", "Strategic Planning", "Team Leadership"]
   }
 ];
 
@@ -483,21 +501,23 @@ END:VCARD`;
             )}
 
             {/* Skills */}
-            <AnimatedCard hoverEffect="border">
-              <div className="p-6">
-                <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-primary" />
-                  Skills & Expertise
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {employee.skills.map((skill: string, index: number) => (
-                    <Badge key={index} variant="outline">
-                      {skill}
-                    </Badge>
-                  ))}
+            {employee.skills && employee.skills.length > 0 && (
+              <AnimatedCard hoverEffect="border">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                    Skills & Expertise
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {employee.skills.map((skill: string, index: number) => (
+                      <Badge key={index} variant="outline">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </AnimatedCard>
+              </AnimatedCard>
+            )}
 
             {/* Recent Work */}
             {employee.recentWork && employee.recentWork.length > 0 && (
