@@ -81,6 +81,31 @@ const EnhancedTeamV2 = () => {
     }
   };
 
+  const handleEditEmployee = (employee: any) => {
+    setSelectedEmployee(employee);
+    setShowEditModal(true);
+  };
+
+  const handleSaveEmployee = async (updatedEmployee: any) => {
+    try {
+      await db.employees.update(updatedEmployee.id, updatedEmployee);
+      await loadTeamMembers();
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      throw error;
+    }
+  };
+
+  const handleDeleteEmployee = async (id: string) => {
+    try {
+      await db.employees.delete(id);
+      await loadTeamMembers();
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      throw error;
+    }
+  };
+
   // Filter team members
   const filteredMembers = teamMembers.filter(member => {
     const matchesSearch = 
@@ -292,6 +317,7 @@ const EnhancedTeamV2 = () => {
               <CompactIDCardGrid 
                 employees={filteredMembers}
                 onPhotoUpdate={handlePhotoUpdate}
+                onEdit={handleEditEmployee}
               />
             ) : (
               <div className="space-y-4">
@@ -399,6 +425,20 @@ const EnhancedTeamV2 = () => {
           loadTeamMembers(); // Refresh from database
         }}
       />
+
+      {/* Edit Employee Modal */}
+      {selectedEmployee && (
+        <EditEmployeeModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedEmployee(null);
+          }}
+          employee={selectedEmployee}
+          onSave={handleSaveEmployee}
+          onDelete={handleDeleteEmployee}
+        />
+      )}
     </div>
   );
 };

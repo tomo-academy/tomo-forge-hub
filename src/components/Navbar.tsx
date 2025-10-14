@@ -17,9 +17,20 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-primary p-2 rounded-lg group-hover:shadow-glow transition-all">
-              <Youtube className="w-6 h-6 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center overflow-hidden shadow-lg ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all p-1">
+              <img 
+                src="/logo.png" 
+                alt="TOMO Academy" 
+                className="w-full h-full object-cover rounded-full" 
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<div class="w-6 h-6 text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></div>';
+                  }
+                }} 
+              />
             </div>
             <span className="text-xl font-bold">TOMO Academy</span>
           </Link>

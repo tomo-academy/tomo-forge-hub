@@ -4,10 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { AdminOnly } from "@/components/ui/admin-only";
 import { 
   Download, Share2, Mail, Phone, MapPin, Calendar, Star, Shield,
   Verified, Eye, Camera, Sparkles, Video, Briefcase, Globe,
-  Linkedin, Twitter, Github, Instagram, ExternalLink
+  Linkedin, Twitter, Github, Instagram, ExternalLink, Edit
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -180,8 +181,8 @@ END:VCARD`;
           {/* Compact Header */}
           <div className="relative h-12 bg-gradient-to-r from-pink-600 via-pink-500 to-pink-600 flex items-center justify-between px-3">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md p-0.5">
-                <img src="/logo.png" alt="TOMO Academy" className="w-full h-full object-contain" onError={(e) => {
+              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md p-1 ring-2 ring-white/50">
+                <img src="/logo.png" alt="TOMO Academy" className="w-full h-full object-cover rounded-full" onError={(e) => {
                   e.currentTarget.src = '/TOMO.jpg';
                 }} />
               </div>
@@ -444,19 +445,38 @@ END:VCARD`;
 // Grid Component for Compact Cards
 export function CompactIDCardGrid({ 
   employees,
-  onPhotoUpdate 
+  onPhotoUpdate,
+  onEdit
 }: { 
   employees: CompactIDCardProps['employee'][];
   onPhotoUpdate?: (employeeId: string, file: File) => Promise<void>;
+  onEdit?: (employee: CompactIDCardProps['employee']) => void;
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
       {employees.map((employee) => (
-        <CompactIDCard
-          key={employee.id}
-          employee={employee}
-          onPhotoUpdate={onPhotoUpdate ? (file) => onPhotoUpdate(employee.id, file) : undefined}
-        />
+        <div key={employee.id} className="relative group/container">
+          <CompactIDCard
+            employee={employee}
+            onPhotoUpdate={onPhotoUpdate ? (file) => onPhotoUpdate(employee.id, file) : undefined}
+          />
+          {onEdit && (
+            <AdminOnly>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="absolute top-2 right-2 opacity-0 group-hover/container:opacity-100 transition-all shadow-lg z-10 gap-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(employee);
+                }}
+              >
+                <Edit className="w-3 h-3" />
+                Edit
+              </Button>
+            </AdminOnly>
+          )}
+        </div>
       ))}
     </div>
   );
