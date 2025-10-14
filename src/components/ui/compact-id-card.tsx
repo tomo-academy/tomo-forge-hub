@@ -49,6 +49,24 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
 
   const profileUrl = `${window.location.origin}/profile/${employee.id}`;
 
+  // Function to get the correct image path
+  const getImagePath = (avatar?: string) => {
+    if (!avatar) return null;
+    
+    // If it's a public path, remove the 'public/' prefix
+    if (avatar.startsWith('public/')) {
+      return avatar.replace('public/', '/');
+    }
+    
+    // If it already starts with '/', return as is
+    if (avatar.startsWith('/')) {
+      return avatar;
+    }
+    
+    // If it's a relative path without leading '/', add it
+    return `/${avatar}`;
+  };
+
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -83,8 +101,8 @@ FN:${employee.name}
 ORG:TOMO Academy
 TITLE:${employee.role}
 EMAIL:${employee.email}
-${employee.phone ? `TEL:${employee.phone}` : ''}
-${employee.location ? `ADR:;;${employee.location};;;;` : ''}
+ ${employee.phone ? `TEL:${employee.phone}` : ''}
+ ${employee.location ? `ADR:;;${employee.location};;;;` : ''}
 URL:${profileUrl}
 NOTE:${employee.bio || ''}
 END:VCARD`;
@@ -184,15 +202,21 @@ END:VCARD`;
             <div className="flex-shrink-0">
               <div className="relative group/photo">
                 <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-3 border-white shadow-lg overflow-hidden">
-                  {employee.avatar ? (
+                  {getImagePath(employee.avatar) ? (
                     <img 
-                      src={employee.avatar} 
+                      src={getImagePath(employee.avatar) || ''} 
                       alt={employee.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to initials if image fails to load
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling!.style.display = 'flex';
+                      }}
                     />
-                  ) : (
-                    <span className="text-lg">{employee.name.split(' ').map(n => n[0]).join('')}</span>
-                  )}
+                  ) : null}
+                  <span className={!getImagePath(employee.avatar) ? '' : 'hidden'}>
+                    {employee.name.split(' ').map(n => n[0]).join('')}
+                  </span>
                   {isUploading && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
