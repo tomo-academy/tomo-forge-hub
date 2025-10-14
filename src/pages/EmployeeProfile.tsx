@@ -24,11 +24,11 @@ const employeeData = [
     role: "Lead Developer & Channel Manager",
     department: "Technology",
     email: "kanish.sj@tomoacademy.com",
-    phone: "+91 98765 43210",
+    phone: "+91 9940375600",
     employeeId: "TOMO-001",
-    joinDate: "2020-01-15",
-    avatar: "KS",
-    location: "Chennai, India",
+    joinDate: "2025-08-15",
+    avatar: "public/kanish.jpg", // Updated to use actual photo
+    location: "salem, Tamilnadu, India",
     availability: "available",
     stats: { videos: 28, tasks: 165, rating: 4.9, projects: 24 },
     bio: "Full-stack developer and channel manager leading the technical vision for TOMO Academy.",
@@ -40,15 +40,15 @@ const employeeData = [
   },
   {
     id: "kamesh",
-    name: "Kamesh",
+    name: "Kamesh AJ",
     role: "Senior Video Editor & UI Designer",
     department: "Content Production",
     email: "kamesh@tomoacademy.com",
-    phone: "+91 98765 43211",
+    phone: "+91 9385718659",
     employeeId: "TOMO-002",
-    joinDate: "2020-06-01",
-    avatar: "K",
-    location: "Bangalore, India",
+    joinDate: "2025-08-15",
+    avatar: "public/kamesh.jpg", // Placeholder image
+    location: "salem, tamilnadu, India",
     availability: "busy",
     stats: { videos: 156, tasks: 89, rating: 4.8, projects: 45 },
     bio: "Multi-talented video editor and UI designer with expertise in creating engaging educational content.",
@@ -63,7 +63,7 @@ const employeeData = [
     phone: "+91 98765 43212",
     employeeId: "TOMO-003",
     joinDate: "2021-02-10",
-    avatar: "AC",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 134, tasks: 76, rating: 4.7, projects: 38 },
@@ -79,7 +79,7 @@ const employeeData = [
     phone: "+91 98765 43213",
     employeeId: "TOMO-004",
     joinDate: "2021-08-15",
-    avatar: "KV",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Hyderabad, India",
     availability: "available",
     stats: { videos: 98, tasks: 67, rating: 4.6, projects: 29 },
@@ -95,7 +95,7 @@ const employeeData = [
     phone: "+91 98765 43214",
     employeeId: "TOMO-005",
     joinDate: "2022-01-20",
-    avatar: "M",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Chennai, India",
     availability: "busy",
     stats: { videos: 87, tasks: 54, rating: 4.5, projects: 31 },
@@ -111,7 +111,7 @@ const employeeData = [
     phone: "+91 98765 43215",
     employeeId: "TOMO-006",
     joinDate: "2021-03-10",
-    avatar: "AK",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 89, tasks: 134, rating: 4.7, projects: 32 },
@@ -127,7 +127,7 @@ const employeeData = [
     phone: "+91 98765 43216",
     employeeId: "TOMO-007",
     joinDate: "2021-07-05",
-    avatar: "HL",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Coimbatore, India",
     availability: "available",
     stats: { videos: 45, tasks: 98, rating: 4.6, projects: 28 },
@@ -143,7 +143,7 @@ const employeeData = [
     phone: "+91 98765 43217",
     employeeId: "TOMO-008",
     joinDate: "2020-08-20",
-    avatar: "N",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Bangalore, India",
     availability: "busy",
     stats: { videos: 12, tasks: 156, rating: 4.8, projects: 42 },
@@ -159,7 +159,7 @@ const employeeData = [
     phone: "+91 98765 43218",
     employeeId: "TOMO-009",
     joinDate: "2022-05-01",
-    avatar: "D",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Pune, India",
     availability: "available",
     stats: { videos: 8, tasks: 76, rating: 4.5, projects: 18 },
@@ -175,7 +175,7 @@ const employeeData = [
     phone: "+91 98765 43219",
     employeeId: "TOMO-010",
     joinDate: "2020-08-20",
-    avatar: "RN",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Hyderabad, India",
     availability: "available",
     stats: { videos: 234, tasks: 98, rating: 4.9, projects: 67 },
@@ -191,7 +191,7 @@ const employeeData = [
     phone: "+91 98765 43220",
     employeeId: "TOMO-011",
     joinDate: "2021-11-15",
-    avatar: "NS",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Chennai, India",
     availability: "available",
     stats: { videos: 67, tasks: 89, rating: 4.6, projects: 34 },
@@ -207,7 +207,7 @@ const employeeData = [
     phone: "+91 98765 43221",
     employeeId: "TOMO-012",
     joinDate: "2021-09-10",
-    avatar: "I",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Coimbatore, India",
     availability: "busy",
     stats: { videos: 45, tasks: 112, rating: 4.7, projects: 29 },
@@ -223,7 +223,7 @@ const employeeData = [
     phone: "+91 98765 43222",
     employeeId: "TOMO-013",
     joinDate: "2022-03-01",
-    avatar: "KT",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Chennai, India",
     availability: "available",
     stats: { videos: 189, tasks: 145, rating: 4.8, projects: 23 },
@@ -239,7 +239,7 @@ const employeeData = [
     phone: "+91 98765 43223",
     employeeId: "TOMO-014",
     joinDate: "2020-11-01",
-    avatar: "PK",
+    avatar: "public/placeholder.jpg", // Placeholder image
     location: "Mumbai, India",
     availability: "available",
     stats: { videos: 15, tasks: 87, rating: 4.9, projects: 19 },
@@ -247,6 +247,9 @@ const employeeData = [
     skills: ["Financial Planning", "Operations Management", "Budgeting", "Excel", "Strategic Planning", "Team Leadership"]
   }
 ];
+
+// Rest of the EmployeeProfile component remains unchanged
+// ... (keep the rest of the file as it is)
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
