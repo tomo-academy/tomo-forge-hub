@@ -12,7 +12,7 @@ import {
   Mail, Phone, MapPin, Calendar, Building2, User,
   Briefcase, Star, Video, CheckSquare, Upload, Camera
 } from "lucide-react";
-import { firebaseService } from "@/services/firebase";
+// Firebase removed - using mock data
 import { cn } from "@/lib/utils";
 
 interface AddMemberModalProps {
@@ -202,7 +202,8 @@ export function AddMemberModal({ isOpen, onClose, onMemberAdded }: AddMemberModa
         cardColor: cardColors[Math.floor(Math.random() * cardColors.length)]
       };
 
-      await firebaseService.createEmployee(newEmployee);
+      // await firebaseService.createEmployee(newEmployee);
+      console.log('Employee created (mock):', newEmployee);
       
       setSuccess(true);
       setTimeout(() => {

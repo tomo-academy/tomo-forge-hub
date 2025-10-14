@@ -11,68 +11,55 @@ import {
   Users, Video, CheckCircle, TrendingUp, 
   Calendar, Clock, Award, PlayCircle, Eye,
   ThumbsUp, MessageSquare, DollarSign,
-  BarChart3, Zap, Target, Activity, Database,
+  BarChart3, Zap, Target, Activity as ActivityIcon, Database,
   Wifi, RefreshCw
 } from "lucide-react";
 import { useChannelInfo, useYouTubeAnalytics, youtubeService } from "@/services/youtube";
-import { firebaseService, FirebaseRevenue, FirebaseActivity, FirebaseAnalytics } from "@/services/firebase";
+import { neonService, Revenue, Activity, Analytics } from "@/services/neonService";
 
 const EnhancedDashboard = () => {
-  // State for Firebase real-time data
-  const [revenue, setRevenue] = useState<FirebaseRevenue | null>(null);
-  const [activities, setActivities] = useState<FirebaseActivity[]>([]);
-  const [firebaseAnalytics, setFirebaseAnalytics] = useState<FirebaseAnalytics | null>(null);
-  const [isFirebaseLoading, setIsFirebaseLoading] = useState(true);
+  // State for NeonDB data
+  const [revenue, setRevenue] = useState<Revenue | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [neonAnalytics, setNeonAnalytics] = useState<Analytics | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   // Fetch live YouTube data
   const { data: channelInfo, isLoading: channelLoading } = useQuery(useChannelInfo());
   const { data: analytics, isLoading: analyticsLoading } = useQuery(useYouTubeAnalytics());
 
-  const isLoading = channelLoading || analyticsLoading || isFirebaseLoading;
+  const isLoading = channelLoading || analyticsLoading || isDataLoading;
 
-  // Initialize Firebase data and set up real-time listeners
+  // Initialize NeonDB data
   useEffect(() => {
-    const initializeFirebaseData = async () => {
+    const initializeData = async () => {
       try {
-        // Initialize default data if needed
-        await firebaseService.initializeDefaultData();
-        
-        // Fetch initial data
         const [revenueData, activitiesData, analyticsData] = await Promise.all([
-          firebaseService.getCurrentMonthRevenue(),
-          firebaseService.getRecentActivities(10),
-          firebaseService.getTodayAnalytics()
+          neonService.getCurrentMonthRevenue(),
+          neonService.getRecentActivities(10),
+          neonService.getTodayAnalytics()
         ]);
 
         setRevenue(revenueData);
         setActivities(activitiesData);
-        setFirebaseAnalytics(analyticsData);
+        setNeonAnalytics(analyticsData);
       } catch (error) {
-        console.error('Failed to initialize Firebase data:', error);
+        console.error('Failed to initialize data:', error);
       } finally {
-        setIsFirebaseLoading(false);
+        setIsDataLoading(false);
       }
     };
 
-    initializeFirebaseData();
-
-    // Set up real-time listeners
-    const unsubscribeActivities = firebaseService.onActivitiesChange(setActivities);
-    const unsubscribeAnalytics = firebaseService.onAnalyticsChange(setFirebaseAnalytics);
-
-    return () => {
-      unsubscribeActivities();
-      unsubscribeAnalytics();
-    };
+    initializeData();
   }, []);
 
-  // Format Firebase activities for display
-  const formatActivities = (activities: FirebaseActivity[]) => {
+  // Format activities for display
+  const formatActivities = (activities: Activity[]) => {
     return activities.map(activity => ({
       user: activity.userName,
       action: activity.action,
       title: activity.title,
-      time: formatTimeAgo(activity.timestamp.toDate()),
+      time: formatTimeAgo(new Date(activity.timestamp)),
       avatar: activity.userName.split(' ').map(n => n[0]).join(''),
       type: activity.type
     }));
@@ -118,7 +105,7 @@ const EnhancedDashboard = () => {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" className="gap-2">
-                  <Activity className="w-4 h-4" />
+                  <ActivityIcon className="w-4 h-4" />
                   Live Data
                 </Button>
                 <Button className="bg-primary hover:bg-primary-hover shadow-glow gap-2">
@@ -182,7 +169,7 @@ const EnhancedDashboard = () => {
                       <h3 className="text-lg font-bold">Monthly Revenue</h3>
                       <p className="text-sm text-muted-foreground flex items-center gap-1">
                         <Database className="w-3 h-3" />
-                        Firebase Live Data
+                        NeonDB Data
                       </p>
                     </div>
                   </div>
@@ -235,19 +222,19 @@ const EnhancedDashboard = () => {
                     <h2 className="text-2xl font-bold">Performance Metrics</h2>
                     <div className="ml-auto flex items-center gap-2 text-xs text-success">
                       <Wifi className="w-3 h-3 animate-pulse" />
-                      Firebase Live
+                      Live Data
                     </div>
                   </div>
                   
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 relative overflow-hidden">
                       <div className="text-3xl font-bold text-primary mb-2">
-                        {firebaseAnalytics?.videosPublished || channelInfo?.videoCount || 234}
+                        {neonAnalytics?.videosPublished || channelInfo?.videoCount || 234}
                       </div>
                       <p className="text-sm text-muted-foreground">Total Videos</p>
                       <div className="absolute top-2 right-2">
                         <ProgressRing 
-                          value={firebaseAnalytics?.videosPublished || 234} 
+                          value={neonAnalytics?.videosPublished || 234} 
                           max={300} 
                           size={40} 
                           strokeWidth={3}
@@ -256,12 +243,12 @@ const EnhancedDashboard = () => {
                     </div>
                     <div className="text-center p-4 rounded-lg bg-gradient-to-br from-accent/10 to-success/10 relative overflow-hidden">
                       <div className="text-3xl font-bold text-accent mb-2">
-                        {firebaseAnalytics?.tasksCompleted || 89}
+                        {neonAnalytics?.tasksCompleted || 89}
                       </div>
                       <p className="text-sm text-muted-foreground">Tasks Completed</p>
                       <div className="absolute top-2 right-2">
                         <ProgressRing 
-                          value={firebaseAnalytics?.tasksCompleted || 89} 
+                          value={neonAnalytics?.tasksCompleted || 89} 
                           max={100} 
                           size={40} 
                           strokeWidth={3}
@@ -270,12 +257,12 @@ const EnhancedDashboard = () => {
                     </div>
                     <div className="text-center p-4 rounded-lg bg-gradient-to-br from-success/10 to-warning/10 relative overflow-hidden">
                       <div className="text-3xl font-bold text-success mb-2">
-                        {firebaseAnalytics?.teamProductivity?.toFixed(1) || '92.3'}%
+                        {neonAnalytics?.teamProductivity?.toFixed(1) || '92.3'}%
                       </div>
                       <p className="text-sm text-muted-foreground">Team Productivity</p>
                       <div className="absolute top-2 right-2">
                         <ProgressRing 
-                          value={firebaseAnalytics?.teamProductivity || 92.3} 
+                          value={neonAnalytics?.teamProductivity || 92.3} 
                           max={100} 
                           size={40} 
                           strokeWidth={3}
@@ -294,7 +281,7 @@ const EnhancedDashboard = () => {
                       </Button>
                     </div>
                     <TrendLine 
-                      data={[65, 72, 68, 85, 89, 92, firebaseAnalytics?.teamProductivity || 92]} 
+                      data={[65, 72, 68, 85, 89, 92, neonAnalytics?.teamProductivity || 92]} 
                       width={400} 
                       height={60}
                       color="hsl(var(--primary))"
