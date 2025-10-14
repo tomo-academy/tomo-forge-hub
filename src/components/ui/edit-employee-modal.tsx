@@ -56,9 +56,22 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
-  const [formData, setFormData] = useState(employee);
+  // Convert date to yyyy-MM-dd format
+  const formatDateForInput = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return dateString;
+    }
+  };
+  
+  const [formData, setFormData] = useState({
+    ...employee,
+    joinDate: formatDateForInput(employee.joinDate)
+  });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(employee.avatar || null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(employee.avatar || (employee as any).avatar_url || null);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -93,26 +106,20 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
       const updatedEmployee = {
         ...formData,
         avatar: photoPreview || formData.avatar,
+        avatar_url: photoPreview || formData.avatar || (employee as any).avatar_url,
+        joinDate: formData.joinDate, // Already in yyyy-MM-dd format
         skills: typeof formData.skills === 'string' 
           ? (formData.skills as string).split(',').map(s => s.trim()).filter(Boolean)
           : formData.skills
       };
 
+      console.log('💾 Saving employee with avatar:', updatedEmployee.avatar);
+      console.log('💾 Saving employee with avatar_url:', updatedEmployee.avatar_url);
+      
       await onSave(updatedEmployee);
       
-      // Detect changes for email notification
-      const changes: string[] = [];
-      if (formData.name !== employee.name) changes.push('name');
-      if (formData.role !== employee.role) changes.push('role');
-      if (formData.department !== employee.department) changes.push('department');
-      if (photoPreview && photoPreview !== employee.avatar) changes.push('photo');
-      
-      // Send email notification
-      if (changes.length > 0) {
-        emailService.notifyEmployeeUpdated(formData.name, changes).catch(err =>
-          console.error('Failed to send email notification:', err)
-        );
-      }
+      // Email notification disabled to avoid 414/422 errors
+      // Will be re-enabled after EmailJS template is properly configured
       
       toast({
         title: "✅ Employee Updated",
@@ -137,10 +144,8 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
     try {
       await onDelete(employee.id);
       
-      // Send email notification
-      emailService.notifyEmployeeDeleted(employee.name).catch(err =>
-        console.error('Failed to send email notification:', err)
-      );
+      // Email notification disabled to avoid 414/422 errors
+      // Will be re-enabled after EmailJS template is properly configured
       
       toast({
         title: "✅ Employee Deleted",

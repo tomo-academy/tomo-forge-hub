@@ -70,10 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         deviceInfo
       }));
       
-      // Send email notification with detailed info
-      emailService.notifyLogin(email, browserInfo, deviceInfo).catch(err => 
-        console.error('Failed to send login notification:', err)
-      );
+      // Email notification temporarily disabled to avoid 414/422 errors
+      // Will be re-enabled after EmailJS template is properly configured
+      // emailService.notifyLogin(email, browserInfo, deviceInfo).catch(err => 
+      //   console.error('Failed to send login notification:', err)
+      // );
       
       return true;
     }
