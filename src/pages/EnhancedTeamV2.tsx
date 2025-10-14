@@ -1,3 +1,5 @@
+// src/pages/EnhancedTeamV2.tsx
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +12,7 @@ import { CompactIDCardGrid } from "@/components/ui/compact-id-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import { AddEmployeeModal } from "@/components/ui/add-employee-modal";
 import Navbar from "@/components/Navbar";
-import { allEmployees, departments } from "@/data/employeesComplete";
+import { employees, departments } from "@/data/employees";
 import { db } from "@/lib/db";
 import { photoUploadService } from "@/services/photoUpload";
 import { 
@@ -24,7 +26,7 @@ const EnhancedTeamV2 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [teamMembers, setTeamMembers] = useState(allEmployees);
+  const [teamMembers, setTeamMembers] = useState(employees);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -49,7 +51,7 @@ const EnhancedTeamV2 = () => {
     } catch (error) {
       console.error('Error loading team members:', error);
         // Fallback to static data
-        setTeamMembers(allEmployees);
+        setTeamMembers(employees);
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +96,28 @@ const EnhancedTeamV2 = () => {
     available: teamMembers.filter(m => m.availability === 'available').length,
     totalVideos: teamMembers.reduce((sum, m) => sum + m.stats.videos, 0),
     avgRating: (teamMembers.reduce((sum, m) => sum + m.stats.rating, 0) / teamMembers.length).toFixed(1)
+  };
+
+  // Function to render avatar with fallback
+  const renderAvatar = (member: any) => {
+    if (member.avatar && !member.avatar.startsWith('public/')) {
+      // External URL or properly formatted path
+      return (
+        <img 
+          src={member.avatar} 
+          alt={member.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // Fallback to initials if image fails to load
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling!.style.display = 'flex';
+          }}
+        />
+      );
+    } else {
+      // Fallback to initials
+      return null;
+    }
   };
 
   return (
@@ -189,7 +213,7 @@ const EnhancedTeamV2 = () => {
                   >
                     All
                   </Button>
-                  {departments.map((dept) => (
+                  {Object.keys(departments).map((dept) => (
                     <Button
                       key={dept}
                       variant={selectedDepartment === dept ? "default" : "outline"}
@@ -253,11 +277,10 @@ const EnhancedTeamV2 = () => {
                       {/* Avatar */}
                       <div className="relative group">
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-4 border-white shadow-lg overflow-hidden">
-                          {member.avatar ? (
-                            <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span>{member.name.split(' ').map(n => n[0]).join('')}</span>
-                          )}
+                          {renderAvatar(member)}
+                          <span className={member.avatar && !member.avatar.startsWith('public/') ? 'hidden' : ''}>
+                            {member.name.split(' ').map(n => n[0]).join('')}
+                          </span>
                         </div>
                         <div className={cn(
                           "absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white",
