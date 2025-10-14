@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationDropdown } from "@/components/ui/notifications";
 import { LoginModal } from "@/components/ui/login-modal";
-import { Menu, X, Youtube } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Menu, X, Youtube, Shield, LogOut, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const { isAdmin, logout } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -39,14 +42,32 @@ const Navbar = () => {
             </Link>
             <NotificationDropdown />
             <ThemeToggle />
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="bg-primary hover:bg-primary-hover shadow-glow"
-              onClick={() => setShowLogin(true)}
-            >
-              Login
-            </Button>
+            {isAdmin ? (
+              <>
+                <Badge variant="outline" className="gap-1.5 bg-primary/10 text-primary border-primary/20">
+                  <Shield className="w-3 h-3" />
+                  Admin
+                </Badge>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={logout}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="bg-primary hover:bg-primary-hover shadow-glow"
+                onClick={() => setShowLogin(true)}
+              >
+                Login
+              </Button>
+            )}
           </div>
 
           <button
@@ -89,14 +110,31 @@ const Navbar = () => {
             >
               Resources
             </Link>
-            <div className="px-4">
-              <Button 
-                variant="default" 
-                className="w-full bg-primary hover:bg-primary-hover"
-                onClick={() => setShowLogin(true)}
-              >
-                Login
-              </Button>
+            <div className="px-4 space-y-2">
+              {isAdmin ? (
+                <>
+                  <Badge variant="outline" className="w-full justify-center gap-1.5 bg-primary/10 text-primary border-primary/20">
+                    <Shield className="w-3 h-3" />
+                    Admin Mode
+                  </Badge>
+                  <Button 
+                    variant="outline" 
+                    className="w-full gap-2"
+                    onClick={logout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  variant="default" 
+                  className="w-full bg-primary hover:bg-primary-hover"
+                  onClick={() => setShowLogin(true)}
+                >
+                  Login
+                </Button>
+              )}
             </div>
           </div>
         )}

@@ -30,13 +30,14 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
+  const ADMIN_EMAIL = 'tomoacademyofficial@gmail.com';
+  
   const [loginData, setLoginData] = useState({
-    email: '',
     password: ''
   });
 
   const resetForm = () => {
-    setLoginData({ email: '', password: '' });
+    setLoginData({ password: '' });
     setError(null);
     setSuccess(false);
     setShowPassword(false);
@@ -53,7 +54,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
     setError(null);
 
     try {
-      const success = await login(loginData.email, loginData.password);
+      const success = await login(ADMIN_EMAIL, loginData.password);
       
       if (success) {
         setSuccess(true);
@@ -85,22 +86,16 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
         </DialogHeader>
 
         <form onSubmit={handleLogin} className="space-y-4 mt-4">
-          {/* Email */}
+          {/* Admin Email Display */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
+            <Label className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
               Admin Email
             </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="tomoacademyofficial@gmail.com"
-              value={loginData.email}
-              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-              required
-              disabled={isLoading}
-              className="w-full"
-            />
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg border">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="font-medium text-sm">{ADMIN_EMAIL}</span>
+            </div>
           </div>
 
           {/* Password */}

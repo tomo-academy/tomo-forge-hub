@@ -204,24 +204,25 @@ END:VCARD`;
             {/* Photo */}
             <div className="flex-shrink-0">
               <div className="relative group/photo">
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-3 border-white shadow-lg overflow-hidden relative">
+                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white dark:border-slate-600 shadow-lg overflow-hidden relative ring-2 ring-primary/20">
                   {getImagePath(employee.avatar) ? (
                     <>
                       <img 
                         src={getImagePath(employee.avatar) || ''} 
                         alt={employee.name}
-                        className="w-full h-full object-contain absolute inset-0 bg-white"
+                        className="w-full h-full object-cover absolute inset-0 scale-105"
+                        style={{ objectPosition: 'center 20%' }}
                         onError={(e) => {
                           // Fallback to initials if image fails to load
                           e.currentTarget.style.display = 'none';
                         }}
                       />
-                      <span className="absolute inset-0 flex items-center justify-center opacity-0">
+                      <span className="absolute inset-0 flex items-center justify-center opacity-0 bg-gradient-to-br from-primary to-accent text-white">
                         {employee.name.split(' ').map(n => n[0]).join('')}
                       </span>
                     </>
                   ) : (
-                    <span className="text-xl">
+                    <span className="text-xl bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
                       {employee.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   )}
