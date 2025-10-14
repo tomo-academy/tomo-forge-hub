@@ -10,7 +10,7 @@ interface EmailNotification {
 
 class EmailService {
   private adminEmail = 'tomoacademyofficial@gmail.com';
-  private serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+  private serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_zskl03k';
   private templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
   private publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
   private isConfigured = false;
@@ -18,7 +18,8 @@ class EmailService {
   constructor() {
     this.isConfigured = !!(this.serviceId && this.templateId && this.publicKey);
     if (!this.isConfigured) {
-      console.warn('⚠️ Email service not configured. Set VITE_EMAILJS_* environment variables.');
+      console.warn('⚠️ Email service not fully configured. Set VITE_EMAILJS_TEMPLATE_ID and VITE_EMAILJS_PUBLIC_KEY in environment variables.');
+      console.log('📧 Service ID is set:', this.serviceId);
     }
   }
 
