@@ -1,3 +1,5 @@
+// src/data/employees.ts
+
 // TOMO Academy Employee Database
 export interface Employee {
   id: string;
