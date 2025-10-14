@@ -17,8 +17,19 @@ import {
   Youtube,
   Loader2
 } from "lucide-react";
-import { authService } from "@/services/auth";
 import { cn } from "@/lib/utils";
+
+// Mock auth service (Firebase auth removed)
+const authService = {
+  async login(email: string, password: string) {
+    console.log('Login (mock):', email);
+    return { user: { email, displayName: 'User' } };
+  },
+  async signup(email: string, password: string, displayName: string) {
+    console.log('Signup (mock):', email, displayName);
+    return { user: { email, displayName } };
+  }
+};
 
 interface LoginModalProps {
   isOpen: boolean;
