@@ -178,16 +178,19 @@ END:VCARD`;
           </div>
 
           {/* Compact Header */}
-          <div className="relative h-12 bg-gradient-to-r from-primary via-primary to-accent flex items-center justify-between px-3">
+          <div className="relative h-12 bg-gradient-to-r from-pink-600 via-pink-500 to-pink-600 flex items-center justify-between px-3">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md">
-                <img src="/TOMO.jpg" alt="TOMO" className="w-full h-full object-cover" />
+              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md p-0.5">
+                <img src="/logo.png" alt="TOMO Academy" className="w-full h-full object-contain" onError={(e) => {
+                  e.currentTarget.src = '/TOMO.jpg';
+                }} />
               </div>
               <div className="text-white">
                 <p className="font-bold text-xs leading-none flex items-center gap-1">
-                  TOMO Academy
+                  TOMO ACADEMY
                   <Verified className="w-3 h-3" />
                 </p>
+                <p className="text-[9px] opacity-90 leading-tight">EDUCATION ELEVATED</p>
               </div>
             </div>
             <Badge className="bg-white/20 text-white border-white/30 text-[10px] px-1.5 py-0">
@@ -201,24 +204,29 @@ END:VCARD`;
             {/* Photo */}
             <div className="flex-shrink-0">
               <div className="relative group/photo">
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-3 border-white shadow-lg overflow-hidden">
+                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-3 border-white shadow-lg overflow-hidden relative">
                   {getImagePath(employee.avatar) ? (
-                    <img 
-                      src={getImagePath(employee.avatar) || ''} 
-                      alt={employee.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback to initials if image fails to load
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling!.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <span className={!getImagePath(employee.avatar) ? '' : 'hidden'}>
-                    {employee.name.split(' ').map(n => n[0]).join('')}
-                  </span>
+                    <>
+                      <img 
+                        src={getImagePath(employee.avatar) || ''} 
+                        alt={employee.name}
+                        className="w-full h-full object-cover absolute inset-0"
+                        onError={(e) => {
+                          // Fallback to initials if image fails to load
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center opacity-0">
+                        {employee.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xl">
+                      {employee.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  )}
                   {isUploading && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
@@ -316,37 +324,39 @@ END:VCARD`;
           "border-2 border-accent/30 shadow-xl"
         )}>
           {/* Header */}
-          <div className="relative h-14 bg-gradient-to-r from-primary to-accent text-white flex items-center justify-center">
+          <div className="relative h-14 bg-gradient-to-r from-pink-600 via-pink-500 to-pink-600 text-white flex items-center justify-center">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md">
-                <img src="/TOMO.jpg" alt="TOMO" className="w-full h-full object-cover" />
+              <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md p-1">
+                <img src="/logo.png" alt="TOMO Academy" className="w-full h-full object-contain" onError={(e) => {
+                  e.currentTarget.src = '/TOMO.jpg';
+                }} />
               </div>
               <div>
-                <p className="font-bold text-sm leading-none">TOMO Academy</p>
-                <p className="text-[10px] opacity-90 leading-none mt-0.5">Digital Learning</p>
+                <p className="font-bold text-sm leading-none">TOMO ACADEMY</p>
+                <p className="text-[10px] opacity-90 leading-none mt-0.5">EDUCATION ELEVATED</p>
               </div>
             </div>
           </div>
 
           {/* QR Content */}
-          <div className="relative h-[calc(260px-56px-48px)] flex flex-col items-center justify-center p-4">
-            <div className="text-center mb-2">
-              <h3 className="font-bold text-sm">{employee.name}</h3>
-              <p className="text-xs text-muted-foreground">{employee.role}</p>
+          <div className="relative h-[calc(260px-56px-48px)] flex flex-col items-center justify-center p-3">
+            <div className="text-center mb-1.5">
+              <h3 className="font-bold text-sm leading-tight truncate max-w-full px-2">{employee.name}</h3>
+              <p className="text-xs text-muted-foreground leading-tight truncate max-w-full px-2">{employee.role}</p>
               <p className="text-[10px] font-mono text-primary mt-0.5">{employee.employeeId}</p>
             </div>
 
-            <div className="p-3 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-2">
-              <QRCode value={profileUrl} size={100} />
+            <div className="p-2.5 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-1.5">
+              <QRCode value={profileUrl} size={90} />
             </div>
 
-            <div className="text-center space-y-0.5 mb-2">
+            <div className="text-center space-y-0.5 mb-1.5">
               <p className="font-semibold text-xs flex items-center justify-center gap-1">
                 <Sparkles className="w-3 h-3 text-primary" />
-                Scan for Full Profile
+                Scan for Profile
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                Access complete details
+              <p className="text-[9px] text-muted-foreground leading-tight">
+                View complete details
               </p>
             </div>
 
@@ -379,35 +389,35 @@ END:VCARD`;
           </div>
 
           {/* Footer Actions */}
-          <div className="relative h-12 bg-gradient-to-r from-primary/10 to-accent/10 border-t flex items-center justify-center gap-1.5 px-3">
+          <div className="relative h-12 bg-gradient-to-r from-primary/10 to-accent/10 border-t flex items-center justify-center gap-1 px-2">
             <Button 
               variant="ghost" 
               size="sm"
-              className="h-7 px-2 text-[10px]"
+              className="h-7 px-1.5 text-[9px] flex-1 max-w-[70px]"
               onClick={downloadVCard}
             >
-              <Download className="w-3 h-3 mr-1" />
+              <Download className="w-3 h-3 mr-0.5" />
               Save
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
-              className="h-7 px-2 text-[10px]"
+              className="h-7 px-1.5 text-[9px] flex-1 max-w-[70px]"
               onClick={shareProfile}
             >
-              <Share2 className="w-3 h-3 mr-1" />
+              <Share2 className="w-3 h-3 mr-0.5" />
               Share
             </Button>
             <Button 
               variant="default" 
               size="sm"
-              className="h-7 px-2 text-[10px] bg-primary"
+              className="h-7 px-1.5 text-[9px] bg-primary flex-1 max-w-[70px]"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(`/profile/${employee.id}`, '_blank');
               }}
             >
-              <Eye className="w-3 h-3 mr-1" />
+              <Eye className="w-3 h-3 mr-0.5" />
               View
             </Button>
           </div>

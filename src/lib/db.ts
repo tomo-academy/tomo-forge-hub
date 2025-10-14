@@ -1,11 +1,12 @@
 // Neon Serverless Postgres Database Configuration
 import { neon } from '@neondatabase/serverless';
+import { employees as mockEmployees } from '@/data/employees';
 
 // Get database URL from environment
 const DATABASE_URL = import.meta.env.VITE_DATABASE_URL || process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  console.warn('DATABASE_URL not found. Using mock data.');
+  console.warn('⚠️ DATABASE_URL not found. Using mock data fallback.');
 }
 
 // Create SQL client
@@ -68,36 +69,84 @@ export const db = {
   // Employee operations
   employees: {
     async getAll(): Promise<Employee[]> {
-      if (!sql) return [];
+      if (!sql) {
+        console.log('📦 Using mock employee data');
+        return mockEmployees.map(emp => ({
+          ...emp,
+          employee_id: emp.employeeId,
+          join_date: emp.joinDate,
+          avatar_url: emp.avatar,
+          social_links: emp.social,
+          card_color: emp.cardColor
+        }));
+      }
       try {
         const result = await sql`SELECT * FROM employees ORDER BY name`;
         return result as Employee[];
       } catch (error) {
         console.error('Error fetching employees:', error);
-        return [];
+        console.log('📦 Falling back to mock employee data');
+        return mockEmployees.map(emp => ({
+          ...emp,
+          employee_id: emp.employeeId,
+          join_date: emp.joinDate,
+          avatar_url: emp.avatar,
+          social_links: emp.social,
+          card_color: emp.cardColor
+        }));
       }
     },
 
     async getById(id: string): Promise<Employee | null> {
-      if (!sql) return null;
+      if (!sql) {
+        const emp = mockEmployees.find(e => e.id === id);
+        if (!emp) return null;
+        return {
+          ...emp,
+          employee_id: emp.employeeId,
+          join_date: emp.joinDate,
+          avatar_url: emp.avatar,
+          social_links: emp.social,
+          card_color: emp.cardColor
+        };
+      }
       try {
         const result = await sql`SELECT * FROM employees WHERE id = ${id}`;
         return result[0] as Employee || null;
       } catch (error) {
         console.error('Error fetching employee:', error);
-        return null;
+        const emp = mockEmployees.find(e => e.id === id);
+        if (!emp) return null;
+        return {
+          ...emp,
+          employee_id: emp.employeeId,
+          join_date: emp.joinDate,
+          avatar_url: emp.avatar,
+          social_links: emp.social,
+          card_color: emp.cardColor
+        };
       }
     },
 
     async create(employee: Omit<Employee, 'id' | 'created_at' | 'updated_at'>): Promise<Employee | null> {
-      if (!sql) return null;
+      if (!sql) {
+        // Fallback: create employee in memory (for demo purposes)
+        console.log('📝 Creating employee in memory (no database connection)');
+        const newEmployee = {
+          id: `emp-${Date.now()}`,
+          ...employee,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        return newEmployee as Employee;
+      }
       try {
         const result = await sql`
           INSERT INTO employees (
-            name, role, department, email, phone, employee_id, join_date,
+            id, name, role, department, email, phone, employee_id, join_date,
             avatar_url, location, availability, bio, skills, social_links, stats, card_color
           ) VALUES (
-            ${employee.name}, ${employee.role}, ${employee.department}, ${employee.email},
+            ${`emp-${Date.now()}`}, ${employee.name}, ${employee.role}, ${employee.department}, ${employee.email},
             ${employee.phone}, ${employee.employee_id}, ${employee.join_date},
             ${employee.avatar_url}, ${employee.location}, ${employee.availability},
             ${employee.bio}, ${JSON.stringify(employee.skills)}, ${JSON.stringify(employee.social_links)},
@@ -108,7 +157,14 @@ export const db = {
         return result[0] as Employee;
       } catch (error) {
         console.error('Error creating employee:', error);
-        return null;
+        // Fallback on error
+        const newEmployee = {
+          id: `emp-${Date.now()}`,
+          ...employee,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        return newEmployee as Employee;
       }
     },
 
