@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface LoginModalProps {
 
 export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -61,6 +63,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
         setTimeout(() => {
           onLoginSuccess();
           handleClose();
+          // Redirect to admin dashboard
+          navigate('/admin');
         }, 1500);
       } else {
         setError('Invalid credentials. Only admin can login.');

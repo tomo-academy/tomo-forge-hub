@@ -11,6 +11,7 @@ import { reactQueryCacheConfig } from "@/lib/cache";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import EnhancedDashboard from "./pages/EnhancedDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import EnhancedTeamV2 from "./pages/EnhancedTeamV2";
 import Videos from "./pages/Videos";
 import EnhancedVideos from "./pages/EnhancedVideos";
@@ -37,6 +38,7 @@ const App = () => (
               <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/dashboard" element={<EnhancedDashboard />} />
                 <Route path="/dashboard/classic" element={<Dashboard />} />
                 <Route path="/team" element={<EnhancedTeamV2 />} />

@@ -14,6 +14,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ADMIN_EMAIL = 'tomoacademyofficial@gmail.com';
 const ADMIN_PASSWORD = 'admin123'; // Change this to a secure password
 
+// Helper functions to get browser and device info
+function getBrowserInfo(userAgent: string): string {
+  if (userAgent.includes('Chrome')) return 'Chrome';
+  if (userAgent.includes('Firefox')) return 'Firefox';
+  if (userAgent.includes('Safari')) return 'Safari';
+  if (userAgent.includes('Edge')) return 'Edge';
+  return 'Unknown Browser';
+}
+
+function getDeviceInfo(userAgent: string): string {
+  if (/mobile/i.test(userAgent)) return 'Mobile Device';
+  if (/tablet/i.test(userAgent)) return 'Tablet';
+  return 'Desktop';
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,14 +57,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(true);
       setAdminEmail(email);
       
+      // Get browser and device info
+      const userAgent = navigator.userAgent;
+      const browserInfo = getBrowserInfo(userAgent);
+      const deviceInfo = getDeviceInfo(userAgent);
+      
       // Store in localStorage
       localStorage.setItem('adminAuth', JSON.stringify({
         email,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        browserInfo,
+        deviceInfo
       }));
       
-      // Send email notification
-      emailService.notifyLogin().catch(err => 
+      // Send email notification with detailed info
+      emailService.notifyLogin(email, browserInfo, deviceInfo).catch(err => 
         console.error('Failed to send login notification:', err)
       );
       

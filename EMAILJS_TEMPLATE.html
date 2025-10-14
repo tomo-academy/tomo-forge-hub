@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Portal Admin Login Notification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Montserrat', system-ui, sans-serif, Arial; background-color: #f8f8f8; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <!-- Header -->
+        <div style="background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+            <div style="position: relative; margin-bottom: 10px;">
+                <div style="position: absolute; top: -30px; right: -30px; width: 100px; height: 100px; opacity: 0.1; z-index: 0;">
+                    <img src="https://z-cdn-media.chatglm.cn/files/212c474e-1315-49f1-91d2-41d02e208eb0_pasted_image_1760453276017.jpg?auth_key=1760456927-cef97fd65b2e430d92a605df16481020-0-6dfb40d65c65a3e66b7304c30fd49c59" alt="pattern" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <img src="https://z-cdn-media.chatglm.cn/files/212c474e-1315-49f1-91d2-41d02e208eb0_pasted_image_1760453276017.jpg?auth_key=1760456927-cef97fd65b2e430d92a605df16481020-0-6dfb40d65c65a3e66b7304c30fd49c59" alt="TOMO ACADEMY" style="height: 55px; position: relative; z-index: 1;">
+            </div>
+            <h1 style="font-family: 'Courier New', monospace; font-weight: 800; font-size: 28px; letter-spacing: 2px; margin: 0; color: #000; text-transform: uppercase;">TOMO ACADEMY</h1>
+            <div style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #fc0038; letter-spacing: 1px; font-weight: 500; margin-top: 5px; text-transform: lowercase;">EDUCATION ELEVATED</div>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 30px 20px;">
+            <h1 style="font-family: 'Montserrat', sans-serif; font-weight: 700; color: #333; margin-top: 0; margin-bottom: 20px; font-size: 24px;">YouTube Portal Admin Login</h1>
+            
+            <div style="margin-bottom: 30px; line-height: 1.6; font-family: 'Montserrat', sans-serif; font-weight: 400;">
+                <p>Hello Team,</p>
+                <p>An administrator has logged into the TOMO Academy YouTube Management Portal. Below are the details of this login session:</p>
+            </div>
+            
+            <!-- Login Details -->
+            <div style="background-color: #f8f8f8; border-radius: 8px; padding: 15px; margin-bottom: 30px;">
+                <div style="display: flex; margin-bottom: 10px;">
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #666; width: 150px;">Admin Name:</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 500; color: #333;">{{adminName}}</div>
+                </div>
+                <div style="display: flex; margin-bottom: 10px;">
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #666; width: 150px;">Login Time:</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 500; color: #333;">{{loginTime}}</div>
+                </div>
+                <div style="display: flex; margin-bottom: 10px;">
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #666; width: 150px;">IP Address:</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 500; color: #333;">{{ipAddress}}</div>
+                </div>
+                <div style="display: flex; margin-bottom: 10px;">
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #666; width: 150px;">Device:</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 500; color: #333;">{{deviceInfo}}</div>
+                </div>
+                <div style="display: flex; margin-bottom: 10px;">
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #666; width: 150px;">Browser:</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 500; color: #333;">{{browserInfo}}</div>
+                </div>
+                <div style="display: flex;">
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #666; width: 150px;">Location:</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-weight: 500; color: #333;">{{location}}</div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div style="background-color: #fff8f1; border-left: 4px solid #fc0038; padding: 15px; margin-bottom: 30px;">
+                <p style="font-family: 'Montserrat', sans-serif; font-weight: 600; margin: 0 0 10px 0; color: #333;">Recent Portal Activity:</p>
+                <div style="font-family: 'Montserrat', sans-serif; font-weight: 400; color: #666; font-size: 14px;">
+                    <p style="margin: 5px 0;">• Last login: {{lastLoginTime}} by {{lastLoginAdmin}}</p>
+                    <p style="margin: 5px 0;">• Total logins today: {{dailyLoginCount}}</p>
+                    <p style="margin: 5px 0;">• Most recent action: {{recentAction}}</p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{portalUrl}}" style="
+                    font-family: 'Montserrat', sans-serif;
+                    display: inline-block;
+                    text-decoration: none;
+                    outline: none;
+                    color: #fff;
+                    background-color: #fc0038;
+                    padding: 12px 24px;
+                    border-radius: 30px;
+                    font-weight: 600;
+                    box-shadow: 0 4px 8px rgba(252, 0, 56, 0.2);
+                    margin-right: 10px;
+                ">Go to YouTube Portal</a>
+                <a href="{{adminSettingsUrl}}" style="
+                    font-family: 'Montserrat', sans-serif;
+                    display: inline-block;
+                    text-decoration: none;
+                    outline: none;
+                    color: #fc0038;
+                    background-color: transparent;
+                    border: 2px solid #fc0038;
+                    padding: 10px 22px;
+                    border-radius: 30px;
+                    font-weight: 600;
+                ">Admin Settings</a>
+            </div>
+            
+            <!-- Security Notice -->
+            <div style="border-top: 1px solid #f0f0f0; padding-top: 20px; margin-top: 30px;">
+                <p style="font-family: 'Montserrat', sans-serif; margin: 0; font-size: 12px; color: #888; text-align: center;">
+                    This is an automated security notification sent to tomoacademyofficial@gmail.com<br>
+                    for TOMO Academy YouTube Management Portal admin access.<br>
+                    Do not reply to this email. If this login was unauthorized, please contact security immediately.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background-color: #fff8f1; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
+            <div style="position: relative; height: 60px;">
+                <div style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; opacity: 0.15;">
+                    <img src="https://z-cdn-media.chatglm.cn/files/3d4d68d6-43e8-43e8-80ae-97c1a26f79e1_pasted_image_1760453088908.jpg?auth_key=1791989336-3a0c3004bed9422f8cd02e444ee770fc-0-4eec7d4673e1dc303895057d2524b6e2" alt="pattern" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+            <p style="font-family: 'Montserrat', sans-serif; margin: 0; font-size: 12px; color: #888;">© 2025 TOMO Academy. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

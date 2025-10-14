@@ -67,12 +67,25 @@ class EmailService {
   }
 
   /**
-   * Notify admin of successful login
+   * Notify admin of successful login with detailed information
    */
-  async notifyLogin(ipAddress?: string): Promise<void> {
+  async notifyLogin(adminName: string = 'Admin', browserInfo: string = 'Unknown', deviceInfo: string = 'Unknown'): Promise<void> {
+    const loginTime = new Date().toLocaleString();
+    
     await this.sendNotification({
-      subject: '🔐 Admin Login Detected',
-      message: `Admin login successful at ${new Date().toLocaleString()}${ipAddress ? `\nIP Address: ${ipAddress}` : ''}`,
+      subject: '🔐 YouTube Portal Admin Login Notification',
+      message: `
+Admin Login Detected
+
+Admin Name: ${adminName}
+Login Time: ${loginTime}
+Browser: ${browserInfo}
+Device: ${deviceInfo}
+IP Address: [Client-side detection not available]
+Location: [Requires server-side detection]
+
+This is an automated security notification for TOMO Academy YouTube Management Portal.
+      `.trim(),
       type: 'login',
     });
   }
