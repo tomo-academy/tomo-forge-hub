@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/db";
+import { emailService } from "@/services/emailService";
 import { Loader2, UserPlus, Sparkles, Upload, Camera, X } from "lucide-react";
 
 interface AddEmployeeModalProps {
@@ -116,6 +117,11 @@ export function AddEmployeeModal({ isOpen, onClose, onEmployeeAdded }: AddEmploy
           description: `${formData.name} has been added to the team.`,
           duration: 3000,
         });
+
+        // Send email notification
+        emailService.notifyEmployeeAdded(formData.name, formData.role).catch(err =>
+          console.error('Failed to send email notification:', err)
+        );
 
         // Notify parent
         if (onEmployeeAdded) {

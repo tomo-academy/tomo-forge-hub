@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { emailService } from '@/services/emailService';
 
 interface AuthContextType {
   isAdmin: boolean;
@@ -46,6 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         timestamp: Date.now()
       }));
+      
+      // Send email notification
+      emailService.notifyLogin().catch(err => 
+        console.error('Failed to send login notification:', err)
+      );
       
       return true;
     }

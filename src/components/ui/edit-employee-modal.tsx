@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { emailService } from "@/services/emailService";
 import { 
   Save, X, Upload, Camera, Trash2, AlertCircle, CheckCircle,
   Mail, Phone, MapPin, Briefcase, User, Building2, Calendar
@@ -99,6 +100,20 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
 
       await onSave(updatedEmployee);
       
+      // Detect changes for email notification
+      const changes: string[] = [];
+      if (formData.name !== employee.name) changes.push('name');
+      if (formData.role !== employee.role) changes.push('role');
+      if (formData.department !== employee.department) changes.push('department');
+      if (photoPreview && photoPreview !== employee.avatar) changes.push('photo');
+      
+      // Send email notification
+      if (changes.length > 0) {
+        emailService.notifyEmployeeUpdated(formData.name, changes).catch(err =>
+          console.error('Failed to send email notification:', err)
+        );
+      }
+      
       toast({
         title: "✅ Employee Updated",
         description: "Changes saved successfully!",
@@ -121,6 +136,12 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
     setIsDeleting(true);
     try {
       await onDelete(employee.id);
+      
+      // Send email notification
+      emailService.notifyEmployeeDeleted(employee.name).catch(err =>
+        console.error('Failed to send email notification:', err)
+      );
+      
       toast({
         title: "✅ Employee Deleted",
         description: "Employee removed successfully.",
