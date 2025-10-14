@@ -9,11 +9,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Circular favicon -->
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <link rel="shortcut icon" href="/logo.png" />
-    <!-- Fallback to TOMO.jpg if logo.png not found -->
-    <link rel="alternate icon" type="image/jpeg" href="/logo.png" />
+    <link rel="alternate icon" type="image/jpeg" href="/TOMO.jpg" />
+    
+    <!-- Add border-radius to favicon using inline style -->
+    <style>
+      /* Make favicon circular in browser tab */
+      link[rel="icon"],
+      link[rel="apple-touch-icon"],
+      link[rel="shortcut icon"] {
+        border-radius: 50%;
+      }
+    </style>
     
     <meta property="og:type" content="website" />
 

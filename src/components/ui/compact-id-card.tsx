@@ -52,20 +52,28 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
 
   // Function to get the correct image path
   const getImagePath = (avatar?: string) => {
-    if (!avatar) return null;
+    // Check both avatar and avatar_url fields
+    const avatarPath = avatar || (employee as any).avatar_url;
+    
+    if (!avatarPath) return null;
+    
+    // If it's already a full URL (http/https), return as is
+    if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
+      return avatarPath;
+    }
     
     // If it's a public path, remove the 'public/' prefix
-    if (avatar.startsWith('public/')) {
-      return avatar.replace('public/', '/');
+    if (avatarPath.startsWith('public/')) {
+      return avatarPath.replace('public/', '/');
     }
     
     // If it already starts with '/', return as is
-    if (avatar.startsWith('/')) {
-      return avatar;
+    if (avatarPath.startsWith('/')) {
+      return avatarPath;
     }
     
     // If it's a relative path without leading '/', add it
-    return `/${avatar}`;
+    return `/${avatarPath}`;
   };
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

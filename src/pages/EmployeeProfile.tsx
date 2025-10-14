@@ -150,20 +150,28 @@ END:VCARD`;
 
   // Function to get the correct image path
   const getImagePath = (avatar?: string) => {
-    if (!avatar) return null;
+    // Check both avatar and avatar_url fields
+    const avatarPath = avatar || employee?.avatar_url;
+    
+    if (!avatarPath) return null;
+    
+    // If it's already a full URL (http/https), return as is
+    if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
+      return avatarPath;
+    }
     
     // If it's a public path, remove the 'public/' prefix
-    if (avatar.startsWith('public/')) {
-      return avatar.replace('public/', '/');
+    if (avatarPath.startsWith('public/')) {
+      return avatarPath.replace('public/', '/');
     }
     
     // If it already starts with '/', return as is
-    if (avatar.startsWith('/')) {
-      return avatar;
+    if (avatarPath.startsWith('/')) {
+      return avatarPath;
     }
     
     // If it's a relative path without leading '/', add it
-    return `/${avatar}`;
+    return `/${avatarPath}`;
   };
 
   // Function to render avatar with fallback
@@ -203,17 +211,15 @@ END:VCARD`;
               </Button>
             </Link>
             
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg ring-2 ring-white/50 p-1">
               <img 
-                src="/TOMO.jpg" 
+                src="/logo.png" 
                 alt="TOMO Academy"
                 className="w-full h-full object-cover rounded-full"
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling!.style.display = 'block';
+                  e.currentTarget.src = '/TOMO.jpg';
                 }}
               />
-              <Youtube className="w-6 h-6 text-primary hidden" />
             </div>
             
             <div className="flex-1">
