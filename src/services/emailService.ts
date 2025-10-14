@@ -45,20 +45,46 @@ class EmailService {
 
     try {
       const templateParams = {
+        // EmailJS requires these exact parameter names
+        to_name: 'TOMO Academy Admin',
         to_email: this.adminEmail,
+        from_name: 'TOMO Academy System',
+        reply_to: this.adminEmail,
+        
+        // Custom parameters for your template
         admin_name: this.adminEmail,
+        adminName: this.adminEmail,
         subject: notification.subject,
         message: notification.message,
         type: notification.type,
         timestamp: new Date().toLocaleString(),
         login_time: new Date().toLocaleString(),
+        loginTime: new Date().toLocaleString(),
         browser_info: navigator.userAgent,
+        browserInfo: navigator.userAgent,
         device_info: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        deviceInfo: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
         ip_address: 'Client-side detection unavailable',
+        ipAddress: 'Client-side detection unavailable',
         location: 'Requires server-side detection',
+        
+        // Additional helpful parameters
+        portal_url: window.location.origin + '/admin',
+        portalUrl: window.location.origin + '/admin',
+        admin_settings_url: window.location.origin + '/admin',
+        adminSettingsUrl: window.location.origin + '/admin',
+        last_login_time: 'First login today',
+        lastLoginTime: 'First login today',
+        last_login_admin: this.adminEmail,
+        lastLoginAdmin: this.adminEmail,
+        daily_login_count: '1',
+        dailyLoginCount: '1',
+        recent_action: 'Logged into admin dashboard',
+        recentAction: 'Logged into admin dashboard',
       };
       
       console.log('📧 Sending email with params:', templateParams);
+      console.log('📧 Recipient:', this.adminEmail);
       
       // Using EmailJS for client-side email sending
       const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
