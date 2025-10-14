@@ -148,13 +148,33 @@ END:VCARD`;
     }
   };
 
+  // Function to get the correct image path
+  const getImagePath = (avatar?: string) => {
+    if (!avatar) return null;
+    
+    // If it's a public path, remove the 'public/' prefix
+    if (avatar.startsWith('public/')) {
+      return avatar.replace('public/', '/');
+    }
+    
+    // If it already starts with '/', return as is
+    if (avatar.startsWith('/')) {
+      return avatar;
+    }
+    
+    // If it's a relative path without leading '/', add it
+    return `/${avatar}`;
+  };
+
   // Function to render avatar with fallback
   const renderAvatar = () => {
-    if (employee.avatar && !employee.avatar.startsWith('public/')) {
+    const imagePath = getImagePath(employee.avatar);
+    
+    if (imagePath) {
       // External URL or properly formatted path
       return (
         <img 
-          src={employee.avatar} 
+          src={imagePath} 
           alt={employee.name}
           className="w-full h-full object-cover rounded-full"
           onError={(e) => {
@@ -208,7 +228,7 @@ END:VCARD`;
             <div className="relative inline-block mb-4">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-2xl md:text-4xl border-4 border-white shadow-lg overflow-hidden">
                 {renderAvatar()}
-                <span className={employee.avatar && !employee.avatar.startsWith('public/') ? 'hidden' : ''}>
+                <span className={!getImagePath(employee.avatar) ? '' : 'hidden'}>
                   {employee.name.split(' ').map((n: string) => n[0]).join('')}
                 </span>
               </div>
