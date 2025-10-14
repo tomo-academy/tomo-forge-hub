@@ -204,25 +204,30 @@ END:VCARD`;
             {/* Photo */}
             <div className="flex-shrink-0">
               <div className="relative group/photo">
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white dark:border-slate-600 shadow-lg overflow-hidden relative ring-2 ring-primary/20">
+                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white dark:border-slate-600 shadow-xl overflow-hidden relative ring-2 ring-primary/30 hover:ring-primary/50 transition-all">
                   {getImagePath(employee.avatar) ? (
                     <>
                       <img 
                         src={getImagePath(employee.avatar) || ''} 
                         alt={employee.name}
-                        className="w-full h-full object-cover absolute inset-0 scale-105"
-                        style={{ objectPosition: 'center 20%' }}
+                        className="w-full h-full object-cover absolute inset-0"
+                        style={{ 
+                          objectPosition: 'center 30%',
+                          objectFit: 'cover',
+                          minHeight: '100%',
+                          minWidth: '100%'
+                        }}
                         onError={(e) => {
                           // Fallback to initials if image fails to load
                           e.currentTarget.style.display = 'none';
                         }}
                       />
-                      <span className="absolute inset-0 flex items-center justify-center opacity-0 bg-gradient-to-br from-primary to-accent text-white">
+                      <span className="absolute inset-0 flex items-center justify-center opacity-0 bg-gradient-to-br from-primary to-accent text-white text-2xl font-bold">
                         {employee.name.split(' ').map(n => n[0]).join('')}
                       </span>
                     </>
                   ) : (
-                    <span className="text-xl bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
+                    <span className="text-2xl font-bold bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
                       {employee.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   )}

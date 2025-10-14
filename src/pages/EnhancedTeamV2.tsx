@@ -11,6 +11,8 @@ import { PremiumLandscapeGrid } from "@/components/ui/premium-landscape-card";
 import { CompactIDCardGrid } from "@/components/ui/compact-id-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import { AddEmployeeModal } from "@/components/ui/add-employee-modal";
+import { EditEmployeeModal } from "@/components/ui/edit-employee-modal";
+import { AdminOnly } from "@/components/ui/admin-only";
 import Navbar from "@/components/Navbar";
 import { employees, departments } from "@/data/employees";
 import { db } from "@/lib/db";
@@ -18,7 +20,7 @@ import { photoUploadService } from "@/services/photoUpload";
 import { 
   Users, Search, Filter, Award, MapPin, Calendar, Video,
   Star, Plus, Grid, List, Building2, UserCheck, TrendingUp,
-  Eye, MessageSquare, Briefcase, Activity, RefreshCw, Upload
+  Eye, MessageSquare, Briefcase, Activity, RefreshCw, Upload, Edit
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +32,8 @@ const EnhancedTeamV2 = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
 
   // Load from database
   useEffect(() => {
