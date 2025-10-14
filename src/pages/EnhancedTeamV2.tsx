@@ -43,19 +43,28 @@ const EnhancedTeamV2 = () => {
   const loadTeamMembers = async () => {
     setIsLoading(true);
     try {
+      console.log('🔄 Loading team members from database...');
       const dbEmployees = await db.employees.getAll();
+      console.log('✅ Loaded employees:', dbEmployees.length);
+      
       if (dbEmployees && dbEmployees.length > 0) {
-        setTeamMembers(dbEmployees.map(emp => ({
+        const mappedEmployees = dbEmployees.map(emp => ({
           ...emp,
           employeeId: emp.employee_id,
           joinDate: emp.join_date,
-          avatar: emp.avatar_url
-        })));
+          avatar: emp.avatar_url,
+          cardColor: emp.card_color
+        }));
+        console.log('📋 Mapped employees:', mappedEmployees.length);
+        setTeamMembers(mappedEmployees);
+      } else {
+        console.log('⚠️ No employees in database, using fallback data');
+        setTeamMembers(employees);
       }
     } catch (error) {
-      console.error('Error loading team members:', error);
-        // Fallback to static data
-        setTeamMembers(employees);
+      console.error('❌ Error loading team members:', error);
+      // Fallback to static data
+      setTeamMembers(employees);
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +97,25 @@ const EnhancedTeamV2 = () => {
 
   const handleSaveEmployee = async (updatedEmployee: any) => {
     try {
-      await db.employees.update(updatedEmployee.id, updatedEmployee);
+      console.log('💾 Saving employee:', updatedEmployee);
+      const result = await db.employees.update(updatedEmployee.id, updatedEmployee);
+      console.log('✅ Update result:', result);
+      
+      // Immediately update local state for instant UI feedback
+      setTeamMembers(prev => prev.map(emp => 
+        emp.id === updatedEmployee.id ? {
+          ...emp,
+          ...updatedEmployee,
+          employeeId: updatedEmployee.employeeId || emp.employeeId,
+          joinDate: updatedEmployee.joinDate || emp.joinDate,
+          avatar: updatedEmployee.avatar || emp.avatar
+        } : emp
+      ));
+      
+      // Reload from database to ensure consistency
       await loadTeamMembers();
     } catch (error) {
-      console.error('Error updating employee:', error);
+      console.error('❌ Error updating employee:', error);
       throw error;
     }
   };

@@ -36,6 +36,12 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
+            {isAdmin && (
+              <Link to="/admin" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                <Shield className="w-4 h-4" />
+                Admin
+              </Link>
+            )}
             <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-fast">
               Dashboard
             </Link>
@@ -54,21 +60,15 @@ const Navbar = () => {
             <NotificationDropdown />
             <ThemeToggle />
             {isAdmin ? (
-              <>
-                <Badge variant="outline" className="gap-1.5 bg-primary/10 text-primary border-primary/20">
-                  <Shield className="w-3 h-3" />
-                  Admin
-                </Badge>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2"
-                  onClick={logout}
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </Button>
-              </>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={logout}
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
             ) : (
               <Button 
                 variant="default" 

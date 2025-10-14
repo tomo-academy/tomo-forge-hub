@@ -39,21 +39,31 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // Load employees
+      // Load employees from database
       const employees = await db.employees.getAll();
+      console.log('📊 Loaded employees:', employees.length);
       
-      // Load videos (from localStorage for now)
-      const videos = JSON.parse(localStorage.getItem('videos') || '[]');
+      // Load videos from database
+      const videos = await db.videos.getAll();
+      console.log('📊 Loaded videos:', videos.length);
+      
+      // Get login count from localStorage
+      const loginHistory = JSON.parse(localStorage.getItem('adminLoginHistory') || '[]');
+      const today = new Date().toDateString();
+      const todayLogins = loginHistory.filter((login: any) => 
+        new Date(login.timestamp).toDateString() === today
+      ).length;
       
       setStats({
         totalEmployees: employees.length,
         totalVideos: videos.length,
-        recentLogins: 1, // Current session
+        recentLogins: todayLogins || 1,
         pendingTasks: 0
       });
 
-      // Create recent activity log
-      const activity = [
+      // Create recent activity log from localStorage
+      const storedActivity = JSON.parse(localStorage.getItem('adminActivity') || '[]');
+      const activity = storedActivity.length > 0 ? storedActivity.slice(0, 5) : [
         {
           id: 1,
           type: 'login',
@@ -73,6 +83,15 @@ export default function AdminDashboard() {
       ];
       
       setRecentActivity(activity);
+      
+      // Log current login
+      const newLogin = {
+        timestamp: new Date().toISOString(),
+        email: adminEmail
+      };
+      loginHistory.push(newLogin);
+      localStorage.setItem('adminLoginHistory', JSON.stringify(loginHistory.slice(-50))); // Keep last 50
+      
     } catch (error) {
       console.error('Error loading dashboard:', error);
       toast({

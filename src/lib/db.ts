@@ -168,9 +168,17 @@ export const db = {
       }
     },
 
-    async update(id: string, updates: Partial<Employee>): Promise<Employee | null> {
-      if (!sql) return null;
+    async update(id: string, updates: Partial<any>): Promise<Employee | null> {
+      if (!sql) {
+        console.log('📝 Updating employee in memory (no database connection)');
+        return null;
+      }
       try {
+        // Map avatar to avatar_url if present
+        const avatarUrl = updates.avatar || updates.avatar_url;
+        const skills = Array.isArray(updates.skills) ? updates.skills : [];
+        const socialLinks = updates.social || updates.social_links || {};
+        
         const result = await sql`
           UPDATE employees
           SET
@@ -179,20 +187,21 @@ export const db = {
             department = COALESCE(${updates.department}, department),
             email = COALESCE(${updates.email}, email),
             phone = COALESCE(${updates.phone}, phone),
-            avatar_url = COALESCE(${updates.avatar_url}, avatar_url),
+            avatar_url = COALESCE(${avatarUrl}, avatar_url),
             location = COALESCE(${updates.location}, location),
             availability = COALESCE(${updates.availability}, availability),
             bio = COALESCE(${updates.bio}, bio),
-            skills = COALESCE(${JSON.stringify(updates.skills)}, skills),
-            social_links = COALESCE(${JSON.stringify(updates.social_links)}, social_links),
-            stats = COALESCE(${JSON.stringify(updates.stats)}, stats),
+            skills = COALESCE(${JSON.stringify(skills)}::jsonb, skills),
+            social_links = COALESCE(${JSON.stringify(socialLinks)}::jsonb, social_links),
+            stats = COALESCE(${JSON.stringify(updates.stats)}::jsonb, stats),
             updated_at = NOW()
           WHERE id = ${id}
           RETURNING *
         `;
+        console.log('✅ Employee updated successfully:', result[0]);
         return result[0] as Employee || null;
       } catch (error) {
-        console.error('Error updating employee:', error);
+        console.error('❌ Error updating employee:', error);
         return null;
       }
     },

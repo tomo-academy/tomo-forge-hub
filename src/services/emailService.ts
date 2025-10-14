@@ -27,12 +27,39 @@ class EmailService {
    * Send email notification to admin
    */
   async sendNotification(notification: Omit<EmailNotification, 'to'>): Promise<boolean> {
+    console.log('📧 Attempting to send email notification...');
+    console.log('📧 Service ID:', this.serviceId);
+    console.log('📧 Template ID:', this.templateId ? '✅ Set' : '❌ Not set');
+    console.log('📧 Public Key:', this.publicKey ? '✅ Set' : '❌ Not set');
+    console.log('📧 Is Configured:', this.isConfigured);
+    
     if (!this.isConfigured) {
+      console.warn('⚠️ Email service not fully configured. Email will not be sent.');
       console.log('📧 Email notification (mock):', notification);
+      console.log('📧 To configure:');
+      console.log('   1. Set VITE_EMAILJS_TEMPLATE_ID in Vercel');
+      console.log('   2. Set VITE_EMAILJS_PUBLIC_KEY in Vercel');
+      console.log('   3. Redeploy application');
       return true; // Mock success
     }
 
     try {
+      const templateParams = {
+        to_email: this.adminEmail,
+        admin_name: this.adminEmail,
+        subject: notification.subject,
+        message: notification.message,
+        type: notification.type,
+        timestamp: new Date().toLocaleString(),
+        login_time: new Date().toLocaleString(),
+        browser_info: navigator.userAgent,
+        device_info: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        ip_address: 'Client-side detection unavailable',
+        location: 'Requires server-side detection',
+      };
+      
+      console.log('📧 Sending email with params:', templateParams);
+      
       // Using EmailJS for client-side email sending
       const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method: 'POST',
@@ -43,21 +70,17 @@ class EmailService {
           service_id: this.serviceId,
           template_id: this.templateId,
           user_id: this.publicKey,
-          template_params: {
-            to_email: this.adminEmail,
-            subject: notification.subject,
-            message: notification.message,
-            type: notification.type,
-            timestamp: new Date().toLocaleString(),
-          },
+          template_params: templateParams,
         }),
       });
 
       if (response.ok) {
-        console.log('✅ Email sent successfully');
+        console.log('✅ Email sent successfully to', this.adminEmail);
         return true;
       } else {
-        console.error('❌ Email send failed:', await response.text());
+        const errorText = await response.text();
+        console.error('❌ Email send failed:', errorText);
+        console.error('❌ Response status:', response.status);
         return false;
       }
     } catch (error) {
