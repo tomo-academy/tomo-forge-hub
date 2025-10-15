@@ -121,6 +121,15 @@ const EnhancedTeamV2 = () => {
       const result = await db.employees.update(updatedEmployee.id, updatedEmployee);
       console.log('✅ Update result:', result);
       
+      // Add cache busting to the avatar URL for immediate display
+      let avatarUrl = updatedEmployee.avatar || updatedEmployee.avatar_url;
+      if (avatarUrl && avatarUrl.includes('cloudinary.com')) {
+        const timestamp = Date.now();
+        avatarUrl = avatarUrl.includes('?') 
+          ? `${avatarUrl}&t=${timestamp}` 
+          : `${avatarUrl}?t=${timestamp}`;
+      }
+      
       // Immediately update local state for instant UI feedback
       setTeamMembers(prev => prev.map(emp => 
         emp.id === updatedEmployee.id ? {
@@ -128,12 +137,17 @@ const EnhancedTeamV2 = () => {
           ...updatedEmployee,
           employeeId: updatedEmployee.employeeId || emp.employeeId,
           joinDate: updatedEmployee.joinDate || emp.joinDate,
-          avatar: updatedEmployee.avatar || emp.avatar
+          avatar: avatarUrl,
+          avatar_url: avatarUrl
         } : emp
       ));
       
-      // Reload from database to ensure consistency
-      await loadTeamMembers();
+      // Close modal first for better UX
+      setShowEditModal(false);
+      setSelectedEmployee(null);
+      
+      // Reload from database in background to ensure consistency
+      setTimeout(() => loadTeamMembers(), 500);
     } catch (error) {
       console.error('❌ Error updating employee:', error);
       throw error;

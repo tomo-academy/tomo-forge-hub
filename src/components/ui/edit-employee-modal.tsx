@@ -168,9 +168,9 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
       
       toast({
         title: "✅ Employee Updated",
-        description: "Changes saved successfully!",
+        description: "Changes saved successfully! Refreshing...",
       });
-      onClose();
+      // Parent component will handle closing and refreshing
     } catch (error) {
       console.error('❌ Save error:', error);
       toast({
