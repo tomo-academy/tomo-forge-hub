@@ -51,7 +51,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
   // Generate particles for background effect
   useEffect(() => {
-    const newParticles = Array.from({ length: 15 }, (_, i) => ({
+    const newParticles = Array.from({ length: 10 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100
@@ -125,7 +125,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg overflow-hidden p-0 bg-black border-0 shadow-2xl rounded-2xl">
+      <DialogContent className="max-w-md overflow-hidden p-0 bg-black border-0 shadow-2xl rounded-2xl">
         <style jsx>{`
           :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -144,8 +144,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           .modal-container {
             position: relative;
             width: 100%;
-            height: 600px;
-            max-height: 90vh;
+            height: 85vh;
+            max-height: 650px;
             display: flex;
             flex-direction: column;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
@@ -216,22 +216,25 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem 1rem;
             z-index: 10;
+            overflow-y: auto;
+            overflow-x: hidden;
           }
 
           .logo-section {
             position: relative;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex-shrink: 0;
           }
 
           .logo-orbital {
             position: relative;
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -245,13 +248,13 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           }
 
           .orbital-ring-1 {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
           }
 
           .orbital-ring-2 {
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             animation-duration: 20s;
             animation-direction: reverse;
             border-color: rgba(240, 147, 251, 0.2);
@@ -259,8 +262,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .logo-glow {
             position: absolute;
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, transparent 70%);
             border-radius: 50%;
             filter: blur(15px);
@@ -269,13 +272,13 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .logo-wrapper {
             position: relative;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             overflow: hidden;
             box-shadow: 
-              0 0 30px rgba(102, 126, 234, 0.4),
-              0 0 60px rgba(240, 147, 251, 0.2);
+              0 0 20px rgba(102, 126, 234, 0.4),
+              0 0 40px rgba(240, 147, 251, 0.2);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             animation: logo-float 6s ease-in-out infinite;
             border: 2px solid rgba(255, 255, 255, 0.1);
@@ -285,8 +288,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           .logo-wrapper:hover {
             transform: scale(1.05) rotate(5deg);
             box-shadow: 
-              0 0 40px rgba(102, 126, 234, 0.6),
-              0 0 80px rgba(240, 147, 251, 0.3);
+              0 0 30px rgba(102, 126, 234, 0.6),
+              0 0 60px rgba(240, 147, 251, 0.3);
           }
 
           .logo-wrapper img {
@@ -315,20 +318,21 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             position: relative;
             width: 100%;
             max-width: 280px;
-            margin: 0 auto 1.5rem;
-            padding: 1rem 1.2rem;
+            margin: 0 auto 1rem;
+            padding: 0.8rem 1rem;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             box-shadow: 0 4px 20px var(--shadow-color);
+            flex-shrink: 0;
           }
 
           .control-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.6rem;
           }
 
           .control-label {
@@ -354,7 +358,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .slider-container {
             position: relative;
-            height: 32px;
+            height: 28px;
             display: flex;
             align-items: center;
           }
@@ -383,8 +387,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             position: absolute;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -411,9 +415,10 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             transform-style: preserve-3d;
             perspective: 800px;
+            flex-shrink: 0;
           }
 
           .lamp-container {
@@ -425,7 +430,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           .lamp-cable {
             position: absolute;
             width: 3px;
-            height: 60px;
+            height: 50px;
             background: linear-gradient(180deg, #333 0%, #666 100%);
             left: 50%;
             transform: translateX(-50%);
@@ -435,20 +440,20 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .lamp-body {
             position: relative;
-            width: 70px;
-            height: 50px;
+            width: 60px;
+            height: 40px;
             background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             box-shadow: 
-              0 8px 20px rgba(0, 0, 0, 0.3),
-              inset 0 -3px 8px rgba(0, 0, 0, 0.2);
+              0 6px 15px rgba(0, 0, 0, 0.3),
+              inset 0 -2px 6px rgba(0, 0, 0, 0.2);
             overflow: hidden;
           }
 
           .lamp-bulb {
             position: absolute;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: radial-gradient(circle, #fff 0%, #ffd89b 50%, transparent 70%);
             border-radius: 50%;
             top: 50%;
@@ -461,8 +466,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .light-rays {
             position: absolute;
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -473,7 +478,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           .light-ray {
             position: absolute;
             width: 2px;
-            height: 60px;
+            height: 50px;
             background: linear-gradient(180deg, var(--lamp-glow) 0%, transparent 100%);
             top: 50%;
             left: 50%;
@@ -484,27 +489,28 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           .auth-form {
             position: relative;
             width: 100%;
-            max-width: 300px;
-            padding: 1.5rem;
+            max-width: 280px;
+            padding: 1.2rem;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: 
-              0 15px 40px rgba(0, 0, 0, 0.3),
+              0 10px 30px rgba(0, 0, 0, 0.3),
               inset 0 1px 0 rgba(255, 255, 255, 0.1);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
           }
 
           .form-header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
           }
 
           .form-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 0.3rem;
@@ -516,11 +522,11 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .form-subtitle {
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
           }
 
           .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
           }
 
           .form-label {
@@ -529,7 +535,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             gap: 0.4rem;
             color: var(--text-primary);
             font-weight: 500;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             margin-bottom: 0.4rem;
           }
 
@@ -539,12 +545,12 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .form-input {
             width: 100%;
-            padding: 0.8rem 0.8rem 0.8rem 2.2rem;
+            padding: 0.7rem 0.7rem 0.7rem 2rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
           }
 
@@ -587,23 +593,23 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             display: flex;
             align-items: center;
             gap: 0.4rem;
-            padding: 0.8rem;
+            padding: 0.7rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
           }
 
           .submit-button {
             width: 100%;
-            padding: 0.8rem;
+            padding: 0.7rem;
             background: var(--primary-gradient);
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             color: white;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
@@ -630,7 +636,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             gap: 0.4rem;
             padding: 0.6rem;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-top: 0.8rem;
             animation: slide-in 0.3s ease-out;
           }
@@ -649,14 +655,14 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           .security-footer {
             text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
           }
 
           .security-text {
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             margin: 0.2rem 0;
           }
 
@@ -777,11 +783,11 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             }
             90% {
               opacity: 1;
-              transform: translateY(-50px) scale(1);
+              transform: translateY(-40px) scale(1);
             }
             100% { 
               opacity: 0;
-              transform: translateY(-60px) scale(0);
+              transform: translateY(-50px) scale(0);
             }
           }
 
@@ -808,7 +814,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
           @keyframes energy-orbit {
             from { 
-              transform: rotate(0deg) translateX(35px) rotate(0deg);
+              transform: rotate(0deg) translateX(30px) rotate(0deg);
               opacity: 0;
             }
             10% {
@@ -818,7 +824,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
               opacity: 1;
             }
             to { 
-              transform: rotate(360deg) translateX(35px) rotate(-360deg);
+              transform: rotate(360deg) translateX(30px) rotate(-360deg);
               opacity: 0;
             }
           }
@@ -837,66 +843,12 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           /* Responsive Design */
           @media (max-width: 640px) {
             .modal-container {
-              height: 500px;
-              max-height: 85vh;
+              height: 90vh;
+              max-height: 600px;
             }
 
             .content-wrapper {
-              padding: 1.5rem 1rem;
-            }
-
-            .logo-orbital {
-              width: 70px;
-              height: 70px;
-            }
-
-            .orbital-ring-1 {
-              width: 90px;
-              height: 90px;
-            }
-
-            .orbital-ring-2 {
-              width: 110px;
-              height: 110px;
-            }
-
-            .logo-wrapper {
-              width: 50px;
-              height: 50px;
-            }
-
-            .light-control {
-              max-width: 250px;
-              padding: 0.8rem 1rem;
-            }
-
-            .lamp-body {
-              width: 60px;
-              height: 43px;
-            }
-
-            .lamp-cable {
-              height: 50px;
-            }
-
-            .auth-form {
-              max-width: 280px;
-              padding: 1.2rem;
-            }
-
-            .form-title {
-              font-size: 1.1rem;
-            }
-          }
-
-          @media (max-width: 480px) {
-            .modal-container {
-              height: 450px;
-              max-height: 80vh;
-            }
-
-            .content-wrapper {
-              padding: 1rem 0.8rem;
+              padding: 1.2rem 0.8rem;
             }
 
             .logo-orbital {
@@ -920,13 +872,13 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             }
 
             .light-control {
-              max-width: 220px;
+              max-width: 250px;
               padding: 0.6rem 0.8rem;
             }
 
             .lamp-body {
               width: 50px;
-              height: 36px;
+              height: 35px;
             }
 
             .lamp-cable {
@@ -941,15 +893,69 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
             .form-title {
               font-size: 1rem;
             }
+          }
+
+          @media (max-width: 480px) {
+            .modal-container {
+              height: 95vh;
+              max-height: 550px;
+            }
+
+            .content-wrapper {
+              padding: 1rem 0.6rem;
+            }
+
+            .logo-orbital {
+              width: 50px;
+              height: 50px;
+            }
+
+            .orbital-ring-1 {
+              width: 70px;
+              height: 70px;
+            }
+
+            .orbital-ring-2 {
+              width: 90px;
+              height: 90px;
+            }
+
+            .logo-wrapper {
+              width: 35px;
+              height: 35px;
+            }
+
+            .light-control {
+              max-width: 220px;
+              padding: 0.5rem 0.6rem;
+            }
+
+            .lamp-body {
+              width: 45px;
+              height: 30px;
+            }
+
+            .lamp-cable {
+              height: 35px;
+            }
+
+            .auth-form {
+              max-width: 240px;
+              padding: 0.8rem;
+            }
+
+            .form-title {
+              font-size: 0.9rem;
+            }
 
             .form-input {
-              padding: 0.7rem 0.7rem 0.7rem 2rem;
-              font-size: 0.85rem;
+              padding: 0.6rem 0.6rem 0.6rem 1.8rem;
+              font-size: 0.8rem;
             }
 
             .submit-button {
-              padding: 0.7rem;
-              font-size: 0.85rem;
+              padding: 0.6rem;
+              font-size: 0.8rem;
             }
           }
 
