@@ -63,6 +63,7 @@ const EnhancedTeamV2 = () => {
             employeeId: emp.employee_id,
             joinDate: emp.join_date,
             avatar: avatarUrl,
+            avatar_url: avatarUrl,
             cardColor: emp.card_color
           };
         });
@@ -97,8 +98,17 @@ const EnhancedTeamV2 = () => {
         
         // Update local state immediately
         setTeamMembers(prev => prev.map(emp => 
-          emp.id === employeeId ? { ...emp, avatar: result.url, avatar_url: result.url } : emp
+          emp.id === employeeId ? { 
+            ...emp, 
+            avatar: result.url, 
+            avatar_url: result.url 
+          } : emp
         ));
+        
+        // Update database
+        await db.employees.update(employeeId, { 
+          avatar_url: result.url 
+        });
         
         // Reload from database to ensure consistency
         await loadTeamMembers();
@@ -191,26 +201,29 @@ const EnhancedTeamV2 = () => {
   };
 
   // Function to get the correct image path
-  const getImagePath = (avatar?: string) => {
-    if (!avatar) return null;
+  const getImagePath = (avatar?: string, avatar_url?: string) => {
+    // Check both avatar and avatar_url fields
+    const avatarPath = avatar || avatar_url;
+    
+    if (!avatarPath) return null;
     
     // If it's a public path, remove the 'public/' prefix
-    if (avatar.startsWith('public/')) {
-      return avatar.replace('public/', '/');
+    if (avatarPath.startsWith('public/')) {
+      return avatarPath.replace('public/', '/');
     }
     
     // If it already starts with '/', return as is
-    if (avatar.startsWith('/')) {
-      return avatar;
+    if (avatarPath.startsWith('/')) {
+      return avatarPath;
     }
     
     // If it's a relative path without leading '/', add it
-    return `/${avatar}`;
+    return `/${avatarPath}`;
   };
 
   // Function to render avatar with fallback
   const renderAvatar = (member: any) => {
-    const imagePath = getImagePath(member.avatar);
+    const imagePath = getImagePath(member.avatar, member.avatar_url);
     
     if (imagePath) {
       // Add timestamp to force reload for Cloudinary images
@@ -266,12 +279,12 @@ const EnhancedTeamV2 = () => {
                   Refresh
                 </Button>
                 <Button 
-                className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
-                onClick={() => setShowAddModal(true)}
-              >
-                <Plus className="w-4 h-4" />
-                Add Member
-              </Button>
+                  className="bg-primary hover:bg-primary-hover shadow-glow gap-2"
+                  onClick={() => setShowAddModal(true)}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Member
+                </Button>
               </div>
             </div>
 
@@ -397,7 +410,7 @@ const EnhancedTeamV2 = () => {
                       <div className="relative group">
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-4 border-white shadow-lg overflow-hidden">
                           {renderAvatar(member)}
-                          <span className={!getImagePath(member.avatar) ? '' : 'hidden'}>
+                          <span className={!getImagePath(member.avatar, member.avatar_url) ? '' : 'hidden'}>
                             {member.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
