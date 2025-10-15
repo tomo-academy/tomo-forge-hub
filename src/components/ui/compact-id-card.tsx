@@ -23,6 +23,7 @@ interface CompactIDCardProps {
     employeeId: string;
     joinDate: string;
     avatar?: string;
+    avatar_url?: string;
     location?: string;
     availability: 'available' | 'busy' | 'offline';
     bio?: string;
@@ -53,12 +54,16 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
   // Function to get the correct image path
   const getImagePath = (avatar?: string) => {
     // Check both avatar and avatar_url fields
-    const avatarPath = avatar || (employee as any).avatar_url;
+    const avatarPath = avatar || employee.avatar_url;
     
     if (!avatarPath) return null;
     
     // If it's already a full URL (http/https), return as is
     if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
+      // Add cache busting for Cloudinary images
+      if (avatarPath.includes('cloudinary.com') && !avatarPath.includes('?t=')) {
+        return `${avatarPath}?t=${Date.now()}`;
+      }
       return avatarPath;
     }
     
@@ -74,6 +79,36 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
     
     // If it's a relative path without leading '/', add it
     return `/${avatarPath}`;
+  };
+
+  // Function to render avatar with fallback
+  const renderAvatar = () => {
+    const imagePath = getImagePath(employee.avatar);
+    
+    if (imagePath) {
+      // Add timestamp to force reload for Cloudinary images
+      const imageUrl = imagePath.includes('cloudinary.com') && !imagePath.includes('?t=')
+        ? `${imagePath}?t=${Date.now()}`
+        : imagePath;
+      
+      // External URL or properly formatted path
+      return (
+        <img 
+          key={imageUrl}
+          src={imageUrl} 
+          alt={employee.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // Fallback to initials if image fails to load
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling!.style.display = 'flex';
+          }}
+        />
+      );
+    } else {
+      // Fallback to initials
+      return null;
+    }
   };
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,32 +249,10 @@ END:VCARD`;
             <div className="flex-shrink-0">
               <div className="relative group/photo">
                 <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white dark:border-slate-600 shadow-xl overflow-hidden relative ring-2 ring-primary/30 hover:ring-primary/50 transition-all">
-                  {getImagePath(employee.avatar) ? (
-                    <>
-                      <img 
-                        src={getImagePath(employee.avatar) || ''} 
-                        alt={employee.name}
-                        className="w-full h-full object-cover absolute inset-0"
-                        style={{ 
-                          objectPosition: 'center 30%',
-                          objectFit: 'cover',
-                          minHeight: '100%',
-                          minWidth: '100%'
-                        }}
-                        onError={(e) => {
-                          // Fallback to initials if image fails to load
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      <span className="absolute inset-0 flex items-center justify-center opacity-0 bg-gradient-to-br from-primary to-accent text-white text-2xl font-bold">
-                        {employee.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-2xl font-bold bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
-                      {employee.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  )}
+                  {renderAvatar()}
+                  <span className="absolute inset-0 flex items-center justify-center opacity-0 bg-gradient-to-br from-primary to-accent text-white text-2xl font-bold">
+                    {employee.name.split(' ').map(n => n[0]).join('')}
+                  </span>
                   {isUploading && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
