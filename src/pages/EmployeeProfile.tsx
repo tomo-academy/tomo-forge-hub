@@ -55,6 +55,7 @@ const EmployeeProfile = () => {
             employeeId: dbEmployee.employee_id,
             joinDate: dbEmployee.join_date,
             avatar: avatarUrl,
+            avatar_url: avatarUrl,
             social: dbEmployee.social_links,
             cardColor: dbEmployee.card_color
           };
@@ -168,14 +169,18 @@ END:VCARD`;
   };
 
   // Function to get the correct image path
-  const getImagePath = (avatar?: string) => {
+  const getImagePath = (avatar?: string, avatar_url?: string) => {
     // Check both avatar and avatar_url fields
-    const avatarPath = avatar || employee?.avatar_url;
+    const avatarPath = avatar || avatar_url;
     
     if (!avatarPath) return null;
     
     // If it's already a full URL (http/https), return as is
     if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
+      // Add cache busting for Cloudinary images
+      if (avatarPath.includes('cloudinary.com') && !avatarPath.includes('?t=')) {
+        return `${avatarPath}?t=${Date.now()}`;
+      }
       return avatarPath;
     }
     
@@ -195,7 +200,7 @@ END:VCARD`;
 
   // Function to render avatar with fallback
   const renderAvatar = () => {
-    const imagePath = getImagePath(employee.avatar);
+    const imagePath = getImagePath(employee.avatar, employee.avatar_url);
     
     if (imagePath) {
       // External URL or properly formatted path
@@ -253,7 +258,7 @@ END:VCARD`;
             <div className="relative inline-block mb-4">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-2xl md:text-4xl border-4 border-white shadow-lg overflow-hidden">
                 {renderAvatar()}
-                <span className={!getImagePath(employee.avatar) ? '' : 'hidden'}>
+                <span className={!getImagePath(employee.avatar, employee.avatar_url) ? '' : 'hidden'}>
                   {employee.name.split(' ').map((n: string) => n[0]).join('')}
                 </span>
               </div>
