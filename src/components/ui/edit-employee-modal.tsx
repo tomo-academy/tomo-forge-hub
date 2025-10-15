@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { emailService } from "@/services/emailService";
+import { imageUploadService } from "@/services/imageUploadService";
 import { 
   Save, X, Upload, Camera, Trash2, AlertCircle, CheckCircle,
   Mail, Phone, MapPin, Briefcase, User, Building2, Calendar
@@ -72,25 +73,50 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(employee.avatar || (employee as any).avatar_url || null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "❌ File Too Large",
-          description: "Please select an image under 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!file) return;
 
-      setPhotoFile(file);
+    // Validate image
+    const validation = imageUploadService.validateImage(file, 5);
+    if (!validation.valid) {
+      toast({
+        title: "❌ Invalid Image",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsUploadingImage(true);
+      
+      // Compress image before preview
+      const compressedFile = await imageUploadService.compressImage(file, 800, 0.8);
+      setPhotoFile(compressedFile);
+      
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
+      
+      toast({
+        title: "✅ Image Ready",
+        description: "Image compressed and ready to save",
+      });
+    } catch (error) {
+      console.error('Error processing image:', error);
+      toast({
+        title: "❌ Image Processing Failed",
+        description: "Failed to process image. Please try another.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -103,23 +129,42 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      let avatarUrl = formData.avatar || (employee as any).avatar_url;
+      
+      // Upload new photo if one was selected
+      if (photoFile) {
+        toast({
+          title: "📤 Uploading Image",
+          description: "Please wait while we upload your image...",
+        });
+        
+        try {
+          avatarUrl = await imageUploadService.uploadImage(photoFile);
+          console.log('✅ Image uploaded successfully:', avatarUrl);
+        } catch (error) {
+          console.error('❌ Image upload failed:', error);
+          toast({
+            title: "⚠️ Image Upload Failed",
+            description: "Saving employee data without new image.",
+            variant: "destructive",
+          });
+        }
+      }
+
       const updatedEmployee = {
         ...formData,
-        avatar: photoPreview || formData.avatar,
-        avatar_url: photoPreview || formData.avatar || (employee as any).avatar_url,
+        avatar: avatarUrl,
+        avatar_url: avatarUrl,
         joinDate: formData.joinDate, // Already in yyyy-MM-dd format
         skills: typeof formData.skills === 'string' 
           ? (formData.skills as string).split(',').map(s => s.trim()).filter(Boolean)
           : formData.skills
       };
 
-      console.log('💾 Saving employee with avatar:', updatedEmployee.avatar);
-      console.log('💾 Saving employee with avatar_url:', updatedEmployee.avatar_url);
+      console.log('💾 Saving employee:', updatedEmployee.id);
+      console.log('💾 Avatar URL:', avatarUrl);
       
       await onSave(updatedEmployee);
-      
-      // Email notification disabled to avoid 414/422 errors
-      // Will be re-enabled after EmailJS template is properly configured
       
       toast({
         title: "✅ Employee Updated",
@@ -127,6 +172,7 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
       });
       onClose();
     } catch (error) {
+      console.error('❌ Save error:', error);
       toast({
         title: "❌ Update Failed",
         description: "Failed to update employee. Please try again.",
@@ -197,9 +243,13 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
             <div className="flex-1">
               <Label htmlFor="photo" className="cursor-pointer">
                 <div className="flex items-center gap-2 p-3 border-2 border-dashed rounded-lg hover:border-primary transition-colors">
-                  <Camera className="w-5 h-5" />
+                  {isUploadingImage ? (
+                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="w-5 h-5" />
+                  )}
                   <span className="text-sm font-medium">
-                    {photoPreview ? 'Change Photo' : 'Upload Photo'}
+                    {isUploadingImage ? 'Processing...' : photoPreview ? 'Change Photo' : 'Upload Photo'}
                   </span>
                 </div>
               </Label>
@@ -209,6 +259,7 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
                 accept="image/*"
                 onChange={handlePhotoChange}
                 className="hidden"
+                disabled={isUploadingImage || isSaving}
               />
               <p className="text-xs text-muted-foreground mt-1">
                 JPG, PNG or GIF. Max 5MB.

@@ -174,10 +174,19 @@ export const db = {
         return null;
       }
       try {
-        // Map avatar to avatar_url if present
-        const avatarUrl = updates.avatar || updates.avatar_url;
+        // Map avatar to avatar_url if present (handle both field names)
+        const avatarUrl = updates.avatar_url || updates.avatar;
         const skills = Array.isArray(updates.skills) ? updates.skills : [];
         const socialLinks = updates.social || updates.social_links || {};
+        
+        console.log('💾 Updating employee:', id);
+        console.log('💾 Avatar URL to save:', avatarUrl);
+        console.log('💾 Avatar URL length:', avatarUrl?.length || 0);
+        
+        // Only update avatar_url if a new value is provided
+        const avatarUpdateClause = avatarUrl 
+          ? sql`avatar_url = ${avatarUrl}`
+          : sql`avatar_url = avatar_url`;
         
         const result = await sql`
           UPDATE employees
@@ -187,7 +196,7 @@ export const db = {
             department = COALESCE(${updates.department}, department),
             email = COALESCE(${updates.email}, email),
             phone = COALESCE(${updates.phone}, phone),
-            avatar_url = COALESCE(${avatarUrl}, avatar_url),
+            ${avatarUpdateClause},
             location = COALESCE(${updates.location}, location),
             availability = COALESCE(${updates.availability}, availability),
             bio = COALESCE(${updates.bio}, bio),
@@ -198,10 +207,18 @@ export const db = {
           WHERE id = ${id}
           RETURNING *
         `;
-        console.log('✅ Employee updated successfully:', result[0]);
-        return result[0] as Employee || null;
+        
+        if (result && result.length > 0) {
+          console.log('✅ Employee updated successfully');
+          console.log('✅ New avatar_url:', result[0].avatar_url);
+          return result[0] as Employee;
+        } else {
+          console.warn('⚠️ No employee found with id:', id);
+          return null;
+        }
       } catch (error) {
         console.error('❌ Error updating employee:', error);
+        console.error('❌ Error details:', error instanceof Error ? error.message : String(error));
         return null;
       }
     },
