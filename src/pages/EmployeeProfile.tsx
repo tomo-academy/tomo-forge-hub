@@ -18,8 +18,8 @@ import {
   Building2, Users, Target, Activity, BarChart3
 } from "lucide-react";
 
-// Import employee data from the centralized data file
-import { employees } from "@/data/employees";
+// Import database service
+import { db } from "@/lib/db";
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -27,16 +27,45 @@ const EmployeeProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Profile page loaded');
-    console.log('Looking for employee ID:', employeeId);
-    console.log('Available employees:', employees.map(emp => emp.id));
+    const loadEmployee = async () => {
+      console.log('🔄 Loading employee profile from database...');
+      console.log('📋 Looking for employee ID:', employeeId);
+      
+      try {
+        // Fetch employee from database
+        const dbEmployee = await db.employees.getById(employeeId || '');
+        
+        if (dbEmployee) {
+          console.log('✅ Found employee in database:', dbEmployee);
+          
+          // Map database fields to component fields
+          const mappedEmployee = {
+            ...dbEmployee,
+            employeeId: dbEmployee.employee_id,
+            joinDate: dbEmployee.join_date,
+            avatar: dbEmployee.avatar_url,
+            social: dbEmployee.social_links,
+            cardColor: dbEmployee.card_color
+          };
+          
+          setEmployee(mappedEmployee);
+        } else {
+          console.warn('⚠️ Employee not found in database');
+          setEmployee(null);
+        }
+      } catch (error) {
+        console.error('❌ Error loading employee:', error);
+        setEmployee(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Find employee by ID
-    const foundEmployee = employees.find(emp => emp.id === employeeId);
-    console.log('Found employee:', foundEmployee);
-    
-    setEmployee(foundEmployee);
-    setIsLoading(false);
+    if (employeeId) {
+      loadEmployee();
+    } else {
+      setIsLoading(false);
+    }
   }, [employeeId]);
 
   if (isLoading) {
@@ -47,38 +76,16 @@ const EmployeeProfile = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="p-8 text-center max-w-2xl">
-          <h1 className="text-2xl font-bold mb-4">Employee Profile</h1>
+          <h1 className="text-2xl font-bold mb-4">Employee Not Found</h1>
           <p className="text-muted-foreground mb-6">
-            Looking for employee ID: <code className="bg-muted px-2 py-1 rounded">{employeeId}</code>
+            Could not find employee with ID: <code className="bg-muted px-2 py-1 rounded">{employeeId}</code>
           </p>
-          
-          <div className="mb-6">
-            <h3 className="font-semibold mb-3">Available Employee IDs:</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              {employees.map(emp => (
-                <Link 
-                  key={emp.id} 
-                  to={`/profile/${emp.id}`}
-                  className="p-2 bg-muted rounded hover:bg-primary/10 transition-colors"
-                >
-                  <div className="font-mono text-xs">{emp.id}</div>
-                  <div className="text-xs text-muted-foreground">{emp.name}</div>
-                </Link>
-              ))}
-            </div>
-          </div>
           
           <div className="flex gap-2 justify-center">
             <Link to="/team">
               <Button>
                 <Users className="w-4 h-4 mr-2" />
                 View All Team Members
-              </Button>
-            </Link>
-            <Link to={`/profile/${employees[0].id}`}>
-              <Button variant="outline">
-                <Eye className="w-4 h-4 mr-2" />
-                View Sample Profile
               </Button>
             </Link>
           </div>
