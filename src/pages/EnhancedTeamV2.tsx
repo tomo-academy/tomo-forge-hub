@@ -48,13 +48,24 @@ const EnhancedTeamV2 = () => {
       console.log('✅ Loaded employees:', dbEmployees.length);
       
       if (dbEmployees && dbEmployees.length > 0) {
-        const mappedEmployees = dbEmployees.map(emp => ({
-          ...emp,
-          employeeId: emp.employee_id,
-          joinDate: emp.join_date,
-          avatar: emp.avatar_url,
-          cardColor: emp.card_color
-        }));
+        const mappedEmployees = dbEmployees.map(emp => {
+          // Add cache busting for Cloudinary images
+          let avatarUrl = emp.avatar_url;
+          if (avatarUrl && avatarUrl.includes('cloudinary.com')) {
+            const timestamp = Date.now();
+            avatarUrl = avatarUrl.includes('?') 
+              ? `${avatarUrl}&t=${timestamp}` 
+              : `${avatarUrl}?t=${timestamp}`;
+          }
+          
+          return {
+            ...emp,
+            employeeId: emp.employee_id,
+            joinDate: emp.join_date,
+            avatar: avatarUrl,
+            cardColor: emp.card_color
+          };
+        });
         console.log('📋 Mapped employees:', mappedEmployees.length);
         setTeamMembers(mappedEmployees);
       } else {
