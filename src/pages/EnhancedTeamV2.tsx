@@ -146,14 +146,13 @@ const EnhancedTeamV2 = () => {
       setShowEditModal(false);
       setSelectedEmployee(null);
       
-      // Force component refresh
-      setRefreshKey(prev => prev + 1);
+      // Force immediate re-render by updating state
+      setTeamMembers(prev => [...prev]);
       
       // Reload from database in background to ensure consistency
       setTimeout(() => {
         loadTeamMembers();
-        setRefreshKey(prev => prev + 1);
-      }, 500);
+      }, 100);
     } catch (error) {
       console.error('❌ Error updating employee:', error);
       throw error;
