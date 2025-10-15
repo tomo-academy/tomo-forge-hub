@@ -37,17 +37,29 @@ const EmployeeProfile = () => {
         
         if (dbEmployee) {
           console.log('✅ Found employee in database:', dbEmployee);
+          console.log('📸 Avatar URL from DB:', dbEmployee.avatar_url);
+          
+          // Add cache busting for Cloudinary images
+          let avatarUrl = dbEmployee.avatar_url;
+          if (avatarUrl && avatarUrl.includes('cloudinary.com')) {
+            // Add timestamp to force refresh
+            const timestamp = Date.now();
+            avatarUrl = avatarUrl.includes('?') 
+              ? `${avatarUrl}&t=${timestamp}` 
+              : `${avatarUrl}?t=${timestamp}`;
+          }
           
           // Map database fields to component fields
           const mappedEmployee = {
             ...dbEmployee,
             employeeId: dbEmployee.employee_id,
             joinDate: dbEmployee.join_date,
-            avatar: dbEmployee.avatar_url,
+            avatar: avatarUrl,
             social: dbEmployee.social_links,
             cardColor: dbEmployee.card_color
           };
           
+          console.log('✅ Mapped employee with avatar:', mappedEmployee.avatar);
           setEmployee(mappedEmployee);
         } else {
           console.warn('⚠️ Employee not found in database');
