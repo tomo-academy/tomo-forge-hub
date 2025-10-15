@@ -146,8 +146,14 @@ const EnhancedTeamV2 = () => {
       setShowEditModal(false);
       setSelectedEmployee(null);
       
+      // Force component refresh
+      setRefreshKey(prev => prev + 1);
+      
       // Reload from database in background to ensure consistency
-      setTimeout(() => loadTeamMembers(), 500);
+      setTimeout(() => {
+        loadTeamMembers();
+        setRefreshKey(prev => prev + 1);
+      }, 500);
     } catch (error) {
       console.error('❌ Error updating employee:', error);
       throw error;
@@ -208,10 +214,16 @@ const EnhancedTeamV2 = () => {
     const imagePath = getImagePath(member.avatar);
     
     if (imagePath) {
+      // Add timestamp to force reload for Cloudinary images
+      const imageUrl = imagePath.includes('cloudinary.com') && !imagePath.includes('?t=')
+        ? `${imagePath}?t=${Date.now()}`
+        : imagePath;
+      
       // External URL or properly formatted path
       return (
         <img 
-          src={imagePath} 
+          key={imageUrl}
+          src={imageUrl} 
           alt={member.name}
           className="w-full h-full object-cover"
           onError={(e) => {
