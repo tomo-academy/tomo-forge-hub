@@ -391,7 +391,7 @@ const EnhancedTeamV2 = () => {
                         <div className="relative group">
                           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl border-4 border-white shadow-lg overflow-hidden">
                             {renderAvatar(member)}
-                            <span className={!getImagePath(member.avatar, member.avatar_url) ? '' : 'hidden'}>
+                            <span className={!githubPhotoService.getEmployeePhotoUrl(member) ? '' : 'hidden'}>
                               {member.name.split(' ').map(n => n[0]).join('')}
                             </span>
                           </div>
