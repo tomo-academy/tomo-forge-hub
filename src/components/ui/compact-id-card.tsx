@@ -369,19 +369,22 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* QR Content - Fixed layout */}
+          {/* QR Content - Fixed layout with proper spacing */}
           <div className="relative h-[calc(260px-56px-48px)] flex flex-col items-center justify-center p-3">
-            <div className="text-center mb-2">
-              <h3 className="font-bold text-sm leading-tight truncate max-w-full px-2">{employee.name}</h3>
-              <p className="text-xs text-muted-foreground leading-tight truncate max-w-full px-2">{employee.role}</p>
-              <p className="text-[10px] font-mono text-primary mt-0.5">{employee.employeeId}</p>
+            {/* Name and Role Section */}
+            <div className="text-center mb-3 w-full">
+              <h3 className="font-bold text-sm leading-tight truncate px-2">{employee.name}</h3>
+              <p className="text-xs text-muted-foreground leading-tight truncate px-2">{employee.role}</p>
+              <p className="text-[10px] font-mono text-primary mt-1">{employee.employeeId}</p>
             </div>
 
-            <div className="p-2.5 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-2">
+            {/* QR Code Section */}
+            <div className="p-2.5 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-3">
               <QRCode value={profileUrl} size={90} />
             </div>
 
-            <div className="text-center space-y-0.5 mb-2">
+            {/* Scan Instructions */}
+            <div className="text-center space-y-0.5 mb-3">
               <p className="font-semibold text-xs flex items-center justify-center gap-1">
                 <Sparkles className="w-3 h-3 text-primary" />
                 Scan for Profile
@@ -393,7 +396,7 @@ END:VCARD`;
 
             {/* Social Links - Fixed positioning */}
             {employee.social && Object.values(employee.social).some(v => v) && (
-              <div className="flex items-center gap-1.5 mt-1">
+              <div className="flex items-center gap-1.5 mt-auto">
                 {employee.social.linkedin && (
                   <a href={employee.social.linkedin} target="_blank" rel="noopener noreferrer" 
                      onClick={(e) => e.stopPropagation()}
