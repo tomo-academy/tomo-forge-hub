@@ -1,3 +1,4 @@
+// src/components/SEO.tsx
 import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
@@ -10,6 +11,8 @@ interface SEOProps {
   author?: string;
   publishedTime?: string;
   modifiedTime?: string;
+  employeeName?: string;
+  employeeRole?: string;
 }
 
 export const SEO = ({
@@ -22,10 +25,43 @@ export const SEO = ({
   author = 'TOMO Academy',
   publishedTime,
   modifiedTime,
+  employeeName,
+  employeeRole,
 }: SEOProps) => {
   const fullTitle = title.includes('TOMO Academy') ? title : `${title} | TOMO Academy`;
   const fullUrl = url.startsWith('http') ? url : `https://tomo-forge-hub.vercel.app${url}`;
   const fullImage = image.startsWith('http') ? image : `https://tomo-forge-hub.vercel.app${image}`;
+
+  // Generate structured data for employee profiles
+  const generateStructuredData = () => {
+    if (type === 'profile' && employeeName) {
+      return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": employeeName,
+        "jobTitle": employeeRole,
+        "worksFor": {
+          "@type": "Organization",
+          "name": "TOMO Academy",
+          "url": "https://tomo-forge-hub.vercel.app"
+        },
+        "url": fullUrl,
+        "image": fullImage
+      };
+    }
+    return {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TOMO Academy",
+      "url": "https://tomo-forge-hub.vercel.app",
+      "logo": "https://tomo-forge-hub.vercel.app/logo.png",
+      "description": description,
+      "sameAs": [
+        "https://www.youtube.com/@tomoacademy",
+        "https://twitter.com/tomo_academy"
+      ]
+    };
+  };
 
   return (
     <Helmet>
@@ -43,6 +79,8 @@ export const SEO = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={fullImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:site_name" content="TOMO Academy" />
       <meta property="og:locale" content="en_US" />
 
@@ -52,6 +90,8 @@ export const SEO = ({
       <meta property="twitter:title" content={fullTitle} />
       <meta property="twitter:description" content={description} />
       <meta property="twitter:image" content={fullImage} />
+      <meta property="twitter:site" content="@tomo_academy" />
+      <meta property="twitter:creator" content="@tomo_academy" />
 
       {/* Article specific */}
       {type === 'article' && publishedTime && (
@@ -81,6 +121,12 @@ export const SEO = ({
       {/* Theme Color */}
       <meta name="theme-color" content="#6366f1" />
       <meta name="msapplication-TileColor" content="#6366f1" />
+      <meta name="msapplication-config" content="/browserconfig.xml" />
+
+      {/* Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify(generateStructuredData())}
+      </script>
     </Helmet>
   );
 };
