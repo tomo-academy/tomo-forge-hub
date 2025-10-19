@@ -16,7 +16,7 @@ import { SEO } from "@/components/SEO";
 import Navbar from "@/components/Navbar";
 import { employees, departments } from "@/data/employees";
 import { db } from "@/lib/db";
-import { photoUploadService } from "@/services/photoUpload";
+import { githubPhotoService } from "@/services/githubPhotoService";
 import { 
   Users, Search, Filter, Award, MapPin, Calendar, Video,
   Star, Plus, Grid, List, Building2, UserCheck, TrendingUp,
@@ -200,45 +200,19 @@ const EnhancedTeamV2 = () => {
     avgRating: (teamMembers.reduce((sum, m) => sum + m.stats.rating, 0) / teamMembers.length).toFixed(1)
   };
 
-  // Function to get the correct image path
-  const getImagePath = (avatar?: string, avatar_url?: string) => {
-    // Check both avatar and avatar_url fields
-    const avatarPath = avatar || avatar_url;
-    
-    if (!avatarPath) return null;
-    
-    // If it's a public path, remove the 'public/' prefix
-    if (avatarPath.startsWith('public/')) {
-      return avatarPath.replace('public/', '/');
-    }
-    
-    // If it already starts with '/', return as is
-    if (avatarPath.startsWith('/')) {
-      return avatarPath;
-    }
-    
-    // If it's a relative path without leading '/', add it
-    return `/${avatarPath}`;
-  };
-
-  // Function to render avatar with fallback
+  // Function to render avatar with GitHub photo service
   const renderAvatar = (member: any) => {
-    const imagePath = getImagePath(member.avatar, member.avatar_url);
+    const avatarProps = githubPhotoService.getAvatarProps(member);
     
-    if (imagePath) {
-      // Add timestamp to force reload for Cloudinary images
-      const imageUrl = imagePath.includes('cloudinary.com') && !imagePath.includes('?t=')
-        ? `${imagePath}?t=${Date.now()}`
-        : imagePath;
-      
-      // External URL or properly formatted path
+    if (avatarProps.src) {
       return (
         <img 
-          key={imageUrl}
-          src={imageUrl} 
-          alt={member.name}
+          key={avatarProps.src}
+          src={avatarProps.src}
+          alt={avatarProps.alt}
           className="w-full h-full object-cover"
           onError={(e) => {
+            console.warn(`❌ Failed to load image: ${avatarProps.src}`);
             // Fallback to initials if image fails to load
             e.currentTarget.style.display = 'none';
             e.currentTarget.nextElementSibling!.style.display = 'flex';

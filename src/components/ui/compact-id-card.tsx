@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AdminOnly } from "@/components/ui/admin-only";
+import { githubPhotoService } from "@/services/githubPhotoService";
 import { 
   Download, Share2, Mail, Phone, MapPin, Calendar, Star, Shield,
   Verified, Eye, Camera, Sparkles, Video, Briefcase, Globe,
@@ -53,55 +54,24 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
 
   const profileUrl = `${window.location.origin}/profile/${employee.id}`;
 
-  // Function to get the correct image path
+  // Function to get the correct image path using GitHub photo service
   const getImagePath = (avatar?: string, avatar_url?: string) => {
-    // Check both avatar and avatar_url fields
-    const avatarPath = avatar || avatar_url;
-    
-    if (!avatarPath) return null;
-    
-    // If it's already a full URL (http/https), return as is
-    if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
-      // Add cache busting for Cloudinary images
-      if (avatarPath.includes('cloudinary.com') && !avatarPath.includes('?t=')) {
-        return `${avatarPath}?t=${Date.now()}`;
-      }
-      return avatarPath;
-    }
-    
-    // If it's a public path, remove the 'public/' prefix
-    if (avatarPath.startsWith('public/')) {
-      return avatarPath.replace('public/', '/');
-    }
-    
-    // If it already starts with '/', return as is
-    if (avatarPath.startsWith('/')) {
-      return avatarPath;
-    }
-    
-    // If it's a relative path without leading '/', add it
-    return `/${avatarPath}`;
+    return githubPhotoService.getEmployeePhotoUrl({ avatar, avatar_url, name: employee.name });
   };
 
   // Function to render avatar with fallback
   const renderAvatar = () => {
-    const imagePath = getImagePath(employee.avatar, employee.avatar_url);
+    const avatarProps = githubPhotoService.getAvatarProps(employee);
     
-    if (imagePath && !imageError) {
-      // Add timestamp to force reload for Cloudinary images
-      const imageUrl = imagePath.includes('cloudinary.com') && !imagePath.includes('?t=')
-        ? `${imagePath}?t=${Date.now()}`
-        : imagePath;
-      
-      // External URL or properly formatted path
+    if (avatarProps.src && !imageError) {
       return (
         <img 
-          key={imageUrl}
-          src={imageUrl} 
-          alt={employee.name}
+          key={avatarProps.src}
+          src={avatarProps.src}
+          alt={avatarProps.alt}
           className="w-full h-full object-cover"
           onError={(e) => {
-            // Fallback to initials if image fails to load
+            console.warn(`❌ Failed to load image: ${avatarProps.src}`);
             setImageError(true);
           }}
         />
@@ -110,7 +80,7 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
       // Fallback to initials
       return (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-accent text-white font-bold text-2xl">
-          {employee.name.split(' ').map(n => n[0]).join('')}
+          {avatarProps.fallback}
         </div>
       );
     }
@@ -122,7 +92,20 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
 
     setIsUploading(true);
     setImageError(false);
+    
     try {
+      // Validate the image
+      const validation = githubPhotoService.validateImage(file);
+      if (!validation.valid) {
+        toast({
+          title: "❌ Invalid Image",
+          description: validation.error,
+          variant: "destructive",
+          duration: 3000,
+        });
+        return;
+      }
+
       if (onPhotoUpdate) {
         await onPhotoUpdate(file);
         toast({
@@ -132,11 +115,12 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
         });
       }
     } catch (error) {
+      console.error('Photo upload error:', error);
       toast({
         title: "❌ Upload Failed",
         description: "Failed to update photo. Please try again.",
         variant: "destructive",
-        duration: 2000,
+        duration: 3000,
       });
     } finally {
       setIsUploading(false);
@@ -354,104 +338,111 @@ END:VCARD`;
           "bg-gradient-to-br from-accent/10 via-primary/5 to-accent/10",
           "border-2 border-accent/30 shadow-xl"
         )}>
-          {/* Header */}
-          <div className="relative h-14 bg-gradient-to-r from-pink-600 via-pink-500 to-pink-600 text-white flex items-center justify-center">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md p-1">
+          {/* Header - Reduced height */}
+          <div className="relative h-12 bg-gradient-to-r from-pink-600 via-pink-500 to-pink-600 text-white flex items-center justify-center">
+            <div className="flex items-center gap-1.5">
+              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md p-1">
                 <img src="/logo.png" alt="TOMO Academy" className="w-full h-full object-contain" onError={(e) => {
                   e.currentTarget.src = '/TOMO.jpg';
                 }} />
               </div>
               <div>
-                <p className="font-bold text-sm leading-none">TOMO ACADEMY</p>
-                <p className="text-[10px] opacity-90 leading-none mt-0.5">EDUCATION ELEVATED</p>
+                <p className="font-bold text-xs leading-none">TOMO ACADEMY</p>
+                <p className="text-[9px] opacity-90 leading-none mt-0.5">EDUCATION ELEVATED</p>
               </div>
             </div>
           </div>
 
-          {/* QR Content - Fixed layout with proper spacing */}
-          <div className="relative h-[calc(260px-56px-48px)] flex flex-col items-center justify-center p-3">
-            {/* Name and Role Section */}
-            <div className="text-center mb-3 w-full">
-              <h3 className="font-bold text-sm leading-tight truncate px-2">{employee.name}</h3>
-              <p className="text-xs text-muted-foreground leading-tight truncate px-2">{employee.role}</p>
-              <p className="text-[10px] font-mono text-primary mt-1">{employee.employeeId}</p>
+          {/* Main Content - Fixed spacing and layout */}
+          <div className="relative flex flex-col h-[calc(260px-48px-40px)] p-3 justify-between">
+            {/* Employee Info Section - Top */}
+            <div className="text-center space-y-0.5">
+              <h3 className="font-bold text-sm leading-tight truncate">{employee.name}</h3>
+              <p className="text-xs text-muted-foreground leading-tight truncate">{employee.role}</p>
+              <p className="text-[10px] font-mono text-primary">{employee.employeeId}</p>
             </div>
 
-            {/* QR Code Section */}
-            <div className="p-2.5 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-3">
-              <QRCode value={profileUrl} size={90} />
-            </div>
-
-            {/* Scan Instructions */}
-            <div className="text-center space-y-0.5 mb-3">
-              <p className="font-semibold text-xs flex items-center justify-center gap-1">
-                <Sparkles className="w-3 h-3 text-primary" />
-                Scan for Profile
-              </p>
-              <p className="text-[9px] text-muted-foreground leading-tight">
-                View complete details
-              </p>
-            </div>
-
-            {/* Social Links - Fixed positioning */}
-            {employee.social && Object.values(employee.social).some(v => v) && (
-              <div className="flex items-center gap-1.5 mt-auto">
-                {employee.social.linkedin && (
-                  <a href={employee.social.linkedin} target="_blank" rel="noopener noreferrer" 
-                     onClick={(e) => e.stopPropagation()}
-                     className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-                    <Linkedin className="w-3 h-3 text-primary" />
-                  </a>
-                )}
-                {employee.social.twitter && (
-                  <a href={employee.social.twitter} target="_blank" rel="noopener noreferrer"
-                     onClick={(e) => e.stopPropagation()}
-                     className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-                    <Twitter className="w-3 h-3 text-primary" />
-                  </a>
-                )}
-                {employee.social.github && (
-                  <a href={employee.social.github} target="_blank" rel="noopener noreferrer"
-                     onClick={(e) => e.stopPropagation()}
-                     className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-                    <Github className="w-3 h-3 text-primary" />
-                  </a>
-                )}
+            {/* QR Code Section - Center */}
+            <div className="flex flex-col items-center space-y-2">
+              <div className="p-2 bg-white rounded-xl shadow-lg border-2 border-primary/20">
+                <QRCode value={profileUrl} size={75} />
               </div>
-            )}
+              <div className="text-center">
+                <p className="font-semibold text-xs flex items-center justify-center gap-1">
+                  <Sparkles className="w-3 h-3 text-primary" />
+                  Scan for Profile
+                </p>
+                <p className="text-[9px] text-muted-foreground">View complete details</p>
+              </div>
+            </div>
+
+            {/* Social Links Section - Bottom */}
+            <div className="flex justify-center">
+              {employee.social && Object.values(employee.social).some(v => v) && (
+                <div className="flex items-center gap-1.5">
+                  {employee.social.linkedin && (
+                    <a href={employee.social.linkedin} target="_blank" rel="noopener noreferrer" 
+                       onClick={(e) => e.stopPropagation()}
+                       className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+                      <Linkedin className="w-3 h-3 text-primary" />
+                    </a>
+                  )}
+                  {employee.social.twitter && (
+                    <a href={employee.social.twitter} target="_blank" rel="noopener noreferrer"
+                       onClick={(e) => e.stopPropagation()}
+                       className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+                      <Twitter className="w-3 h-3 text-primary" />
+                    </a>
+                  )}
+                  {employee.social.github && (
+                    <a href={employee.social.github} target="_blank" rel="noopener noreferrer"
+                       onClick={(e) => e.stopPropagation()}
+                       className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+                      <Github className="w-3 h-3 text-primary" />
+                    </a>
+                  )}
+                  {employee.social.instagram && (
+                    <a href={employee.social.instagram} target="_blank" rel="noopener noreferrer"
+                       onClick={(e) => e.stopPropagation()}
+                       className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+                      <Instagram className="w-3 h-3 text-primary" />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Footer Actions - Fixed height and positioning */}
-          <div className="relative h-12 bg-gradient-to-r from-primary/10 to-accent/10 border-t flex items-center justify-center gap-1 px-2">
+          {/* Footer Actions - Fixed height and compact */}
+          <div className="relative h-10 bg-gradient-to-r from-primary/10 to-accent/10 border-t flex items-center justify-center gap-1 px-2">
             <Button 
               variant="ghost" 
               size="sm"
-              className="h-7 px-1.5 text-[9px] flex-1 max-w-[70px]"
+              className="h-6 px-1.5 text-[9px] flex-1 max-w-[60px] gap-0.5"
               onClick={downloadVCard}
             >
-              <Download className="w-3 h-3 mr-0.5" />
+              <Download className="w-2.5 h-2.5" />
               Save
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
-              className="h-7 px-1.5 text-[9px] flex-1 max-w-[70px]"
+              className="h-6 px-1.5 text-[9px] flex-1 max-w-[60px] gap-0.5"
               onClick={shareProfile}
             >
-              <Share2 className="w-3 h-3 mr-0.5" />
+              <Share2 className="w-2.5 h-2.5" />
               Share
             </Button>
             <Button 
               variant="default" 
               size="sm"
-              className="h-7 px-1.5 text-[9px] bg-primary flex-1 max-w-[70px]"
+              className="h-6 px-1.5 text-[9px] bg-primary flex-1 max-w-[60px] gap-0.5"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(`/profile/${employee.id}`, '_blank');
               }}
             >
-              <Eye className="w-3 h-3 mr-0.5" />
+              <Eye className="w-2.5 h-2.5" />
               View
             </Button>
           </div>

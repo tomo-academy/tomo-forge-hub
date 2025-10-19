@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { emailService } from "@/services/emailService";
-import { imageUploadService } from "@/services/imageUploadService";
+import { githubPhotoService } from "@/services/githubPhotoService";
 import { 
   Save, X, Upload, Camera, Trash2, AlertCircle, CheckCircle,
   Mail, Phone, MapPin, Briefcase, User, Building2, Calendar
@@ -80,7 +80,7 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
     if (!file) return;
 
     // Validate image
-    const validation = imageUploadService.validateImage(file, 5);
+    const validation = githubPhotoService.validateImage(file);
     if (!validation.valid) {
       toast({
         title: "❌ Invalid Image",
@@ -94,7 +94,7 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
       setIsUploadingImage(true);
       
       // Compress image before preview
-      const compressedFile = await imageUploadService.compressImage(file, 800, 0.8);
+      const compressedFile = await githubPhotoService.compressImage(file, 800, 0.8);
       setPhotoFile(compressedFile);
       
       // Create preview
@@ -131,27 +131,36 @@ export function EditEmployeeModal({ isOpen, onClose, employee, onSave, onDelete 
     try {
       let avatarUrl = formData.avatar || (employee as any).avatar_url;
       
-      // Upload new photo if one was selected
-      if (photoFile) {
-        toast({
-          title: "📤 Uploading Image",
-          description: "Please wait while we upload your image...",
-        });
-        
-        try {
-          avatarUrl = await imageUploadService.uploadImage(photoFile);
-          console.log('✅ Image uploaded successfully:', avatarUrl);
-        } catch (error) {
-          console.error('❌ Image upload failed:', error);
+    // Upload new photo if one was selected
+    if (photoFile) {
+      toast({
+        title: "📤 Uploading Image",
+        description: "Please wait while we process your image...",
+      });
+      
+      try {
+        // Use GitHub photo service for upload
+        const uploadResult = await githubPhotoService.uploadPhoto(employee.id, photoFile);
+        if (uploadResult.success) {
+          avatarUrl = uploadResult.url;
+          console.log('✅ Image processed successfully:', avatarUrl);
+        } else {
+          console.error('❌ Image processing failed:', uploadResult.error);
           toast({
-            title: "⚠️ Image Upload Failed",
+            title: "⚠️ Image Processing Failed",
             description: "Saving employee data without new image.",
             variant: "destructive",
           });
         }
+      } catch (error) {
+        console.error('❌ Image processing failed:', error);
+        toast({
+          title: "⚠️ Image Processing Failed",
+          description: "Saving employee data without new image.",
+          variant: "destructive",
+        });
       }
-
-      const updatedEmployee = {
+    }      const updatedEmployee = {
         ...formData,
         avatar: avatarUrl,
         avatar_url: avatarUrl,
