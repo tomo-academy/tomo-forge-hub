@@ -1,3 +1,4 @@
+// src/components/ui/compact-id-card.tsx
 import { useState } from "react";
 import QRCode from "react-qr-code";
 import { Card } from "@/components/ui/card";
@@ -47,14 +48,15 @@ interface CompactIDCardProps {
 export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { toast } = useToast();
 
   const profileUrl = `${window.location.origin}/profile/${employee.id}`;
 
   // Function to get the correct image path
-  const getImagePath = (avatar?: string) => {
+  const getImagePath = (avatar?: string, avatar_url?: string) => {
     // Check both avatar and avatar_url fields
-    const avatarPath = avatar || employee.avatar_url;
+    const avatarPath = avatar || avatar_url;
     
     if (!avatarPath) return null;
     
@@ -83,9 +85,9 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
 
   // Function to render avatar with fallback
   const renderAvatar = () => {
-    const imagePath = getImagePath(employee.avatar);
+    const imagePath = getImagePath(employee.avatar, employee.avatar_url);
     
-    if (imagePath) {
+    if (imagePath && !imageError) {
       // Add timestamp to force reload for Cloudinary images
       const imageUrl = imagePath.includes('cloudinary.com') && !imagePath.includes('?t=')
         ? `${imagePath}?t=${Date.now()}`
@@ -100,14 +102,17 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
           className="w-full h-full object-cover"
           onError={(e) => {
             // Fallback to initials if image fails to load
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.nextElementSibling!.style.display = 'flex';
+            setImageError(true);
           }}
         />
       );
     } else {
       // Fallback to initials
-      return null;
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-accent text-white font-bold text-2xl">
+          {employee.name.split(' ').map(n => n[0]).join('')}
+        </div>
+      );
     }
   };
 
@@ -116,6 +121,7 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
     if (!file) return;
 
     setIsUploading(true);
+    setImageError(false);
     try {
       if (onPhotoUpdate) {
         await onPhotoUpdate(file);
@@ -250,9 +256,6 @@ END:VCARD`;
               <div className="relative group/photo">
                 <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white dark:border-slate-600 shadow-xl overflow-hidden relative ring-2 ring-primary/30 hover:ring-primary/50 transition-all">
                   {renderAvatar()}
-                  <span className="absolute inset-0 flex items-center justify-center opacity-0 bg-gradient-to-br from-primary to-accent text-white text-2xl font-bold">
-                    {employee.name.split(' ').map(n => n[0]).join('')}
-                  </span>
                   {isUploading && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -345,7 +348,7 @@ END:VCARD`;
           </div>
         </Card>
 
-        {/* BACK SIDE - QR Focus */}
+        {/* BACK SIDE - QR Focus - Fixed overlapping issues */}
         <Card className={cn(
           "absolute inset-0 backface-hidden rotate-y-180 overflow-hidden",
           "bg-gradient-to-br from-accent/10 via-primary/5 to-accent/10",
@@ -366,19 +369,19 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* QR Content */}
+          {/* QR Content - Fixed layout */}
           <div className="relative h-[calc(260px-56px-48px)] flex flex-col items-center justify-center p-3">
-            <div className="text-center mb-1.5">
+            <div className="text-center mb-2">
               <h3 className="font-bold text-sm leading-tight truncate max-w-full px-2">{employee.name}</h3>
               <p className="text-xs text-muted-foreground leading-tight truncate max-w-full px-2">{employee.role}</p>
               <p className="text-[10px] font-mono text-primary mt-0.5">{employee.employeeId}</p>
             </div>
 
-            <div className="p-2.5 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-1.5">
+            <div className="p-2.5 bg-white rounded-xl shadow-lg border-2 border-primary/20 mb-2">
               <QRCode value={profileUrl} size={90} />
             </div>
 
-            <div className="text-center space-y-0.5 mb-1.5">
+            <div className="text-center space-y-0.5 mb-2">
               <p className="font-semibold text-xs flex items-center justify-center gap-1">
                 <Sparkles className="w-3 h-3 text-primary" />
                 Scan for Profile
@@ -388,9 +391,9 @@ END:VCARD`;
               </p>
             </div>
 
-            {/* Social Links */}
+            {/* Social Links - Fixed positioning */}
             {employee.social && Object.values(employee.social).some(v => v) && (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 mt-1">
                 {employee.social.linkedin && (
                   <a href={employee.social.linkedin} target="_blank" rel="noopener noreferrer" 
                      onClick={(e) => e.stopPropagation()}
@@ -416,7 +419,7 @@ END:VCARD`;
             )}
           </div>
 
-          {/* Footer Actions */}
+          {/* Footer Actions - Fixed height and positioning */}
           <div className="relative h-12 bg-gradient-to-r from-primary/10 to-accent/10 border-t flex items-center justify-center gap-1 px-2">
             <Button 
               variant="ghost" 
