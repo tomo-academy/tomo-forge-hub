@@ -372,7 +372,7 @@ export const employees: Employee[] = [
     phone: "+91 93458 28690",
     employeeId: "TOMO-011",
     joinDate: "2025-08-15",
-    avatar: "/=nithyasri.jpg",
+    avatar: "/nithyasri.jpg",
     bio: "Content writer and social media specialist focused on creating engaging content.",
     skills: ["Content Writing", "Social Media Marketing", "Copywriting", "SEO", "Community Management"],
     location: "Tamilnadu, India",
