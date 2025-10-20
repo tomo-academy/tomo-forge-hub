@@ -44,19 +44,19 @@ const EnhancedTeamV2 = () => {
     setIsLoading(true);
     try {
       console.log('🔄 Loading team members from database...');
+      
+      // For now, let's use the static employees data to test photo display
+      console.log('✅ Using static employees data for testing');
+      setTeamMembers(employees);
+      
+      /* Commented out database loading for debugging
       const dbEmployees = await db.employees.getAll();
       console.log('✅ Loaded employees:', dbEmployees.length);
       
       if (dbEmployees && dbEmployees.length > 0) {
         const mappedEmployees = dbEmployees.map(emp => {
-          // Add cache busting for Cloudinary images
-          let avatarUrl = emp.avatar_url;
-          if (avatarUrl && avatarUrl.includes('cloudinary.com')) {
-            const timestamp = Date.now();
-            avatarUrl = avatarUrl.includes('?') 
-              ? `${avatarUrl}&t=${timestamp}` 
-              : `${avatarUrl}?t=${timestamp}`;
-          }
+          // Use the GitHub photo service for consistent photo handling
+          const avatarUrl = emp.avatar_url || emp.avatar;
           
           return {
             ...emp,
@@ -73,6 +73,7 @@ const EnhancedTeamV2 = () => {
         console.log('⚠️ No employees in database, using fallback data');
         setTeamMembers(employees);
       }
+      */
     } catch (error) {
       console.error('❌ Error loading team members:', error);
       // Fallback to static data

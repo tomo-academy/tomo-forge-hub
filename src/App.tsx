@@ -22,6 +22,8 @@ import EmployeeProfile from "./pages/EmployeeProfile";
 import TestProfile from "./pages/TestProfile";
 import ProductionAnalytics from "./pages/ProductionAnalytics";
 import HealthCheck from "./pages/HealthCheck";
+import { PhotoDebugPage } from "./pages/PhotoDebug";
+import SimplePhotoTest from "./pages/SimplePhotoTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient(reactQueryCacheConfig);
@@ -51,6 +53,8 @@ const App = () => (
                 <Route path="/test-profile" element={<TestProfile />} />
                 <Route path="/analytics" element={<ProductionAnalytics />} />
                 <Route path="/health" element={<HealthCheck />} />
+                <Route path="/photo-debug" element={<PhotoDebugPage />} />
+                <Route path="/photo-test" element={<SimplePhotoTest />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
