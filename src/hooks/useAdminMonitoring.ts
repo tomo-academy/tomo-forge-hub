@@ -1,7 +1,7 @@
 // src/hooks/useAdminMonitoring.ts
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { adminMonitoringService } from '@/services/adminMonitoringService';
+import { siteMonitoringService } from '@/services/siteMonitoringService';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useAdminMonitoring = () => {
@@ -9,13 +9,17 @@ export const useAdminMonitoring = () => {
   const { isAdmin } = useAuth();
 
   useEffect(() => {
-    // Only track admin pages if user is admin
-    if (isAdmin) {
-      adminMonitoringService.trackPageVisit(location.pathname);
+    // Track all page visits (both admin and visitor)
+    try {
+      if (siteMonitoringService?.trackPageVisit) {
+        siteMonitoringService.trackPageVisit(location.pathname);
+      }
+    } catch (error) {
+      console.warn('Error tracking page visit:', error);
     }
-  }, [location.pathname, isAdmin]);
+  }, [location.pathname]);
 
-  const trackAction = (action: string, details?: any) => {
+  const trackAction = (action: string, details?: Record<string, unknown>) => {
     if (isAdmin) {
       console.log(`Admin action tracked: ${action}`, details);
       // You can extend this to track specific admin actions
@@ -24,7 +28,21 @@ export const useAdminMonitoring = () => {
 
   return {
     trackAction,
-    getCurrentSession: () => adminMonitoringService.getCurrentSession(),
-    getSessionStats: () => adminMonitoringService.getSessionStats()
+    getCurrentSession: () => {
+      try {
+        return siteMonitoringService?.getCurrentSession?.() || null;
+      } catch (error) {
+        console.warn('Error getting current session:', error);
+        return null;
+      }
+    },
+    getVisitorStats: () => {
+      try {
+        return siteMonitoringService?.getVisitorStats?.() || {};
+      } catch (error) {
+        console.warn('Error getting visitor stats:', error);
+        return {};
+      }
+    }
   };
 };

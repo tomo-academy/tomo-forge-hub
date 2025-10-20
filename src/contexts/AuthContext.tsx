@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { emailService } from '@/services/emailService';
-import { adminMonitoringService } from '@/services/adminMonitoringService';
+import { siteMonitoringService } from '@/services/siteMonitoringService';
 
 interface AuthContextType {
   isAdmin: boolean;
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Track admin login with enhanced monitoring
       try {
-        await adminMonitoringService.trackAdminLogin(email);
+        await siteMonitoringService.trackAdminLogin(email);
         console.log('Admin login tracked successfully');
       } catch (error) {
         console.error('Failed to track admin login:', error);
@@ -88,7 +88,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true;
     } else {
       // Track failed login attempt
-      adminMonitoringService.trackFailedLogin(email, 'Invalid credentials');
+      try {
+        if (siteMonitoringService?.trackFailedLogin) {
+          siteMonitoringService.trackFailedLogin(email, 'Invalid credentials');
+        }
+      } catch (error) {
+        console.error('Failed to track failed login:', error);
+      }
     }
     
     return false;
@@ -96,7 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     // Track admin logout
-    adminMonitoringService.trackAdminLogout();
+    try {
+      if (siteMonitoringService?.trackAdminLogout) {
+        siteMonitoringService.trackAdminLogout();
+      }
+    } catch (error) {
+      console.error('Failed to track admin logout:', error);
+    }
     
     setIsAdmin(false);
     setIsAuthenticated(false);
