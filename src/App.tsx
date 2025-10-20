@@ -61,11 +61,13 @@ const AppWithMonitoring = () => {
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/resources" element={<EnhancedResources />} />
         <Route path="/resources/classic" element={<Resources />} />
+        <Route path="/employee/:employeeId" element={<EmployeeProfile />} />
         <Route path="/profile/:employeeId" element={<EmployeeProfile />} />
         <Route path="/test-profile" element={<TestProfile />} />
         <Route path="/analytics" element={<ProductionAnalytics />} />
         <Route path="/health" element={<HealthCheck />} />
         <Route path="/monitoring" element={<UserMonitoring />} />
+        <Route path="/user-management" element={<UserMonitoring />} />
         <Route path="/photo-debug" element={<PhotoDebugPage />} />
         <Route path="/photo-test" element={<SimplePhotoTest />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
