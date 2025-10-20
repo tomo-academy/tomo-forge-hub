@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import QRCode from "react-qr-code";
+import { SimpleQRCode } from '@/components/SimpleQRCode';
+import { useToast } from '@/hooks/use-toast';
+import { APP_CONFIG } from '@/config/constants';
 import { 
   ArrowLeft, Mail, Phone, MapPin, Calendar, Star, 
   Video, CheckCircle, Briefcase, Award, Shield,
@@ -27,7 +31,10 @@ const TestProfile = () => {
     bio: "Full-stack developer and channel manager leading the technical vision for TOMO Academy."
   };
 
-  const qrData = `https://tomo-forge-hub.vercel.app/test-profile`;
+  const { toast } = useToast();
+  const [isSharing, setIsSharing] = useState(false);
+  
+  const qrData = `${APP_CONFIG.DOMAIN}/test-profile`;
 
   return (
     <div className="min-h-screen bg-background">

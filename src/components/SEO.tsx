@@ -20,7 +20,7 @@ export const SEO = ({
   description = 'TOMO Academy is a comprehensive digital learning platform offering high-quality educational content, tutorials, and resources for technology enthusiasts and learners.',
   keywords = ['TOMO Academy', 'online learning', 'tutorials', 'education', 'technology', 'programming', 'web development'],
   image = '/TOMO.jpg',
-  url = 'https://tomo-forge-hub.vercel.app',
+  url = 'https://www.tomoacademy.site',
   type = 'website',
   author = 'TOMO Academy',
   publishedTime,
@@ -29,8 +29,8 @@ export const SEO = ({
   employeeRole,
 }: SEOProps) => {
   const fullTitle = title.includes('TOMO Academy') ? title : `${title} | TOMO Academy`;
-  const fullUrl = url.startsWith('http') ? url : `https://tomo-forge-hub.vercel.app${url}`;
-  const fullImage = image.startsWith('http') ? image : `https://tomo-forge-hub.vercel.app${image}`;
+  const fullUrl = url.startsWith('http') ? url : `https://www.tomoacademy.site${url}`;
+  const fullImage = image.startsWith('http') ? image : `https://www.tomoacademy.site${image}`;
 
   // Generate structured data for employee profiles
   const generateStructuredData = () => {
@@ -43,7 +43,7 @@ export const SEO = ({
         "worksFor": {
           "@type": "Organization",
           "name": "TOMO Academy",
-          "url": "https://tomo-forge-hub.vercel.app"
+          "url": "https://www.tomoacademy.site"
         },
         "url": fullUrl,
         "image": fullImage
@@ -53,8 +53,8 @@ export const SEO = ({
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "TOMO Academy",
-      "url": "https://tomo-forge-hub.vercel.app",
-      "logo": "https://tomo-forge-hub.vercel.app/logo.png",
+      "url": "https://www.tomoacademy.site",
+      "logo": "https://www.tomoacademy.site/logo.png",
       "description": description,
       "sameAs": [
         "https://www.youtube.com/@tomoacademy",

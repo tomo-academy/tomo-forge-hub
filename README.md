@@ -1,12 +1,12 @@
 # 🎓 TOMO Academy - Digital Learning Platform
 
-[![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)](https://tomo-forge-hub.vercel.app)
+[![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)](https://www.tomoacademy.site)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)](package.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 > A comprehensive digital learning platform with team management, YouTube analytics, and real-time collaboration features.
 
-**Live Demo**: https://tomo-forge-hub.vercel.app
+**Live Demo**: https://www.tomoacademy.site
 
 ## 🌟 Features
 
@@ -99,7 +99,7 @@ VITE_YOUTUBE_CHANNEL_ID=your_channel_id_here
 VITE_DATABASE_URL=your_database_url_here
 
 # App Configuration
-VITE_APP_URL=https://tomo-forge-hub.vercel.app
+VITE_APP_URL=https://www.tomoacademy.site
 VITE_APP_VERSION=1.0.0
 ```
 

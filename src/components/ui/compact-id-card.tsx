@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AdminOnly } from "@/components/ui/admin-only";
 import { githubPhotoService } from "@/services/githubPhotoService";
+import { generateProfileUrl } from "@/config/constants";
 import { 
   Download, Share2, Mail, Phone, MapPin, Calendar, Star, Shield,
   Verified, Eye, Camera, Sparkles, Video, Briefcase, Globe,
@@ -52,7 +53,7 @@ export function CompactIDCard({ employee, onPhotoUpdate }: CompactIDCardProps) {
   const [imageError, setImageError] = useState(false);
   const { toast } = useToast();
 
-  const profileUrl = `${window.location.origin}/profile/${employee.id}`;
+  const profileUrl = generateProfileUrl(employee.id);
 
   // Function to get the correct image path using GitHub photo service
   const getImagePath = (avatar?: string, avatar_url?: string) => {
