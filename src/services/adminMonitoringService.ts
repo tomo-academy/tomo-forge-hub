@@ -1,8 +1,11 @@
 // src/services/adminMonitoringService.ts
-interface AdminSession {
+interface VisitorSession {
   id: string;
-  email: string;
-  loginTime: string;
+  sessionType: 'visitor' | 'admin';
+  email?: string;
+  visitorId: string; // Anonymous visitor identifier
+  firstVisit: string;
+  lastVisit: string;
   ipAddress: string;
   location: {
     country: string;
@@ -11,6 +14,8 @@ interface AdminSession {
     timezone: string;
     latitude?: number;
     longitude?: number;
+    isp?: string;
+    org?: string;
   };
   deviceInfo: {
     userAgent: string;
@@ -27,6 +32,8 @@ interface AdminSession {
     language: string;
     cookieEnabled: boolean;
     onlineStatus: boolean;
+    touchSupport: boolean;
+    webGLSupport: boolean;
   };
   networkInfo: {
     connectionType?: string;
@@ -40,13 +47,16 @@ interface AdminSession {
     duration?: number;
     scrollDepth?: number;
     interactions?: number;
+    referrer?: string;
+    exitPage?: boolean;
   }>;
-  securityInfo: {
-    suspiciousActivity: boolean;
-    failedLoginAttempts: number;
-    lastFailedLogin?: string;
-    loginMethod: string;
-    twoFactorEnabled: boolean;
+  behaviorInfo: {
+    totalVisits: number;
+    bounceRate: number;
+    avgSessionDuration: number;
+    pagesPerSession: number;
+    returningVisitor: boolean;
+    engagementScore: number;
   };
   sessionStats: {
     totalPages: number;
@@ -54,6 +64,29 @@ interface AdminSession {
     lastActivity: string;
     isActive: boolean;
     activityScore: number;
+    entryPage: string;
+    exitPage?: string;
+  };
+  technicalInfo: {
+    javascriptEnabled: boolean;
+    cookiesEnabled: boolean;
+    localStorageEnabled: boolean;
+    sessionStorageEnabled: boolean;
+    doNotTrack: boolean;
+    adBlockerDetected: boolean;
+  };
+}
+
+interface AdminSession extends VisitorSession {
+  sessionType: 'admin';
+  email: string;
+  loginTime: string;
+  securityInfo: {
+    suspiciousActivity: boolean;
+    failedLoginAttempts: number;
+    lastFailedLogin?: string;
+    loginMethod: string;
+    twoFactorEnabled: boolean;
   };
 }
 
@@ -69,15 +102,19 @@ interface LoginAttempt {
 }
 
 class AdminMonitoringService {
-  private currentSession: AdminSession | null = null;
+  private currentSession: VisitorSession | null = null;
   private readonly STORAGE_KEY = 'adminMonitoringSessions';
+  private readonly VISITORS_KEY = 'visitorSessions';
   private readonly LOGIN_ATTEMPTS_KEY = 'adminLoginAttempts';
   private activityTimer: NodeJS.Timeout | null = null;
   private pageStartTime: number = Date.now();
+  private visitorId: string;
 
   constructor() {
+    this.visitorId = this.getOrCreateVisitorId();
     this.initializeTracking();
     this.startActivityTracking();
+    this.trackVisitorSession();
   }
 
   private initializeTracking() {
@@ -101,6 +138,114 @@ class AdminMonitoringService {
     });
   }
 
+  private getOrCreateVisitorId(): string {
+    let visitorId = localStorage.getItem('visitorId');
+    if (!visitorId) {
+      visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('visitorId', visitorId);
+    }
+    return visitorId;
+  }
+
+  private async trackVisitorSession(): Promise<void> {
+    if (this.currentSession?.sessionType === 'admin') return; // Don't track admin as visitor
+
+    const existingVisitor = this.getVisitorSession(this.visitorId);
+    const locationInfo = await this.getLocationInfo();
+    const deviceInfo = this.getEnhancedDeviceInfo();
+
+    if (existingVisitor) {
+      // Update existing visitor
+      existingVisitor.lastVisit = new Date().toISOString();
+      existingVisitor.behaviorInfo.totalVisits++;
+      existingVisitor.sessionStats.lastActivity = new Date().toISOString();
+      existingVisitor.sessionStats.isActive = true;
+      this.currentSession = existingVisitor;
+    } else {
+      // Create new visitor session
+      const visitorSession: VisitorSession = {
+        id: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        sessionType: 'visitor',
+        visitorId: this.visitorId,
+        firstVisit: new Date().toISOString(),
+        lastVisit: new Date().toISOString(),
+        ipAddress: locationInfo.ipAddress,
+        location: locationInfo,
+        deviceInfo,
+        networkInfo: deviceInfo.networkInfo || {},
+        pageVisits: [{
+          page: window.location.pathname,
+          timestamp: new Date().toISOString(),
+          scrollDepth: 0,
+          interactions: 0,
+          referrer: document.referrer || 'Direct'
+        }],
+        behaviorInfo: {
+          totalVisits: 1,
+          bounceRate: 0,
+          avgSessionDuration: 0,
+          pagesPerSession: 1,
+          returningVisitor: false,
+          engagementScore: 50
+        },
+        sessionStats: {
+          totalPages: 1,
+          totalTimeSpent: 0,
+          lastActivity: new Date().toISOString(),
+          isActive: true,
+          activityScore: 100,
+          entryPage: window.location.pathname
+        },
+        technicalInfo: {
+          javascriptEnabled: true,
+          cookiesEnabled: navigator.cookieEnabled,
+          localStorageEnabled: this.isLocalStorageEnabled(),
+          sessionStorageEnabled: this.isSessionStorageEnabled(),
+          doNotTrack: navigator.doNotTrack === '1',
+          adBlockerDetected: this.detectAdBlocker()
+        }
+      };
+
+      this.currentSession = visitorSession;
+    }
+
+    this.saveVisitorSession(this.currentSession);
+    this.pageStartTime = Date.now();
+  }
+
+  private isLocalStorageEnabled(): boolean {
+    try {
+      localStorage.setItem('test', 'test');
+      localStorage.removeItem('test');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private isSessionStorageEnabled(): boolean {
+    try {
+      sessionStorage.setItem('test', 'test');
+      sessionStorage.removeItem('test');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private detectAdBlocker(): boolean {
+    // Simple ad blocker detection
+    const adElement = document.createElement('div');
+    adElement.innerHTML = '&nbsp;';
+    adElement.className = 'adsbox';
+    adElement.style.position = 'absolute';
+    adElement.style.left = '-10000px';
+    document.body.appendChild(adElement);
+    const adBlocked = adElement.offsetHeight === 0;
+    document.body.removeChild(adElement);
+    return adBlocked;
+  }
+
   private startActivityTracking() {
     this.activityTimer = setInterval(() => {
       if (this.currentSession) {
@@ -109,7 +254,17 @@ class AdminMonitoringService {
     }, 30000); // Update every 30 seconds
   }
 
-  private async getLocationInfo(): Promise<any> {
+  private async getLocationInfo(): Promise<{
+    country: string;
+    region: string;
+    city: string;
+    timezone: string;
+    latitude?: number;
+    longitude?: number;
+    ipAddress: string;
+    isp?: string;
+    org?: string;
+  }> {
     try {
       // Try to get IP and location from multiple sources
       const responses = await Promise.allSettled([
@@ -128,7 +283,9 @@ class AdminMonitoringService {
             timezone: data.timezone || 'Unknown',
             latitude: data.latitude || data.lat,
             longitude: data.longitude || data.lon,
-            ipAddress: data.ip || 'Unknown'
+            ipAddress: data.ip || 'Unknown',
+            isp: data.isp || data.org,
+            org: data.org || data.as
           };
         }
       }
@@ -146,12 +303,12 @@ class AdminMonitoringService {
     };
   }
 
-  private getDeviceInfo() {
+  private getEnhancedDeviceInfo() {
     const ua = navigator.userAgent;
     const screen = window.screen;
     
     // Get network information if available
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const connection = (navigator as unknown as { connection?: { type?: string; downlink?: number; effectiveType?: string; rtt?: number } }).connection;
     
     return {
       userAgent: ua,
@@ -168,6 +325,8 @@ class AdminMonitoringService {
       language: navigator.language,
       cookieEnabled: navigator.cookieEnabled,
       onlineStatus: navigator.onLine,
+      touchSupport: 'ontouchstart' in window,
+      webGLSupport: this.detectWebGL(),
       networkInfo: connection ? {
         connectionType: connection.type,
         downlink: connection.downlink,
@@ -175,6 +334,15 @@ class AdminMonitoringService {
         rtt: connection.rtt
       } : {}
     };
+  }
+
+  private detectWebGL(): boolean {
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+    } catch {
+      return false;
+    }
   }
 
   private getBrowserName(ua: string): string {
@@ -213,43 +381,55 @@ class AdminMonitoringService {
   async trackAdminLogin(email: string): Promise<AdminSession> {
     const sessionId = `admin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const locationInfo = await this.getLocationInfo();
-    const deviceInfo = this.getDeviceInfo();
+    const deviceInfo = this.getEnhancedDeviceInfo();
 
     const session: AdminSession = {
       id: sessionId,
+      sessionType: 'admin',
       email,
-      loginTime: new Date().toISOString(),
+      visitorId: this.visitorId,
+      firstVisit: new Date().toISOString(),
+      lastVisit: new Date().toISOString(),
       ipAddress: locationInfo.ipAddress,
-      location: {
-        country: locationInfo.country,
-        region: locationInfo.region,
-        city: locationInfo.city,
-        timezone: locationInfo.timezone,
-        latitude: locationInfo.latitude,
-        longitude: locationInfo.longitude
-      },
-      deviceInfo: {
-        ...deviceInfo,
-        networkInfo: deviceInfo.networkInfo
-      },
+      location: locationInfo,
+      deviceInfo,
+      networkInfo: deviceInfo.networkInfo || {},
       pageVisits: [{
         page: window.location.pathname,
         timestamp: new Date().toISOString(),
         scrollDepth: 0,
-        interactions: 0
+        interactions: 0,
+        referrer: document.referrer || 'Direct'
       }],
-      securityInfo: {
-        suspiciousActivity: false,
-        failedLoginAttempts: 0,
-        loginMethod: 'password',
-        twoFactorEnabled: false
+      behaviorInfo: {
+        totalVisits: 1,
+        bounceRate: 0,
+        avgSessionDuration: 0,
+        pagesPerSession: 1,
+        returningVisitor: false,
+        engagementScore: 100
       },
       sessionStats: {
         totalPages: 1,
         totalTimeSpent: 0,
         lastActivity: new Date().toISOString(),
         isActive: true,
-        activityScore: 100
+        activityScore: 100,
+        entryPage: window.location.pathname
+      },
+      technicalInfo: {
+        javascriptEnabled: true,
+        cookiesEnabled: navigator.cookieEnabled,
+        localStorageEnabled: this.isLocalStorageEnabled(),
+        sessionStorageEnabled: this.isSessionStorageEnabled(),
+        doNotTrack: navigator.doNotTrack === '1',
+        adBlockerDetected: this.detectAdBlocker()
+      },
+      securityInfo: {
+        suspiciousActivity: false,
+        failedLoginAttempts: 0,
+        loginMethod: 'password',
+        twoFactorEnabled: false
       }
     };
 
@@ -266,8 +446,11 @@ class AdminMonitoringService {
       this.saveCurrentPageDuration();
       this.currentSession.sessionStats.isActive = false;
       this.currentSession.sessionStats.lastActivity = new Date().toISOString();
+      this.currentSession.sessionStats.exitPage = window.location.pathname;
       this.saveSession(this.currentSession);
-      this.currentSession = null;
+      
+      // Start tracking as visitor again
+      this.trackVisitorSession();
     }
     
     if (this.activityTimer) {

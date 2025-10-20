@@ -224,6 +224,12 @@ class UserMonitoringService {
     return this.currentUser;
   }
 
+  // Backwards-compatible alias used by some components
+  // Older components call getCurrentSession(), so provide an alias to avoid runtime errors
+  getCurrentSession(): UserSession | null {
+    return this.getCurrentUser();
+  }
+
   // Get login attempts
   getLoginAttempts(): LoginAttempt[] {
     return this.loginAttempts;

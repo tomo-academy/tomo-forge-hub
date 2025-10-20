@@ -16,6 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import EnhancedDashboard from "./pages/EnhancedDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMonitoring from "./pages/AdminMonitoring";
+import SiteMonitoringDashboard from "./pages/SiteMonitoringDashboard";
 import EnhancedTeamV2 from "./pages/EnhancedTeamV2";
 import Videos from "./pages/Videos";
 import EnhancedVideos from "./pages/EnhancedVideos";
@@ -51,6 +52,7 @@ const AppWithMonitoring = () => {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+        <Route path="/admin/site-monitoring" element={<SiteMonitoringDashboard />} />
         <Route path="/dashboard" element={<EnhancedDashboard />} />
         <Route path="/dashboard/classic" element={<Dashboard />} />
         <Route path="/team" element={<EnhancedTeamV2 />} />

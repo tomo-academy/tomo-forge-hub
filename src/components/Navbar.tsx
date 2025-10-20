@@ -41,9 +41,13 @@ const Navbar = () => {
                   <Shield className="w-4 h-4" />
                   Admin
                 </Link>
-                <Link to="/admin/monitoring" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                <Link to="/admin/site-monitoring" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
                   <Monitor className="w-4 h-4" />
-                  Advanced Monitoring
+                  Site Visitors
+                </Link>
+                <Link to="/admin/monitoring" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                  <Shield className="w-4 h-4" />
+                  Admin Security
                 </Link>
               </>
             )}
@@ -91,11 +95,18 @@ const Navbar = () => {
                   Admin
                 </Link>
                 <Link
-                  to="/admin/monitoring"
+                  to="/admin/site-monitoring"
                   className="block px-4 py-2 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-fast flex items-center gap-2 font-semibold"
                 >
                   <Monitor className="w-4 h-4" />
-                  Advanced Monitoring
+                  Site Visitors
+                </Link>
+                <Link
+                  to="/admin/monitoring"
+                  className="block px-4 py-2 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-fast flex items-center gap-2 font-semibold"
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin Security
                 </Link>
               </>
             )}
