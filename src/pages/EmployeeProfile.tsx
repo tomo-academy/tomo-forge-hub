@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import { SEO } from "@/components/SEO";
-import { QRCodeComponent } from "@/components/QRCodeComponent";
+import SimpleQRCode from "@/components/SimpleQRCode";
 import { 
   ArrowLeft, 
   Mail, 
@@ -156,9 +156,9 @@ END:VCARD`;
       />
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 max-w-4xl">
           {/* Header Navigation */}
-          <div className="mb-8">
+          <div className="mb-6">
             <Link to="/team">
               <Button variant="ghost" className="mb-4 hover:bg-white/80 dark:hover:bg-gray-800/80">
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -167,259 +167,233 @@ END:VCARD`;
             </Link>
           </div>
 
-          <div className="max-w-6xl mx-auto">
-            {/* Hero Section */}
-            <div className="relative mb-8">
-              <GlowCard className="overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 h-32 relative">
-                  <div className="absolute inset-0 bg-black/20"></div>
-                </div>
-                <div className="relative px-8 pb-8">
-                  {/* Profile Picture */}
-                  <div className="absolute -top-16 left-8">
-                    <div className="relative">
-                      <img
-                        {...avatarProps}
-                        className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-xl bg-white"
-                      />
-                      <div className="absolute -bottom-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
-                        <div className="w-3 h-3 bg-white rounded-full"></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Basic Info */}
-                  <div className="pt-20 grid md:grid-cols-3 gap-6">
-                    <div className="md:col-span-2">
-                      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{employee.name}</h1>
-                      <p className="text-xl text-blue-600 dark:text-blue-400 mb-4 flex items-center">
-                        <Building2 className="w-5 h-5 mr-2" />
-                        {employee.position}
-                      </p>
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {employee.skills.slice(0, 4).map((skill, index) => (
-                          <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
-                        {employee.bio}
-                      </p>
-                    </div>
-                    
-                    {/* Quick Stats */}
-                    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                        <Award className="w-5 h-5 mr-2 text-yellow-500" />
-                        Quick Info
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center text-sm">
-                          <User className="w-4 h-4 mr-3 text-gray-500" />
-                          <span className="text-gray-600 dark:text-gray-300">{employee.specialization}</span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <Building2 className="w-4 h-4 mr-3 text-gray-500" />
-                          <span className="text-gray-600 dark:text-gray-300">{employee.department}</span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <Clock className="w-4 h-4 mr-3 text-gray-500" />
-                          <span className="text-gray-600 dark:text-gray-300">Since {employee.joinDate}</span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <MapPin className="w-4 h-4 mr-3 text-gray-500" />
-                          <span className="text-gray-600 dark:text-gray-300">{employee.location}</span>
-                        </div>
-                      </div>
+          {/* Mobile-First Single Column Layout */}
+          <div className="space-y-6">
+            {/* Hero Profile Card */}
+            <GlowCard className="overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 h-24 sm:h-32 relative">
+                <div className="absolute inset-0 bg-black/20"></div>
+              </div>
+              <div className="relative px-4 sm:px-6 pb-6">
+                {/* Profile Picture */}
+                <div className="absolute -top-12 sm:-top-16 left-4 sm:left-6">
+                  <div className="relative">
+                    <img
+                      {...avatarProps}
+                      className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-xl bg-white"
+                    />
+                    <div className="absolute -bottom-1 -right-1 bg-green-500 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-4 border-white flex items-center justify-center">
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
                     </div>
                   </div>
                 </div>
-              </GlowCard>
-            </div>
+                
+                {/* Basic Info */}
+                <div className="pt-16 sm:pt-20">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">{employee.name}</h1>
+                  <p className="text-lg sm:text-xl text-blue-600 dark:text-blue-400 mb-4 flex items-center">
+                    <Building2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                    {employee.position}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {employee.skills.slice(0, 4).map((skill, index) => (
+                      <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs sm:text-sm">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+                    {employee.bio}
+                  </p>
+                </div>
+              </div>
+            </GlowCard>
 
-            {/* Main Content Grid */}
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Left Column - Contact & Details */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Contact Information */}
-                <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                  <CardHeader>
-                    <h2 className="text-2xl font-bold flex items-center text-gray-900 dark:text-white">
-                      <Mail className="w-6 h-6 mr-3 text-blue-500" />
-                      Contact Information
-                    </h2>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                          <Mail className="w-5 h-5 text-blue-600" />
-                          <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                            <a href={`mailto:${employee.email}`} className="text-blue-600 hover:text-blue-800 font-medium">
-                              {employee.email}
-                            </a>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <Phone className="w-5 h-5 text-green-600" />
-                          <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-                            <a href={`tel:${employee.phone}`} className="text-green-600 hover:text-green-800 font-medium">
-                              {employee.phone}
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                          <MapPin className="w-5 h-5 text-purple-600" />
-                          <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
-                            <span className="text-purple-600 font-medium">{employee.location}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                          <Calendar className="w-5 h-5 text-orange-600" />
-                          <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Joined</p>
-                            <span className="text-orange-600 font-medium">{employee.joinDate}</span>
-                          </div>
-                        </div>
+            {/* QR Code and Actions Card - Mobile Priority */}
+            <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <CardHeader className="text-center pb-4">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Share Profile</h3>
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-inner border-2 border-gray-100">
+                    <SimpleQRCode 
+                      value={typeof window !== 'undefined' ? window.location.href : ''}
+                      size={120}
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                  Scan QR code to share this profile
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button onClick={downloadVCard} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download vCard
+                  </Button>
+                  <Button variant="outline" onClick={shareProfile} className="w-full">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share Profile
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Info Card */}
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+              <CardContent className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold mb-4 flex items-center">
+                  <Award className="w-5 h-5 mr-2 text-yellow-300" />
+                  Quick Info
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center text-sm">
+                      <User className="w-4 h-4 mr-3 text-blue-200 flex-shrink-0" />
+                      <div>
+                        <p className="text-blue-100 text-xs">Specialization</p>
+                        <p className="font-medium">{employee.specialization}</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-
-                {/* Skills Section */}
-                <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                  <CardHeader>
-                    <h2 className="text-2xl font-bold flex items-center text-gray-900 dark:text-white">
-                      <Award className="w-6 h-6 mr-3 text-yellow-500" />
-                      Skills & Expertise
-                    </h2>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {employee.skills.map((skill, index) => (
-                        <div
-                          key={index}
-                          className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-lg text-center font-medium hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                        >
-                          {skill}
-                        </div>
-                      ))}
+                    <div className="flex items-center text-sm">
+                      <Building2 className="w-4 h-4 mr-3 text-blue-200 flex-shrink-0" />
+                      <div>
+                        <p className="text-blue-100 text-xs">Department</p>
+                        <p className="font-medium">{employee.department}</p>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center text-sm">
+                      <Clock className="w-4 h-4 mr-3 text-blue-200 flex-shrink-0" />
+                      <div>
+                        <p className="text-blue-100 text-xs">Joined</p>
+                        <p className="font-medium">{employee.joinDate}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <MapPin className="w-4 h-4 mr-3 text-blue-200 flex-shrink-0" />
+                      <div>
+                        <p className="text-blue-100 text-xs">Location</p>
+                        <p className="font-medium">{employee.location}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-                {/* Projects Section */}
-                {employee.projects && employee.projects.length > 0 && (
-                  <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                    <CardHeader>
-                      <h2 className="text-2xl font-bold flex items-center text-gray-900 dark:text-white">
-                        <ExternalLink className="w-6 h-6 mr-3 text-green-500" />
-                        Recent Projects
-                      </h2>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {employee.projects.slice(0, 3).map((project, index) => (
-                          <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <h4 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{project.name}</h4>
-                                <p className="text-gray-600 dark:text-gray-300 mb-3">
-                                  {project.description}
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                  {project.technologies.map((tech, techIndex) => (
-                                    <Badge key={techIndex} variant="outline" className="text-xs">
-                                      {tech}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              </div>
-                              {project.link && (
-                                <Button size="sm" variant="ghost" asChild>
-                                  <a href={project.link} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="w-4 h-4" />
-                                  </a>
-                                </Button>
-                              )}
+            {/* Contact Information */}
+            <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <CardHeader>
+                <h2 className="text-xl sm:text-2xl font-bold flex items-center text-gray-900 dark:text-white">
+                  <Mail className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-blue-500" />
+                  Contact Information
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <Mail className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                      <a href={`mailto:${employee.email}`} className="text-blue-600 hover:text-blue-800 font-medium break-all">
+                        {employee.email}
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <Phone className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                      <a href={`tel:${employee.phone}`} className="text-green-600 hover:text-green-800 font-medium">
+                        {employee.phone}
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <Calendar className="w-5 h-5 text-orange-600 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Joined</p>
+                      <span className="text-orange-600 font-medium">{employee.joinDate}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Skills Section */}
+            <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <CardHeader>
+                <h2 className="text-xl sm:text-2xl font-bold flex items-center text-gray-900 dark:text-white">
+                  <Award className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-yellow-500" />
+                  Skills & Expertise
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {employee.skills.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-lg text-center font-medium hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
+                    >
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Projects Section */}
+            {employee.projects && employee.projects.length > 0 && (
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <CardHeader>
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center text-gray-900 dark:text-white">
+                    <ExternalLink className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-green-500" />
+                    Recent Projects
+                  </h2>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {employee.projects.slice(0, 3).map((project, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-4 sm:p-6 rounded-lg hover:shadow-md transition-shadow">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{project.name}</h4>
+                            <p className="text-gray-600 dark:text-gray-300 mb-3 text-sm sm:text-base">
+                              {project.description}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {project.technologies.map((tech, techIndex) => (
+                                <Badge key={techIndex} variant="outline" className="text-xs">
+                                  {tech}
+                                </Badge>
+                              ))}
                             </div>
                           </div>
-                        ))}
+                          {project.link && (
+                            <Button size="sm" variant="ghost" asChild className="flex-shrink-0">
+                              <a href={project.link} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-
-              {/* Right Sidebar */}
-              <div className="space-y-6">
-                {/* QR Code Card */}
-                <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                  <CardHeader className="text-center">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Share Profile</h3>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <div className="flex justify-center mb-6">
-                      <div className="bg-white p-6 rounded-2xl shadow-inner border-2 border-gray-100">
-                        <QRCodeComponent 
-                          value={typeof window !== 'undefined' ? window.location.href : ''}
-                          size={150}
-                          className="rounded-lg"
-                        />
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-                      Scan QR code to share this profile
-                    </p>
-                    <div className="flex flex-col gap-3">
-                      <Button onClick={downloadVCard} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download vCard
-                      </Button>
-                      <Button variant="outline" onClick={shareProfile} className="w-full">
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Share Profile
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Department Info Card */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-4">Department</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-blue-100">Team</p>
-                        <p className="font-semibold text-lg">{employee.department}</p>
-                      </div>
-                      <div>
-                        <p className="text-blue-100">Specialization</p>
-                        <p className="font-semibold">{employee.specialization}</p>
-                      </div>
-                      <div>
-                        <p className="text-blue-100">Role</p>
-                        <p className="font-semibold">{employee.position}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Footer */}
-            <div className="text-center py-12 mt-12 border-t border-gray-200 dark:border-gray-700">
-              <div className="max-w-md mx-auto">
-                <p className="text-gray-600 dark:text-gray-300 mb-2">
+            <div className="text-center py-8 border-t border-gray-200 dark:border-gray-700">
+              <div className="max-w-md mx-auto px-4">
+                <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">
                   © 2025 TOMO Academy. All rights reserved.
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Internal Employee Profile System
                 </p>
               </div>
