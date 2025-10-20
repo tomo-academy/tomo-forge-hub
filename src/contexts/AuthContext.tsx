@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { emailService } from '@/services/emailService';
+import { adminMonitoringService } from '@/services/adminMonitoringService';
 
 interface AuthContextType {
   isAdmin: boolean;
@@ -70,6 +71,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         deviceInfo
       }));
       
+      // Track admin login with enhanced monitoring
+      try {
+        await adminMonitoringService.trackAdminLogin(email);
+        console.log('Admin login tracked successfully');
+      } catch (error) {
+        console.error('Failed to track admin login:', error);
+      }
+      
       // Email notification temporarily disabled to avoid 414/422 errors
       // Will be re-enabled after EmailJS template is properly configured
       // emailService.notifyLogin(email, browserInfo, deviceInfo).catch(err => 
@@ -77,12 +86,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // );
       
       return true;
+    } else {
+      // Track failed login attempt
+      adminMonitoringService.trackFailedLogin(email, 'Invalid credentials');
     }
     
     return false;
   };
 
   const logout = () => {
+    // Track admin logout
+    adminMonitoringService.trackAdminLogout();
+    
     setIsAdmin(false);
     setIsAuthenticated(false);
     setAdminEmail(null);

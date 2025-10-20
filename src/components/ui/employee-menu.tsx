@@ -86,7 +86,8 @@ export function EmployeeMenu({
   };
 
   const viewProfile = () => {
-    window.open(`https://tomoacademy.com/team/${employee.id}`, '_blank');
+    // Use internal routing to employee profile page
+    window.open(`/profile/${employee.id}`, '_blank');
     setIsOpen(false);
   };
 

@@ -3,15 +3,14 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationDropdown } from "@/components/ui/notifications";
-import { LoginModal } from "@/components/ui/login-modal";
+import UserSessionStatus from "./UserSessionStatus";
 import { useAuth } from "@/contexts/AuthContext";
-import { Menu, X, Youtube, Shield, LogOut, User } from "lucide-react";
+import { Menu, X, Youtube, Shield, LogOut, User, Monitor } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const { isAdmin, logout } = useAuth();
+  const { isAdmin } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -37,11 +36,21 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center gap-6">
             {isAdmin && (
-              <Link to="/admin" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
-                <Shield className="w-4 h-4" />
-                Admin
-              </Link>
+              <>
+                <Link to="/admin" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+                <Link to="/admin/monitoring" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                  <Monitor className="w-4 h-4" />
+                  Advanced Monitoring
+                </Link>
+              </>
             )}
+            <Link to="/monitoring" className="text-muted-foreground hover:text-foreground transition-fast flex items-center gap-1">
+              <Monitor className="w-4 h-4" />
+              User Monitoring
+            </Link>
             <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-fast">
               Dashboard
             </Link>
@@ -59,26 +68,7 @@ const Navbar = () => {
             </Link>
             <NotificationDropdown />
             <ThemeToggle />
-            {isAdmin ? (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={logout}
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </Button>
-            ) : (
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="bg-primary hover:bg-primary-hover shadow-glow"
-                onClick={() => setShowLogin(true)}
-              >
-                Login
-              </Button>
-            )}
+            <UserSessionStatus />
           </div>
 
           <button
@@ -91,6 +81,31 @@ const Navbar = () => {
 
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-3 border-t border-border">
+            {isAdmin && (
+              <>
+                <Link
+                  to="/admin"
+                  className="block px-4 py-2 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-fast flex items-center gap-2 font-semibold"
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+                <Link
+                  to="/admin/monitoring"
+                  className="block px-4 py-2 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-fast flex items-center gap-2 font-semibold"
+                >
+                  <Monitor className="w-4 h-4" />
+                  Advanced Monitoring
+                </Link>
+              </>
+            )}
+            <Link
+              to="/monitoring"
+              className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast flex items-center gap-2"
+            >
+              <Monitor className="w-4 h-4" />
+              User Monitoring
+            </Link>
             <Link
               to="/dashboard"
               className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast"
@@ -122,44 +137,11 @@ const Navbar = () => {
               Resources
             </Link>
             <div className="px-4 space-y-2">
-              {isAdmin ? (
-                <>
-                  <Badge variant="outline" className="w-full justify-center gap-1.5 bg-primary/10 text-primary border-primary/20">
-                    <Shield className="w-3 h-3" />
-                    Admin Mode
-                  </Badge>
-                  <Button 
-                    variant="outline" 
-                    className="w-full gap-2"
-                    onClick={logout}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </Button>
-                </>
-              ) : (
-                <Button 
-                  variant="default" 
-                  className="w-full bg-primary hover:bg-primary-hover"
-                  onClick={() => setShowLogin(true)}
-                >
-                  Login
-                </Button>
-              )}
+              <UserSessionStatus />
             </div>
           </div>
         )}
       </div>
-
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={showLogin}
-        onClose={() => setShowLogin(false)}
-        onLoginSuccess={() => {
-          setShowLogin(false);
-          // You could add user state management here
-        }}
-      />
     </nav>
   );
 };

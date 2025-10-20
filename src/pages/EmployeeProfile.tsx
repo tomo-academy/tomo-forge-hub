@@ -18,70 +18,59 @@ import {
   Building2, Users, Target, Activity, BarChart3
 } from "lucide-react";
 
-// Import database service
-import { db } from "@/lib/db";
+// Import employee data and GitHub photo service
+import { employees, Employee } from "@/data/employees";
+import { githubPhotoService } from "@/services/githubPhotoService";
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
-  const [employee, setEmployee] = useState<any>(null);
+  const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const loadEmployee = async () => {
-      console.log('🔄 Loading employee profile from database...');
+      console.log('🔄 Loading employee profile...');
       console.log('📋 Looking for employee ID:', employeeId);
       
       try {
-        // Fetch employee from database
-        const dbEmployee = await db.employees.getById(employeeId || '');
+        // Find employee in static data
+        const foundEmployee = employees.find(emp => emp.id === employeeId);
         
-        if (dbEmployee) {
-          console.log('✅ Found employee in database:', dbEmployee);
-          console.log('📸 Avatar URL from DB:', dbEmployee.avatar_url);
+        if (foundEmployee) {
+          console.log('✅ Found employee:', foundEmployee);
+          console.log('📸 Avatar path:', foundEmployee.avatar);
           
-          // Add cache busting for Cloudinary images
-          let avatarUrl = dbEmployee.avatar_url;
-          if (avatarUrl && avatarUrl.includes('cloudinary.com')) {
-            // Add timestamp to force refresh
-            const timestamp = Date.now();
-            avatarUrl = avatarUrl.includes('?') 
-              ? `${avatarUrl}&t=${timestamp}` 
-              : `${avatarUrl}?t=${timestamp}`;
-          }
-          
-          // Map database fields to component fields
-          const mappedEmployee = {
-            ...dbEmployee,
-            employeeId: dbEmployee.employee_id,
-            joinDate: dbEmployee.join_date,
-            avatar: avatarUrl,
-            avatar_url: avatarUrl,
-            social: dbEmployee.social_links,
-            cardColor: dbEmployee.card_color
-          };
-          
-          console.log('✅ Mapped employee with avatar:', mappedEmployee.avatar);
-          setEmployee(mappedEmployee);
+          setEmployee(foundEmployee);
         } else {
-          console.warn('⚠️ Employee not found in database');
-          setEmployee(null);
+          console.log('❌ Employee not found');
         }
       } catch (error) {
         console.error('❌ Error loading employee:', error);
-        setEmployee(null);
       } finally {
         setIsLoading(false);
       }
     };
-    
-    if (employeeId) {
-      loadEmployee();
-    } else {
-      setIsLoading(false);
-    }
+
+    loadEmployee();
   }, [employeeId]);
 
+  // Handle image error and use GitHub photo service
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const getEmployeeAvatar = () => {
+    if (!employee) return null;
+    
+    if (imageError) {
+      return githubPhotoService.getAvatarProps(employee.name);
+    }
+    
+    return {
+      src: githubPhotoService.getEmployeePhotoUrl(employee.avatar || '', employee.name),
+      alt: employee.name
+    };
   if (isLoading) {
     return <LoadingSpinnerOverlay isLoading={true}><div className="h-screen" /></LoadingSpinnerOverlay>;
   }
@@ -175,58 +164,25 @@ END:VCARD`;
     }
   };
 
-  // Function to get the correct image path
-  const getImagePath = (avatar?: string, avatar_url?: string) => {
-    // Check both avatar and avatar_url fields
-    const avatarPath = avatar || avatar_url;
-    
-    if (!avatarPath) return null;
-    
-    // If it's already a full URL (http/https), return as is
-    if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
-      // Add cache busting for Cloudinary images
-      if (avatarPath.includes('cloudinary.com') && !avatarPath.includes('?t=')) {
-        return `${avatarPath}?t=${Date.now()}`;
-      }
-      return avatarPath;
-    }
-    
-    // If it's a public path, remove the 'public/' prefix
-    if (avatarPath.startsWith('public/')) {
-      return avatarPath.replace('public/', '/');
-    }
-    
-    // If it already starts with '/', return as is
-    if (avatarPath.startsWith('/')) {
-      return avatarPath;
-    }
-    
-    // If it's a relative path without leading '/', add it
-    return `/${avatarPath}`;
-  };
-
-  // Function to render avatar with fallback
+  // Function to render avatar with GitHub photo service
   const renderAvatar = () => {
-    const imagePath = getImagePath(employee.avatar, employee.avatar_url);
+    const avatarProps = getEmployeeAvatar();
     
-    if (imagePath && !imageError) {
-      // External URL or properly formatted path
+    if (avatarProps && !imageError) {
       return (
         <img 
-          src={imagePath} 
-          alt={employee.name}
+          src={avatarProps.src} 
+          alt={avatarProps.alt}
           className="w-full h-full object-cover rounded-full"
-          onError={(e) => {
-            // Fallback to initials if image fails to load
-            setImageError(true);
-          }}
+          onError={handleImageError}
         />
       );
     } else {
-      // Fallback to initials
+      // Fallback to initials using GitHub photo service
+      const fallbackProps = githubPhotoService.getAvatarProps(employee.name);
       return (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent to-primary text-white font-bold text-2xl md:text-4xl">
-          {employee.name.split(' ').map((n: string) => n[0]).join('')}
+          {fallbackProps.children}
         </div>
       );
     }
@@ -238,7 +194,7 @@ END:VCARD`;
         title={`${employee.name} - ${employee.role}`}
         description={`${employee.bio || `Meet ${employee.name}, ${employee.role} at TOMO Academy. ${employee.department} department.`}`}
         keywords={[employee.name, employee.role, employee.department, 'TOMO Academy', 'team', 'profile']}
-        image={getImagePath(employee.avatar, employee.avatar_url) || '/TOMO.jpg'}
+        image={githubPhotoService.getEmployeePhotoUrl(employee.avatar || '', employee.name)}
         url={`/profile/${employee.id}`}
         type="profile"
         author={employee.name}

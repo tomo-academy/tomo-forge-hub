@@ -4,16 +4,19 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatsCard } from "@/components/ui/stats-card";
 import { AnimatedCard, GlowCard } from "@/components/ui/animated-card";
 import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
-import { VideoUploadModal } from "@/components/ui/video-upload-modal";
+import { VideoUploadModal } from "@/components/VideoUploadModal";
+import { employees } from "@/data/employees";
 import Navbar from "@/components/Navbar";
 import { 
   Video, Search, Upload, Calendar, Eye, ThumbsUp, 
   MessageSquare, TrendingUp, Filter, MoreVertical,
   Play, Clock, CheckCircle, AlertCircle, Activity,
-  BarChart3, Zap, Target, DollarSign, Copy, Share2
+  BarChart3, Zap, Target, DollarSign, Copy, Share2,
+  Edit3, Save, X, User
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,6 +31,25 @@ const EnhancedVideos = () => {
   const [maxResults, setMaxResults] = useState(20);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedVideos, setUploadedVideos] = useState<any[]>([]);
+  const [editingEditor, setEditingEditor] = useState<string | null>(null);
+  const [videoEditors, setVideoEditors] = useState<Record<string, string>>({});
+  const [selectedVideos, setSelectedVideos] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'views' | 'title'>('date');
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  
+  // Get list of video editors from employees data
+  const videoEditorsList = employees.filter(emp => 
+    emp.department === "Content Production" || 
+    emp.role.toLowerCase().includes("editor") ||
+    emp.name === "Kamesh AJ" || 
+    emp.name === "Aditya Chaurasiya" || 
+    emp.name === "Kavyashree" || 
+    emp.name === "Monika" ||
+    emp.name === "Gowsika" ||
+    emp.name === "Chandramathi"
+  ).map(emp => emp.name);
   
   // Fetch live YouTube data
   const { data: videos, isLoading: videosLoading, refetch } = useQuery(useChannelVideos(maxResults));
@@ -35,16 +57,133 @@ const EnhancedVideos = () => {
 
   const isLoading = videosLoading || analyticsLoading;
 
-  // Load uploaded videos from localStorage on mount
+  // Load uploaded videos and video editors from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem('uploaded_videos');
     if (stored) {
       setUploadedVideos(JSON.parse(stored));
     }
+    
+    const storedEditors = localStorage.getItem('video_editors');
+    if (storedEditors) {
+      setVideoEditors(JSON.parse(storedEditors));
+    }
   }, []);
+
+  // Save video editors to localStorage
+  const saveVideoEditors = (editors: Record<string, string>) => {
+    localStorage.setItem('video_editors', JSON.stringify(editors));
+    setVideoEditors(editors);
+  };
 
   const handleVideoUploaded = (newVideo: any) => {
     setUploadedVideos(prev => [newVideo, ...prev]);
+  };
+
+  const handleEditorUpdate = (videoId: string, editor: string) => {
+    const updatedEditors = { ...videoEditors, [videoId]: editor };
+    saveVideoEditors(updatedEditors);
+    setEditingEditor(null);
+  };
+
+  const getVideoEditor = (videoId: string, fallbackEditor?: string) => {
+    return videoEditors[videoId] || fallbackEditor || "Unassigned";
+  };
+
+  // Bulk operation functions
+  const toggleVideoSelection = (videoId: string) => {
+    const newSelected = new Set(selectedVideos);
+    if (newSelected.has(videoId)) {
+      newSelected.delete(videoId);
+    } else {
+      newSelected.add(videoId);
+    }
+    setSelectedVideos(newSelected);
+    setShowBulkActions(newSelected.size > 0);
+  };
+
+  const selectAllVideos = () => {
+    const allVideoIds = new Set(filteredAndSortedVideos.map(video => video.id));
+    setSelectedVideos(allVideoIds);
+    setShowBulkActions(true);
+  };
+
+  const deselectAllVideos = () => {
+    setSelectedVideos(new Set());
+    setShowBulkActions(false);
+  };
+
+  const bulkAssignEditor = (editor: string) => {
+    const updatedEditors = { ...videoEditors };
+    selectedVideos.forEach(videoId => {
+      updatedEditors[videoId] = editor;
+    });
+    saveVideoEditors(updatedEditors);
+    deselectAllVideos();
+  };
+
+  const bulkDeleteVideos = () => {
+    // In a real app, this would delete from the server
+    const updatedVideos = uploadedVideos.filter(video => !selectedVideos.has(video.id));
+    setUploadedVideos(updatedVideos);
+    localStorage.setItem('uploaded_videos', JSON.stringify(updatedVideos));
+    deselectAllVideos();
+  };
+
+  // Component for editable editor field
+  const EditableEditor = ({ videoId, currentEditor }: { videoId: string; currentEditor?: string }) => {
+    const [tempEditor, setTempEditor] = useState(getVideoEditor(videoId, currentEditor));
+    const isEditing = editingEditor === videoId;
+
+    if (isEditing) {
+      return (
+        <div className="flex items-center gap-2">
+          <Select value={tempEditor} onValueChange={setTempEditor}>
+            <SelectTrigger className="h-7 text-xs flex-1">
+              <SelectValue placeholder="Select editor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Unassigned">Unassigned</SelectItem>
+              {videoEditorsList.map(editor => (
+                <SelectItem key={editor} value={editor}>{editor}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-7 w-7 p-0"
+            onClick={() => handleEditorUpdate(videoId, tempEditor)}
+          >
+            <Save className="w-3 h-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-7 w-7 p-0"
+            onClick={() => setEditingEditor(null)}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2 group">
+        <span className="text-foreground font-medium flex-1">
+          {getVideoEditor(videoId, currentEditor)}
+        </span>
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={() => setEditingEditor(videoId)}
+        >
+          <Edit3 className="w-3 h-3" />
+        </Button>
+      </div>
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -71,11 +210,29 @@ const EnhancedVideos = () => {
     duration: youtubeService.formatDuration(video.duration),
   })) || [];
 
-  const filteredVideos = enhancedVideos.filter(video =>
-    video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    video.editor?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    video.thumbnail_designer?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Enhanced filtering and sorting
+  const filteredAndSortedVideos = enhancedVideos
+    .filter(video => {
+      const matchesSearch = 
+        video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        video.editor?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        video.thumbnail_designer?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesStatus = filterStatus === 'all' || video.status === filterStatus;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'views':
+          return parseInt(b.statistics.viewCount) - parseInt(a.statistics.viewCount);
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'date':
+        default:
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      }
+    });
 
   return (
     <div className="min-h-screen bg-background">
@@ -221,25 +378,124 @@ const EnhancedVideos = () => {
               </AnimatedCard>
             </div>
 
-            {/* Filters & Search */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search videos by title, ID, or team member..."
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+            {/* Enhanced Filters & Controls */}
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search videos by title, ID, or team member..."
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                {/* Filter Controls */}
+                <div className="flex gap-2">
+                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="scheduled">Scheduled</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="planned">Planned</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={sortBy} onValueChange={(value: 'date' | 'views' | 'title') => setSortBy(value)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date">Sort by Date</SelectItem>
+                      <SelectItem value="views">Sort by Views</SelectItem>
+                      <SelectItem value="title">Sort by Title</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Button 
+                    variant={viewMode === 'grid' ? 'default' : 'outline'} 
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                  >
+                    Grid
+                  </Button>
+                  <Button 
+                    variant={viewMode === 'list' ? 'default' : 'outline'} 
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                  >
+                    List
+                  </Button>
+                </div>
               </div>
-              <Button variant="outline" className="gap-2">
-                <Filter className="w-4 h-4" />
-                Filters
-              </Button>
-              <Button variant="outline" className="gap-2">
-                <Calendar className="w-4 h-4" />
-                Schedule
-              </Button>
+
+              {/* Bulk Actions Bar */}
+              {showBulkActions && (
+                <Card className="p-3 bg-accent/10 border-accent">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-medium">
+                        {selectedVideos.size} video{selectedVideos.size !== 1 ? 's' : ''} selected
+                      </span>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={selectAllVideos}>
+                          Select All ({filteredAndSortedVideos.length})
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={deselectAllVideos}>
+                          Deselect All
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Select onValueChange={bulkAssignEditor}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="Assign Editor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {videoEditorsList.map(editor => (
+                            <SelectItem key={editor} value={editor}>{editor}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="destructive" onClick={bulkDeleteVideos}>
+                        Delete Selected
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </div>
+
+            {/* Editor Assignment Summary */}
+            <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Video Editor Assignments
+                  </h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    Click the edit icon next to any video to assign an editor. Changes are saved automatically.
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-blue-600 dark:text-blue-400">
+                    {Object.keys(videoEditors).length} videos assigned
+                  </p>
+                  <p className="text-xs text-blue-500 dark:text-blue-500">
+                    {videoEditorsList.length} editors available
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Additional Actions */}
+            <div className="flex gap-2">
               <Button variant="outline" className="gap-2">
                 <Target className="w-4 h-4" />
                 Analytics
@@ -247,13 +503,26 @@ const EnhancedVideos = () => {
             </div>
 
             {/* Videos Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {filteredVideos.map((video, index) => (
+            <div className={viewMode === 'grid' ? 
+              "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" : 
+              "space-y-4"
+            }>
+              {filteredAndSortedVideos.map((video, index) => (
                 <AnimatedCard 
                   key={video.id}
                   hoverEffect="lift"
-                  className="overflow-hidden group cursor-pointer"
+                  className="overflow-hidden group cursor-pointer relative"
                 >
+                  {/* Selection Checkbox */}
+                  <div className="absolute top-2 left-2 z-10">
+                    <input
+                      type="checkbox"
+                      checked={selectedVideos.has(video.id)}
+                      onChange={() => toggleVideoSelection(video.id)}
+                      className="w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                  </div>
+
                   {/* Thumbnail */}
                   <div className="relative aspect-video overflow-hidden bg-muted">
                     <img 
@@ -266,7 +535,7 @@ const EnhancedVideos = () => {
                         {video.duration}
                       </div>
                     )}
-                    <div className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded">
+                    <div className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded">
                       Live Data
                     </div>
                   </div>
@@ -309,12 +578,17 @@ const EnhancedVideos = () => {
                     </div>
 
                     {/* Team */}
-                    <div className="pt-2 border-t border-border text-xs">
-                      {video.editor && (
-                        <p className="text-muted-foreground">
-                          Editor: <span className="text-foreground font-medium">{video.editor}</span>
-                        </p>
-                      )}
+                    <div className="pt-2 border-t border-border text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          Editor:
+                        </span>
+                        <EditableEditor 
+                          videoId={video.id} 
+                          currentEditor={video.editor} 
+                        />
+                      </div>
                       {video.thumbnail_designer && (
                         <p className="text-muted-foreground">
                           Designer: <span className="text-foreground font-medium">{video.thumbnail_designer}</span>
@@ -390,7 +664,7 @@ const EnhancedVideos = () => {
       {/* Video Upload Modal */}
       <VideoUploadModal
         isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
+        onOpenChange={setShowUploadModal}
         onVideoUploaded={handleVideoUploaded}
       />
     </div>
