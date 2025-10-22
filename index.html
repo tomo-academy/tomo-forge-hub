@@ -56,6 +56,52 @@
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     
+    <!-- Custom Styles for Chatbot -->
+    <style>
+      /* Position the chatbot in bottom right corner */
+      #noupe-chat-widget,
+      .noupe-chat-widget,
+      [id*="noupe"],
+      [class*="noupe"],
+      [id*="chat"],
+      [class*="chat-widget"],
+      iframe[title*="chat"],
+      div[style*="position: fixed"][style*="bottom"] {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 9999 !important;
+      }
+      
+      /* Ensure chat window doesn't interfere with mobile navigation */
+      @media (max-width: 768px) {
+        #noupe-chat-widget,
+        .noupe-chat-widget,
+        [id*="noupe"],
+        [class*="noupe"],
+        [id*="chat"],
+        [class*="chat-widget"],
+        iframe[title*="chat"],
+        div[style*="position: fixed"][style*="bottom"] {
+          bottom: 15px !important;
+          right: 15px !important;
+        }
+      }
+      
+      /* Add smooth transition for chat widget */
+      #noupe-chat-widget,
+      .noupe-chat-widget {
+        transition: all 0.3s ease !important;
+      }
+      
+      /* Ensure the chat widget stays above other elements */
+      .chat-widget-container,
+      .chat-bubble,
+      .chat-button {
+        z-index: 9999 !important;
+      }
+    </style>
+    
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -81,5 +127,8 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Floating Chatbot -->
+    <script src='https://www.noupe.com/embed/019a0bfd70e879be9a7042d484f0dc3add7c.js'></script>
   </body>
 </html>
