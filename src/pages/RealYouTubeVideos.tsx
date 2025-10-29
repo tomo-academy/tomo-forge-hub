@@ -8,7 +8,8 @@ import { LoadingSpinnerOverlay } from "@/components/ui/loading-spinner";
 import { VideoUploadModal } from "@/components/VideoUploadModal";
 import { SEO } from "@/components/SEO";
 import Navbar from "@/components/Navbar";
-import { useChannelVideos, useChannelInfo, youtubeService } from "@/services/youtube";
+import MiniVideoPlayer from "@/components/MiniVideoPlayer";
+import { useChannelVideos, useChannelInfo, youtubeService, YouTubeVideo } from "@/services/youtube";
 import { 
   Video, Search, Upload, Calendar, Eye, ThumbsUp, 
   MessageSquare, Play, Clock, User, TrendingUp, ExternalLink,
@@ -20,6 +21,8 @@ const RealYouTubeVideos = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectedVideo, setSelectedVideo] = useState<YouTubeVideo | null>(null);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   
   const queryClient = useQueryClient();
 
@@ -82,13 +85,26 @@ const RealYouTubeVideos = () => {
     });
   };
 
-  const handleVideoUploaded = (newVideo: any) => {
+  const handleVideoUploaded = (newVideo: YouTubeVideo) => {
     // Refresh the videos list after upload
     queryClient.invalidateQueries({ queryKey: ['youtube', 'videos'] });
     setIsUploadModalOpen(false);
   };
 
   const openYouTubeVideo = (videoId: string) => {
+    const video = videosQuery.data?.find(v => v.id === videoId);
+    if (video) {
+      setSelectedVideo(video);
+      setShowVideoPlayer(true);
+    }
+  };
+
+  const closeVideoPlayer = () => {
+    setShowVideoPlayer(false);
+    setSelectedVideo(null);
+  };
+
+  const openYouTubeInNewTab = (videoId: string) => {
     window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
   };
 
@@ -351,7 +367,7 @@ const RealYouTubeVideos = () => {
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center">
                           <Eye className="w-4 h-4 mr-1 text-gray-400" />
                           {formatNumber(video.statistics.viewCount)}
@@ -360,17 +376,31 @@ const RealYouTubeVideos = () => {
                           <ThumbsUp className="w-4 h-4 mr-1 text-gray-400" />
                           {formatNumber(video.statistics.likeCount)}
                         </div>
-                        <div className="flex items-center">
-                          <MessageSquare className="w-4 h-4 mr-1 text-gray-400" />
-                          {formatNumber(video.statistics.commentCount)}
-                        </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={(e) => {
-                        e.stopPropagation();
-                        // Add more actions menu here
-                      }}>
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openYouTubeVideo(video.id);
+                          }}
+                          className="text-xs"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Play
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openYouTubeInNewTab(video.id);
+                          }}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Tags */}
@@ -442,12 +472,30 @@ const RealYouTubeVideos = () => {
                               {formatNumber(video.statistics.commentCount)}
                             </div>
                           </div>
-                          <Button variant="ghost" size="sm" onClick={(e) => {
-                            e.stopPropagation();
-                            // Add more actions menu here
-                          }}>
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openYouTubeVideo(video.id);
+                              }}
+                              className="text-xs"
+                            >
+                              <Play className="w-3 h-3 mr-1" />
+                              Play
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openYouTubeInNewTab(video.id);
+                              }}
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -488,6 +536,16 @@ const RealYouTubeVideos = () => {
           onOpenChange={setIsUploadModalOpen}
           onVideoUploaded={handleVideoUploaded}
         />
+
+        {/* Mini Video Player */}
+        {showVideoPlayer && selectedVideo && (
+          <MiniVideoPlayer
+            videoId={selectedVideo.id}
+            title={selectedVideo.title}
+            description={selectedVideo.description}
+            onClose={closeVideoPlayer}
+          />
+        )}
       </div>
     </>
   );
