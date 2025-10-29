@@ -65,6 +65,11 @@ const Navbar = () => {
             <Link to="/videos" className="text-muted-foreground hover:text-foreground transition-fast">
               Videos
             </Link>
+            <Link to="/videos/demo" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 px-2 py-1 rounded-md hover:bg-primary/10">
+              <Youtube className="w-4 h-4" />
+              <span className="hidden lg:inline">Player Demo</span>
+              <Badge variant="secondary" className="text-xs bg-gradient-to-r from-green-500 to-blue-500 text-white border-0">NEW</Badge>
+            </Link>
             <Link to="/creator-pulse" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 px-2 py-1 rounded-md hover:bg-primary/10">
               <Youtube className="w-4 h-4" />
               <span className="hidden lg:inline">Creator Pulse</span>
@@ -76,7 +81,7 @@ const Navbar = () => {
             <Link to="/resources" className="text-muted-foreground hover:text-foreground transition-fast">
               Resources
             </Link>
-                        <HeaderClock className="ml-2 border-l border-border pl-4" />
+            <HeaderClock className="flex-shrink-0" />
             <NotificationDropdown />
             <ThemeToggle />
             <UserSessionStatus />
@@ -168,8 +173,8 @@ const Navbar = () => {
             >
               Resources
             </Link>
-            <div className="px-4 py-3 border-t border-border mt-2 pt-4">
-              <HeaderClock className="justify-center" />
+            <div className="px-4 py-2 border-t border-border mt-2 pt-3 flex justify-center">
+              <HeaderClock />
             </div>
             <div className="px-4 space-y-2">
               <UserSessionStatus />

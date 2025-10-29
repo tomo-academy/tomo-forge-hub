@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Clock, Globe, Volume2, VolumeX, Palette, Settings } from 'lucide-react';
+import { Clock, Globe, Volume2, VolumeX, Palette, Settings, X } from 'lucide-react';
 
 interface HackerClockProps {
   className?: string;
@@ -10,7 +10,7 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
   const [is24Hour, setIs24Hour] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [currentTheme, setCurrentTheme] = useState(0);
-  const [showExpanded, setShowExpanded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [userLocation, setUserLocation] = useState<string>('');
   const [userTimezone, setUserTimezone] = useState<string>('');
   const [ispDetails, setIspDetails] = useState<{ip: string, isp: string} | null>(null);
@@ -18,6 +18,9 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
   const hourHandRef = useRef<HTMLDivElement>(null);
   const minuteHandRef = useRef<HTMLDivElement>(null);
   const secondHandRef = useRef<HTMLDivElement>(null);
+  const modalHourHandRef = useRef<HTMLDivElement>(null);
+  const modalMinuteHandRef = useRef<HTMLDivElement>(null);
+  const modalSecondHandRef = useRef<HTMLDivElement>(null);
 
   const themes = [
     { primary: '#00ff41', secondary: '#00d4ff' },
@@ -44,6 +47,7 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
     const minuteAngle = minutes * 6;
     const secondAngle = seconds * 6;
     
+    // Update compact clock in header
     if (hourHandRef.current) {
       hourHandRef.current.style.transform = `translate(-50%, -100%) rotate(${hourAngle}deg)`;
     }
@@ -52,6 +56,17 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
     }
     if (secondHandRef.current) {
       secondHandRef.current.style.transform = `translate(-50%, -100%) rotate(${secondAngle}deg)`;
+    }
+
+    // Update modal clock if open
+    if (modalHourHandRef.current) {
+      modalHourHandRef.current.style.transform = `translate(-50%, -100%) rotate(${hourAngle}deg)`;
+    }
+    if (modalMinuteHandRef.current) {
+      modalMinuteHandRef.current.style.transform = `translate(-50%, -100%) rotate(${minuteAngle}deg)`;
+    }
+    if (modalSecondHandRef.current) {
+      modalSecondHandRef.current.style.transform = `translate(-50%, -100%) rotate(${secondAngle}deg)`;
     }
   }, [currentTime]);
 
@@ -157,8 +172,8 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
   };
 
   const handleExpandedView = () => {
-    setShowExpanded(!showExpanded);
-    if (!userLocation && !showExpanded) {
+    setShowModal(!showModal);
+    if (!userLocation && !showModal) {
       detectLocationAndISP();
     }
   };
@@ -180,73 +195,161 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         :root {
           --hacker-primary: ${themes[currentTheme].primary};
           --hacker-secondary: ${themes[currentTheme].secondary};
-          --hacker-glow: 0 0 10px;
+          --hacker-glow: 0 0 8px;
         }
         
-        .hacker-clock-widget {
-          background: rgba(0, 0, 0, 0.8);
+        .compact-clock {
+          background: rgba(0, 15, 0, 0.95);
           border: 1px solid var(--hacker-primary);
-          border-radius: 8px;
-          padding: 12px 18px;
+          border-radius: 6px;
+          padding: 6px 10px;
           box-shadow: var(--hacker-glow) var(--hacker-primary);
           cursor: pointer;
           transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
           display: flex;
           align-items: center;
-          gap: 15px;
+          gap: 8px;
           font-family: 'Courier New', monospace;
+          min-width: fit-content;
         }
         
-        .hacker-clock-widget::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(45deg, var(--hacker-primary), var(--hacker-secondary));
-          opacity: 0.1;
-          z-index: -1;
+        .compact-clock:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 0 12px var(--hacker-primary);
+          background: rgba(0, 25, 0, 0.95);
         }
         
-        .hacker-clock-widget:hover {
-          transform: translateY(-2px);
-          box-shadow: var(--hacker-glow) var(--hacker-primary);
-        }
-        
-        .analog-clock {
-          width: 60px;
-          height: 60px;
+        .mini-analog-clock {
+          width: 32px;
+          height: 32px;
           position: relative;
-          background: rgba(0, 0, 0, 0.5);
-          border: 2px solid var(--hacker-primary);
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid var(--hacker-primary);
           border-radius: 50%;
-          box-shadow: var(--hacker-glow) var(--hacker-primary);
+          box-shadow: inset 0 0 4px var(--hacker-primary);
+          flex-shrink: 0;
         }
         
-        .analog-clock::before {
+        .mini-analog-clock::before {
           content: '';
           position: absolute;
           top: 50%;
           left: 50%;
-          width: 4px;
-          height: 4px;
+          width: 3px;
+          height: 3px;
           background: var(--hacker-primary);
           border-radius: 50%;
           transform: translate(-50%, -50%);
           z-index: 10;
+          box-shadow: 0 0 3px var(--hacker-primary);
         }
         
-        .clock-face {
+        .mini-hand {
           position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
+          top: 50%;
+          left: 50%;
+          transform-origin: 50% 100%;
+          border-radius: 1px;
         }
         
-        .hand {
+        .mini-hour-hand {
+          width: 1.5px;
+          height: 8px;
+          background: var(--hacker-primary);
+          box-shadow: 0 0 2px var(--hacker-primary);
+        }
+        
+        .mini-minute-hand {
+          width: 1px;
+          height: 12px;
+          background: var(--hacker-secondary);
+          box-shadow: 0 0 2px var(--hacker-secondary);
+        }
+        
+        .mini-second-hand {
+          width: 0.5px;
+          height: 14px;
+          background: #ff0080;
+          box-shadow: 0 0 2px #ff0080;
+        }
+        
+        .compact-time {
+          font-size: 0.875rem;
+          font-weight: bold;
+          color: var(--hacker-primary);
+          text-shadow: 0 0 3px var(--hacker-primary);
+          letter-spacing: 0.5px;
+          line-height: 1;
+        }
+        
+        .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.95);
+          backdrop-filter: blur(5px);
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+        }
+        
+        .modal-content {
+          background: linear-gradient(135deg, rgba(0, 20, 0, 0.95), rgba(0, 40, 0, 0.9));
+          border: 2px solid var(--hacker-primary);
+          border-radius: 12px;
+          padding: 2rem;
+          max-width: 90vw;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 0 30px var(--hacker-primary), inset 0 0 20px rgba(0, 255, 65, 0.1);
+          position: relative;
+          font-family: 'Courier New', monospace;
+          animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+          from {
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        .modal-analog-clock {
+          width: 200px;
+          height: 200px;
+          position: relative;
+          background: radial-gradient(circle, rgba(0, 0, 0, 0.8), rgba(0, 20, 0, 0.9));
+          border: 3px solid var(--hacker-primary);
+          border-radius: 50%;
+          box-shadow: 
+            0 0 20px var(--hacker-primary),
+            inset 0 0 30px rgba(0, 255, 65, 0.2);
+          margin: 0 auto 2rem;
+        }
+        
+        .modal-analog-clock::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 8px;
+          height: 8px;
+          background: var(--hacker-primary);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 10;
+          box-shadow: 0 0 10px var(--hacker-primary);
+        }
+        
+        .modal-hand {
           position: absolute;
           top: 50%;
           left: 50%;
@@ -254,185 +357,269 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           border-radius: 2px;
         }
         
-        .hour-hand {
+        .modal-hour-hand {
+          width: 4px;
+          height: 60px;
+          background: linear-gradient(to top, var(--hacker-primary), rgba(0, 255, 65, 0.8));
+          box-shadow: 0 0 10px var(--hacker-primary);
+        }
+        
+        .modal-minute-hand {
           width: 3px;
-          height: 20px;
-          background: var(--hacker-primary);
-          box-shadow: var(--hacker-glow) var(--hacker-primary);
+          height: 80px;
+          background: linear-gradient(to top, var(--hacker-secondary), rgba(0, 212, 255, 0.8));
+          box-shadow: 0 0 8px var(--hacker-secondary);
         }
         
-        .minute-hand {
+        .modal-second-hand {
           width: 2px;
-          height: 28px;
-          background: var(--hacker-secondary);
-          box-shadow: var(--hacker-glow) var(--hacker-secondary);
+          height: 90px;
+          background: linear-gradient(to top, #ff0080, #ff4db8);
+          box-shadow: 0 0 6px #ff0080;
         }
         
-        .second-hand {
-          width: 1px;
-          height: 30px;
-          background: #ff0080;
-          box-shadow: var(--hacker-glow) #ff0080;
-        }
-        
-        .clock-marker {
+        .clock-numbers {
           position: absolute;
-          width: 2px;
-          height: 4px;
-          background: var(--hacker-primary);
-          left: 50%;
-          transform: translateX(-50%);
-          opacity: 0.7;
-        }
-        
-        .clock-marker:nth-child(1) { top: 2px; }
-        .clock-marker:nth-child(2) { top: 50%; right: 2px; left: auto; transform: translateY(-50%); width: 4px; height: 2px; }
-        .clock-marker:nth-child(3) { bottom: 2px; top: auto; }
-        .clock-marker:nth-child(4) { top: 50%; left: 2px; transform: translateY(-50%); width: 4px; height: 2px; }
-        
-        .digital-time-container {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        
-        .clock-time {
-          font-size: 1.2rem;
+          width: 100%;
+          height: 100%;
+          font-size: 14px;
           font-weight: bold;
           color: var(--hacker-primary);
-          text-shadow: var(--hacker-glow) var(--hacker-primary);
-          letter-spacing: 0.05em;
         }
         
-        .clock-date {
-          font-size: 0.8rem;
+        .clock-number {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .clock-number:nth-child(1) { top: 5px; left: 50%; transform: translateX(-50%); }
+        .clock-number:nth-child(2) { top: 15px; right: 15px; }
+        .clock-number:nth-child(3) { top: 50%; right: 5px; transform: translateY(-50%); }
+        .clock-number:nth-child(4) { bottom: 15px; right: 15px; }
+        .clock-number:nth-child(5) { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .clock-number:nth-child(6) { bottom: 15px; left: 15px; }
+        .clock-number:nth-child(7) { top: 50%; left: 5px; transform: translateY(-50%); }
+        .clock-number:nth-child(8) { top: 15px; left: 15px; }
+        
+        .modal-time-display {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+        
+        .modal-main-time {
+          font-size: 3rem;
+          font-weight: bold;
+          color: var(--hacker-primary);
+          text-shadow: 0 0 15px var(--hacker-primary);
+          margin-bottom: 0.5rem;
+          letter-spacing: 2px;
+        }
+        
+        .modal-date {
+          font-size: 1.25rem;
           color: var(--hacker-secondary);
-          opacity: 0.9;
+          margin-bottom: 1rem;
+        }
+        
+        .timezone-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+          margin-bottom: 2rem;
+        }
+        
+        .timezone-card {
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid var(--hacker-primary);
+          border-radius: 8px;
+          padding: 1rem;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+        
+        .timezone-card:hover {
+          background: rgba(0, 255, 65, 0.1);
+          border-color: var(--hacker-secondary);
+          transform: translateY(-2px);
+        }
+        
+        .timezone-name {
+          font-size: 0.875rem;
+          color: var(--hacker-secondary);
+          margin-bottom: 0.5rem;
+        }
+        
+        .timezone-time {
+          font-size: 1.25rem;
+          font-weight: bold;
+          color: var(--hacker-primary);
+          text-shadow: 0 0 5px var(--hacker-primary);
+        }
+        
+        .controls-section {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 2rem;
+        }
+        
+        .control-button {
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid var(--hacker-primary);
+          color: var(--hacker-primary);
+          padding: 0.75rem 1.5rem;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+        }
+        
+        .control-button:hover {
+          background: var(--hacker-primary);
+          color: black;
+          box-shadow: 0 0 10px var(--hacker-primary);
+        }
+        
+        .close-button {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 0, 0, 0.8);
+          border: 1px solid #ff4444;
+          color: white;
+          padding: 0.5rem;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .close-button:hover {
+          background: #ff4444;
+          box-shadow: 0 0 10px #ff4444;
         }
         
         @media (max-width: 768px) {
-          .hacker-clock-widget {
-            padding: 8px 12px;
-            gap: 10px;
+          .compact-clock {
+            padding: 4px 8px;
+            gap: 6px;
           }
           
-          .analog-clock {
-            width: 50px;
-            height: 50px;
+          .mini-analog-clock {
+            width: 28px;
+            height: 28px;
           }
           
-          .hour-hand { height: 16px; }
-          .minute-hand { height: 22px; }
-          .second-hand { height: 24px; }
+          .mini-hour-hand { height: 6px; }
+          .mini-minute-hand { height: 10px; }
+          .mini-second-hand { height: 12px; }
           
-          .clock-time { font-size: 1rem; }
-          .clock-date { font-size: 0.7rem; }
+          .compact-time { font-size: 0.75rem; }
+          
+          .modal-content {
+            padding: 1rem;
+            margin: 0.5rem;
+          }
+          
+          .modal-analog-clock {
+            width: 150px;
+            height: 150px;
+          }
+          
+          .modal-main-time { font-size: 2rem; }
+          .timezone-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
         }
       `}</style>
       
       <div className={`relative ${className}`}>
-        {/* Compact Hacker Clock */}
-        <div className="hacker-clock-widget" onClick={handleExpandedView}>
-          {/* Analog Clock */}
-          <div className="analog-clock">
-            <div className="clock-face">
-              <div className="clock-marker"></div>
-              <div className="clock-marker"></div>
-              <div className="clock-marker"></div>
-              <div className="clock-marker"></div>
-              <div ref={hourHandRef} className="hand hour-hand"></div>
-              <div ref={minuteHandRef} className="hand minute-hand"></div>
-              <div ref={secondHandRef} className="hand second-hand"></div>
-            </div>
+        {/* Compact Header Clock */}
+        <div className="compact-clock" onClick={handleExpandedView}>
+          <div className="mini-analog-clock">
+            <div ref={hourHandRef} className="mini-hand mini-hour-hand"></div>
+            <div ref={minuteHandRef} className="mini-hand mini-minute-hand"></div>
+            <div ref={secondHandRef} className="mini-hand mini-second-hand"></div>
           </div>
-          
-          {/* Digital Time Display */}
-          <div className="digital-time-container">
-            <div className="clock-time">{formatTime(currentTime)}</div>
-            <div className="clock-date hidden sm:block">{formatDate(currentTime)}</div>
+          <div className="compact-time hidden sm:block">
+            {formatTime(currentTime).split(' ')[0]}
           </div>
         </div>
 
-        {/* Expanded Clock Panel */}
-        {showExpanded && (
-          <>
-            {/* Backdrop */}
-            <div 
-              className="fixed inset-0 z-40 bg-black/95 backdrop-blur-sm"
-              onClick={() => setShowExpanded(false)}
-            />
-            
-            {/* Expanded Panel */}
-            <div className="fixed inset-4 z-50 bg-black/90 border-2 border-green-400 rounded-lg p-6 shadow-2xl overflow-auto font-mono">
-              <button
-                onClick={() => setShowExpanded(false)}
-                className="absolute top-4 right-4 px-4 py-2 bg-transparent border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition-colors"
-              >
-                CLOSE
+        {/* Modal Popup */}
+        {showModal && (
+          <div className="modal-backdrop" onClick={() => setShowModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button className="close-button" onClick={() => setShowModal(false)}>
+                <X size={20} />
               </button>
               
-              <div className="text-center">
-                <h2 className="text-3xl md:text-6xl font-bold text-green-400 mb-4 text-shadow-lg">
-                  {formatTime(currentTime)}
-                </h2>
-                <p className="text-xl text-blue-400 mb-6">
-                  {formatDate(currentTime)}
-                </p>
-
-                {/* Location Info */}
-                <div className="mb-6">
-                  <p className="text-blue-400 mb-2">
-                    LOCATION: {userLocation || 'DETECTING...'}
-                  </p>
-                  {ispDetails && (
-                    <p className="text-purple-400 text-sm">
-                      ISP: {ispDetails.isp} | IP: {ispDetails.ip}
-                    </p>
-                  )}
+              <div className="modal-time-display">
+                <div className="modal-analog-clock">
+                  <div className="clock-numbers">
+                    <div className="clock-number">12</div>
+                    <div className="clock-number">1</div>
+                    <div className="clock-number">3</div>
+                    <div className="clock-number">4</div>
+                    <div className="clock-number">6</div>
+                    <div className="clock-number">7</div>
+                    <div className="clock-number">9</div>
+                    <div className="clock-number">10</div>
+                  </div>
+                  <div ref={modalHourHandRef} className="modal-hand modal-hour-hand"></div>
+                  <div ref={modalMinuteHandRef} className="modal-hand modal-minute-hand"></div>
+                  <div ref={modalSecondHandRef} className="modal-hand modal-second-hand"></div>
                 </div>
+                
+                <div className="modal-main-time">{formatTime(currentTime)}</div>
+                <div className="modal-date">{formatDate(currentTime)}</div>
+                
+                {userLocation && (
+                  <div style={{ color: 'var(--hacker-secondary)', marginBottom: '1rem' }}>
+                    📍 {userLocation}
+                    {ispDetails && (
+                      <div style={{ fontSize: '0.875rem', opacity: 0.8, marginTop: '0.5rem' }}>
+                        ISP: {ispDetails.isp} | IP: {ispDetails.ip}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-                {/* Time Zones Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  {timeZones.map((tz, index) => (
-                    <div 
-                      key={index}
-                      className={`p-3 rounded border transition-all hover:bg-green-400/10 hover:border-green-400 ${
-                        index === 0 ? 'border-blue-400 bg-blue-400/10' : 'border-green-400/30 bg-green-400/5'
-                      }`}
-                    >
-                      <div className="text-xs text-blue-400 mb-1">{tz.name}</div>
-                      <div className="text-lg font-mono text-green-400">{tz.time}</div>
-                    </div>
-                  ))}
-                </div>
+              <div className="timezone-grid">
+                {timeZones.map((tz, index) => (
+                  <div key={index} className="timezone-card">
+                    <div className="timezone-name">{tz.name}</div>
+                    <div className="timezone-time">{tz.time}</div>
+                  </div>
+                ))}
+              </div>
 
-                {/* Controls */}
-                <div className="flex flex-wrap gap-4 justify-center">
-                  <button
-                    onClick={handleThemeChange}
-                    className="flex items-center gap-2 px-4 py-2 bg-transparent border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition-colors"
-                  >
-                    <Palette className="w-4 h-4" />
-                    THEME
-                  </button>
-                  <button
-                    onClick={() => setSoundEnabled(!soundEnabled)}
-                    className="flex items-center gap-2 px-4 py-2 bg-transparent border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition-colors"
-                  >
-                    {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                    SOUND: {soundEnabled ? 'ON' : 'OFF'}
-                  </button>
-                  <button
-                    onClick={() => setIs24Hour(!is24Hour)}
-                    className="flex items-center gap-2 px-4 py-2 bg-transparent border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition-colors"
-                  >
-                    <Settings className="w-4 h-4" />
-                    FORMAT: {is24Hour ? '24H' : '12H'}
-                  </button>
-                </div>
+              <div className="controls-section">
+                <button className="control-button" onClick={handleThemeChange}>
+                  <Palette size={16} />
+                  THEME
+                </button>
+                <button className="control-button" onClick={() => setSoundEnabled(!soundEnabled)}>
+                  {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                  SOUND: {soundEnabled ? 'ON' : 'OFF'}
+                </button>
+                <button className="control-button" onClick={() => setIs24Hour(!is24Hour)}>
+                  <Settings size={16} />
+                  FORMAT: {is24Hour ? '24H' : '12H'}
+                </button>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </>

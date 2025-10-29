@@ -20,6 +20,7 @@ import SiteMonitoringDashboard from "./pages/SiteMonitoringDashboard";
 import EnhancedTeamV2 from "./pages/EnhancedTeamV2";
 import Videos from "./pages/Videos";
 import EnhancedVideos from "./pages/RealYouTubeVideos";
+import VideoPlayerDemo from "./pages/VideoPlayerDemo";
 import Tasks from "./pages/Tasks";
 import Resources from "./pages/Resources";
 import EnhancedResources from "./pages/EnhancedResources";
@@ -58,6 +59,7 @@ const AppWithMonitoring = () => {
         <Route path="/dashboard/classic" element={<Dashboard />} />
         <Route path="/team" element={<EnhancedTeamV2 />} />
         <Route path="/videos" element={<EnhancedVideos />} />
+        <Route path="/videos/demo" element={<VideoPlayerDemo />} />
         <Route path="/videos/classic" element={<Videos />} />
         <Route path="/creator-pulse" element={<CreatorPulsePage />} />
         <Route path="/tasks" element={<Tasks />} />
