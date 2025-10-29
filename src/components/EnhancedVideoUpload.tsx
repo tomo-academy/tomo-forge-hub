@@ -32,7 +32,7 @@ import {
   Target,
   MessageSquare,
   Hash,
-  Thumbnail,
+  Image,
   BookOpen,
   Zap
 } from 'lucide-react';
@@ -889,7 +889,7 @@ export const EnhancedVideoUpload: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Thumbnail className="w-5 h-5" />
+                    <Image className="w-5 h-5" />
                     Thumbnail
                   </CardTitle>
                   <CardDescription>Upload a custom thumbnail (optional)</CardDescription>
@@ -1094,7 +1094,7 @@ export const EnhancedVideoUpload: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <steps[currentStep].icon className="w-5 h-5" />
+            {React.createElement(steps[currentStep].icon, { className: "w-5 h-5" })}
             {steps[currentStep].title}
           </CardTitle>
         </CardHeader>
