@@ -30,6 +30,7 @@ import HealthCheck from "./pages/HealthCheck";
 import UserMonitoring from "./pages/UserMonitoring";
 import { PhotoDebugPage } from "./pages/PhotoDebug";
 import SimplePhotoTest from "./pages/SimplePhotoTest";
+import CreatorPulsePage from "./pages/CreatorPulsePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient(reactQueryCacheConfig);
@@ -58,6 +59,7 @@ const AppWithMonitoring = () => {
         <Route path="/team" element={<EnhancedTeamV2 />} />
         <Route path="/videos" element={<EnhancedVideos />} />
         <Route path="/videos/classic" element={<Videos />} />
+        <Route path="/creator-pulse" element={<CreatorPulsePage />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/resources" element={<EnhancedResources />} />
         <Route path="/resources/classic" element={<Resources />} />

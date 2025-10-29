@@ -64,6 +64,11 @@ const Navbar = () => {
             <Link to="/videos" className="text-muted-foreground hover:text-foreground transition-fast">
               Videos
             </Link>
+            <Link to="/creator-pulse" className="text-muted-foreground hover:text-foreground transition-fast flex items-center gap-1">
+              <Youtube className="w-4 h-4" />
+              Creator Pulse
+              <Badge variant="secondary" className="text-xs">AI</Badge>
+            </Link>
             <Link to="/tasks" className="text-muted-foreground hover:text-foreground transition-fast">
               Tasks
             </Link>
@@ -134,6 +139,14 @@ const Navbar = () => {
               className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast"
             >
               Videos
+            </Link>
+            <Link
+              to="/creator-pulse"
+              className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast flex items-center gap-2"
+            >
+              <Youtube className="w-4 h-4" />
+              Creator Pulse
+              <Badge variant="secondary" className="text-xs">AI</Badge>
             </Link>
             <Link
               to="/tasks"

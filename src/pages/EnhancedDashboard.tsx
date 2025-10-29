@@ -12,7 +12,7 @@ import {
   Calendar, Clock, Award, PlayCircle, Eye,
   ThumbsUp, MessageSquare, DollarSign,
   BarChart3, Zap, Target, Activity as ActivityIcon, Database,
-  Wifi, RefreshCw
+  Wifi, RefreshCw, Youtube, Brain
 } from "lucide-react";
 import { useChannelInfo, useYouTubeAnalytics, youtubeService } from "@/services/youtube";
 import { neonService, Revenue, Activity, Analytics } from "@/services/neonService";
@@ -371,6 +371,92 @@ const EnhancedDashboard = () => {
                 </div>
               </AnimatedCard>
             </div>
+
+            {/* Creator Pulse Integration */}
+            <GlowCard glowColor="secondary">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Youtube className="w-5 h-5 text-secondary" />
+                  <h2 className="text-2xl font-bold">Creator Pulse Analytics</h2>
+                  <div className="ml-auto">
+                    <Button 
+                      size="sm" 
+                      onClick={() => window.location.href = '/creator-pulse'}
+                      className="bg-gradient-to-r from-secondary to-primary text-white"
+                    >
+                      Open Full Dashboard
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <AnimatedCard hoverEffect="scale">
+                    <div className="p-4 text-center">
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <BarChart3 className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <h3 className="font-semibold text-sm">AI Analytics</h3>
+                      <p className="text-xs text-muted-foreground">8+ Analysis Types</p>
+                    </div>
+                  </AnimatedCard>
+                  
+                  <AnimatedCard hoverEffect="scale">
+                    <div className="p-4 text-center">
+                      <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <Video className="w-6 h-6 text-green-600" />
+                      </div>
+                      <h3 className="font-semibold text-sm">Video Projects</h3>
+                      <p className="text-xs text-muted-foreground">Team Management</p>
+                    </div>
+                  </AnimatedCard>
+                  
+                  <AnimatedCard hoverEffect="scale">
+                    <div className="p-4 text-center">
+                      <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <Brain className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h3 className="font-semibold text-sm">AI Content</h3>
+                      <p className="text-xs text-muted-foreground">GPT-4 Powered</p>
+                    </div>
+                  </AnimatedCard>
+                  
+                  <AnimatedCard hoverEffect="scale">
+                    <div className="p-4 text-center">
+                      <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <TrendingUp className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <h3 className="font-semibold text-sm">Growth Tracking</h3>
+                      <p className="text-xs text-muted-foreground">Real-time Updates</p>
+                    </div>
+                  </AnimatedCard>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 p-4 rounded-lg">
+                    <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Latest AI Insights</h4>
+                    <ul className="space-y-1 text-sm">
+                      <li>• Engagement up 23% this month</li>
+                      <li>• Optimal upload time: Tuesday 2PM</li>
+                      <li>• Trending: React tutorials +89%</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 p-4 rounded-lg">
+                    <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">Growth Predictions</h4>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span>3 Month Target:</span>
+                        <span className="font-medium">450K subs</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Success Rate:</span>
+                        <span className="font-medium text-green-600">87%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </GlowCard>
 
             {/* Top Videos Performance */}
             {analytics?.topVideos && (
