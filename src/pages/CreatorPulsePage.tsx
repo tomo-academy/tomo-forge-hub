@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { EnhancedVideoUpload } from '@/components/EnhancedVideoUpload';
 import { ProgressTrackingDashboard } from '@/components/ProgressTrackingDashboard';
+import AIToolsDashboard from '@/components/AIToolsDashboard';
 import { SEO } from '@/components/SEO';
 
 const CreatorPulsePage: React.FC = () => {
@@ -75,11 +76,11 @@ const CreatorPulsePage: React.FC = () => {
                 <p className="text-muted-foreground">Integrated YouTube analytics with AI insights</p>
               </div>
               <Button 
-                onClick={() => window.open('http://localhost:8080', '_blank')}
+                onClick={() => setActiveFeature('ai-tools')}
                 className="flex items-center gap-2"
               >
-                <ExternalLink className="w-4 h-4" />
-                Open Full Dashboard
+                <Brain className="w-4 h-4" />
+                Open AI Tools Dashboard
               </Button>
             </div>
 
@@ -222,10 +223,10 @@ const CreatorPulsePage: React.FC = () => {
                   <Button 
                     variant="outline" 
                     className="h-auto p-4 flex flex-col items-center gap-2"
-                    onClick={() => window.open('http://localhost:8080', '_blank')}
+                    onClick={() => setActiveFeature('ai-tools')}
                   >
-                    <ExternalLink className="w-6 h-6" />
-                    <span className="text-sm">Full Analytics</span>
+                    <Brain className="w-6 h-6" />
+                    <span className="text-sm">AI Tools</span>
                   </Button>
                 </div>
               </CardContent>
@@ -241,63 +242,14 @@ const CreatorPulsePage: React.FC = () => {
         
       case 'ai-tools':
         return (
-          <div className="space-y-6">
-            <div className="text-center py-12">
-              <Brain className="w-16 h-16 mx-auto mb-4 text-primary" />
-              <h2 className="text-2xl font-bold mb-2">AI Content Tools</h2>
-              <p className="text-muted-foreground mb-6">
-                Access the full AI content generation suite in the integrated Creator Pulse dashboard
-              </p>
-              <Button 
-                size="lg"
-                onClick={() => window.open('http://localhost:8080', '_blank')}
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Open AI Tools Dashboard
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    Content Generator
-                  </CardTitle>
-                  <CardDescription>AI-powered video ideas and scripts</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Complete video scripts</li>
-                    <li>• SEO-optimized titles and descriptions</li>
-                    <li>• Thumbnail design suggestions</li>
-                    <li>• Viral hooks and CTAs</li>
-                    <li>• Content calendar planning</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="w-5 h-5" />
-                    Analytics AI
-                  </CardTitle>
-                  <CardDescription>Advanced performance insights</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Growth predictions</li>
-                    <li>• Competitor analysis</li>
-                    <li>• Trend identification</li>
-                    <li>• Revenue optimization</li>
-                    <li>• Audience insights</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          <AIToolsDashboard 
+            channelData={{
+              name: 'TOMO Academy',
+              subscribers: '185K',
+              views: '2.1M',
+              growth: '+18%'
+            }}
+          />
         );
         
       default:

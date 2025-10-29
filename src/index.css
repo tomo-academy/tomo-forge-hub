@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hacker Clock CSS Variables */
+:root {
+  --hacker-primary: #00ff41;
+  --hacker-secondary: #00d4ff;
+  --hacker-purple: #ff00ff;
+  --hacker-dark-bg: #0a0a0a;
+  --hacker-glow-intensity: 0 0 10px;
+}
+
 /* Premium Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }

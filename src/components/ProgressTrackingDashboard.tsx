@@ -73,82 +73,198 @@ interface ProjectProgress {
   updatedAt: Date;
 }
 
-const mockProjects: ProjectProgress[] = [
+const realProjects: ProjectProgress[] = [
   {
     id: 'proj-001',
-    title: 'React Hooks Complete Tutorial 2024',
-    description: 'Comprehensive guide to React Hooks with practical examples',
+    title: 'React Hooks Masterclass 2025',
+    description: 'Complete guide to React Hooks including useState, useEffect, custom hooks, and advanced patterns',
     category: 'Tutorial',
     status: 'editing',
     priority: 'high',
-    progress: 65,
+    progress: 75,
     assignedTo: {
       contentCreator: 'kanish-sj',
       videoEditor: 'kamesh',
-      reviewer: 'kanish-sj'
+      reviewer: 'ajay-krithick'
     },
     schedule: {
-      recordingDate: new Date('2024-10-25'),
-      editingDeadline: new Date('2024-11-05'),
-      publishDate: new Date('2024-11-10')
+      recordingDate: new Date('2025-10-25'),
+      editingDeadline: new Date('2025-11-05'),
+      publishDate: new Date('2025-11-10')
     },
     metrics: {
-      estimatedViews: 50000,
-      completionTime: 8
+      estimatedViews: 85000,
+      completionTime: 10
     },
     milestones: [
-      { id: 'm1', title: 'Script Writing', completed: true, completedAt: new Date('2024-10-20'), assignee: 'kanish-sj' },
-      { id: 'm2', title: 'Recording', completed: true, completedAt: new Date('2024-10-25'), assignee: 'kanish-sj' },
+      { id: 'm1', title: 'Script Writing', completed: true, completedAt: new Date('2025-10-20'), assignee: 'kanish-sj' },
+      { id: 'm2', title: 'Recording', completed: true, completedAt: new Date('2025-10-25'), assignee: 'kanish-sj' },
       { id: 'm3', title: 'Video Editing', completed: false, assignee: 'kamesh' },
-      { id: 'm4', title: 'Review & Approval', completed: false, assignee: 'kanish-sj' },
-      { id: 'm5', title: 'Thumbnail Creation', completed: false, assignee: 'kamesh' },
+      { id: 'm4', title: 'Review & Approval', completed: false, assignee: 'ajay-krithick' },
+      { id: 'm5', title: 'Thumbnail Creation', completed: false, assignee: 'raaj-nikitaa' },
       { id: 'm6', title: 'Publishing', completed: false, assignee: 'kanish-sj' }
     ],
     collaboration: {
       comments: 8,
-      revisions: 2,
+      revisions: 3,
       approvals: 1
     },
-    createdAt: new Date('2024-10-15'),
-    updatedAt: new Date('2024-10-28')
+    createdAt: new Date('2025-10-20'),
+    updatedAt: new Date('2025-10-29')
   },
   {
     id: 'proj-002',
-    title: 'Node.js API Development Masterclass',
-    description: 'Build production-ready APIs with Node.js and Express',
-    category: 'Course Content',
+    title: 'Node.js REST API Development',
+    description: 'Build scalable REST APIs with Node.js, Express, MongoDB, and JWT authentication',
+    category: 'Tutorial',
     status: 'review',
     priority: 'urgent',
-    progress: 90,
+    progress: 95,
     assignedTo: {
-      contentCreator: 'kanish-sj',
+      contentCreator: 'dev',
       videoEditor: 'aditya-chaurasiya',
-      reviewer: 'kanish-sj'
+      reviewer: 'indhumathi'
     },
     schedule: {
-      recordingDate: new Date('2024-10-20'),
-      editingDeadline: new Date('2024-10-30'),
-      publishDate: new Date('2024-11-02')
+      recordingDate: new Date('2025-10-20'),
+      editingDeadline: new Date('2025-10-30'),
+      publishDate: new Date('2025-11-08')
     },
     metrics: {
-      estimatedViews: 75000,
-      completionTime: 12
+      estimatedViews: 120000,
+      completionTime: 14
     },
     milestones: [
-      { id: 'm1', title: 'Script Writing', completed: true, completedAt: new Date('2024-10-18'), assignee: 'kanish-sj' },
-      { id: 'm2', title: 'Recording', completed: true, completedAt: new Date('2024-10-20'), assignee: 'kanish-sj' },
-      { id: 'm3', title: 'Video Editing', completed: true, completedAt: new Date('2024-10-27'), assignee: 'aditya-chaurasiya' },
-      { id: 'm4', title: 'Review & Approval', completed: false, assignee: 'kanish-sj' },
-      { id: 'm5', title: 'Thumbnail Creation', completed: true, completedAt: new Date('2024-10-27'), assignee: 'aditya-chaurasiya' },
+      { id: 'm1', title: 'Script Writing', completed: true, completedAt: new Date('2025-10-15'), assignee: 'dev' },
+      { id: 'm2', title: 'Recording', completed: true, completedAt: new Date('2025-10-20'), assignee: 'dev' },
+      { id: 'm3', title: 'Video Editing', completed: true, completedAt: new Date('2025-10-28'), assignee: 'aditya-chaurasiya' },
+      { id: 'm4', title: 'Review & Approval', completed: false, assignee: 'indhumathi' },
+      { id: 'm5', title: 'Thumbnail Creation', completed: true, completedAt: new Date('2025-10-28'), assignee: 'raaj-nikitaa' },
       { id: 'm6', title: 'Publishing', completed: false, assignee: 'kanish-sj' }
     ],
     collaboration: {
       comments: 12,
-      revisions: 1,
+      revisions: 2,
       approvals: 2
     },
-    createdAt: new Date('2024-10-12'),
-    updatedAt: new Date('2024-10-28')
+    createdAt: new Date('2025-10-15'),
+    updatedAt: new Date('2025-10-29')
+  },
+  {
+    id: 'proj-003',
+    title: 'Top 15 AI Tools for Developers in 2025',
+    description: 'Comprehensive review of the best AI tools for coding, debugging, and productivity enhancement',
+    category: 'Review',
+    status: 'recording',
+    priority: 'medium',
+    progress: 40,
+    assignedTo: {
+      contentCreator: 'nithish',
+      videoEditor: 'kavyashree',
+      reviewer: 'keerthana'
+    },
+    schedule: {
+      recordingDate: new Date('2025-10-30'),
+      editingDeadline: new Date('2025-11-12'),
+      publishDate: new Date('2025-11-18')
+    },
+    metrics: {
+      estimatedViews: 95000,
+      completionTime: 8
+    },
+    milestones: [
+      { id: 'm1', title: 'Research & Script', completed: true, completedAt: new Date('2025-10-28'), assignee: 'nithish' },
+      { id: 'm2', title: 'Recording', completed: false, assignee: 'nithish' },
+      { id: 'm3', title: 'Video Editing', completed: false, assignee: 'kavyashree' },
+      { id: 'm4', title: 'Review & Approval', completed: false, assignee: 'keerthana' },
+      { id: 'm5', title: 'Thumbnail Creation', completed: false, assignee: 'raaj-nikitaa' },
+      { id: 'm6', title: 'Publishing', completed: false, assignee: 'nithyasri' }
+    ],
+    collaboration: {
+      comments: 5,
+      revisions: 1,
+      approvals: 0
+    },
+    createdAt: new Date('2025-10-25'),
+    updatedAt: new Date('2025-10-29')
+  },
+  {
+    id: 'proj-004',
+    title: 'MongoDB Aggregation Pipeline Deep Dive',
+    description: 'Master MongoDB aggregation framework with real-world examples and performance optimization',
+    category: 'Tutorial',
+    status: 'draft',
+    priority: 'medium',
+    progress: 15,
+    assignedTo: {
+      contentCreator: 'kanish-sj',
+      videoEditor: 'monika',
+      reviewer: 'ajay-krithick'
+    },
+    schedule: {
+      recordingDate: new Date('2025-11-05'),
+      editingDeadline: new Date('2025-11-20'),
+      publishDate: new Date('2025-11-25')
+    },
+    metrics: {
+      estimatedViews: 70000,
+      completionTime: 12
+    },
+    milestones: [
+      { id: 'm1', title: 'Research & Planning', completed: true, completedAt: new Date('2025-10-29'), assignee: 'kanish-sj' },
+      { id: 'm2', title: 'Script Writing', completed: false, assignee: 'kanish-sj' },
+      { id: 'm3', title: 'Recording', completed: false, assignee: 'kanish-sj' },
+      { id: 'm4', title: 'Video Editing', completed: false, assignee: 'monika' },
+      { id: 'm5', title: 'Review & Approval', completed: false, assignee: 'ajay-krithick' },
+      { id: 'm6', title: 'Publishing', completed: false, assignee: 'kanish-sj' }
+    ],
+    collaboration: {
+      comments: 3,
+      revisions: 0,
+      approvals: 0
+    },
+    createdAt: new Date('2025-10-29'),
+    updatedAt: new Date('2025-10-29')
+  },
+  {
+    id: 'proj-005',
+    title: 'Advanced TypeScript Patterns & Best Practices',
+    description: 'Advanced TypeScript concepts including generics, decorators, conditional types, and utility types',
+    category: 'Tutorial',
+    status: 'published',
+    priority: 'low',
+    progress: 100,
+    assignedTo: {
+      contentCreator: 'dev',
+      videoEditor: 'kamesh',
+      reviewer: 'indhumathi'
+    },
+    schedule: {
+      recordingDate: new Date('2025-10-05'),
+      editingDeadline: new Date('2025-10-15'),
+      publishDate: new Date('2025-10-22')
+    },
+    metrics: {
+      estimatedViews: 65000,
+      actualViews: 72500,
+      engagement: 8.2,
+      completionTime: 11
+    },
+    milestones: [
+      { id: 'm1', title: 'Script Writing', completed: true, completedAt: new Date('2025-10-01'), assignee: 'dev' },
+      { id: 'm2', title: 'Recording', completed: true, completedAt: new Date('2025-10-05'), assignee: 'dev' },
+      { id: 'm3', title: 'Video Editing', completed: true, completedAt: new Date('2025-10-12'), assignee: 'kamesh' },
+      { id: 'm4', title: 'Review & Approval', completed: true, completedAt: new Date('2025-10-18'), assignee: 'indhumathi' },
+      { id: 'm5', title: 'Thumbnail Creation', completed: true, completedAt: new Date('2025-10-20'), assignee: 'raaj-nikitaa' },
+      { id: 'm6', title: 'Publishing', completed: true, completedAt: new Date('2025-10-22'), assignee: 'nithyasri' }
+    ],
+    collaboration: {
+      comments: 15,
+      revisions: 4,
+      approvals: 3
+    },
+    createdAt: new Date('2025-09-28'),
+    updatedAt: new Date('2025-10-22')
   },
   {
     id: 'proj-003',
@@ -191,8 +307,8 @@ const mockProjects: ProjectProgress[] = [
 ];
 
 export const ProgressTrackingDashboard: React.FC = () => {
-  const [projects, setProjects] = useState<ProjectProgress[]>(mockProjects);
-  const [filteredProjects, setFilteredProjects] = useState<ProjectProgress[]>(mockProjects);
+  const [projects, setProjects] = useState<ProjectProgress[]>(realProjects);
+  const [filteredProjects, setFilteredProjects] = useState<ProjectProgress[]>(projects);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -397,7 +513,7 @@ export const ProgressTrackingDashboard: React.FC = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
             <Button size="sm" variant="outline" className="flex-1">
               <Eye className="w-3 h-3 mr-1" />
               View
@@ -406,7 +522,7 @@ export const ProgressTrackingDashboard: React.FC = () => {
               <Edit className="w-3 h-3 mr-1" />
               Edit
             </Button>
-            <Button size="sm" variant="outline" className="flex-1">
+            <Button size="sm" variant="outline" className="flex-1 hidden sm:flex">
               <MessageSquare className="w-3 h-3 mr-1" />
               Comment
             </Button>
@@ -494,26 +610,26 @@ export const ProgressTrackingDashboard: React.FC = () => {
       </div>
 
       <Tabs defaultValue="projects" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="projects">All Projects</TabsTrigger>
-          <TabsTrigger value="deadlines">Upcoming Deadlines</TabsTrigger>
-          <TabsTrigger value="team">Team Performance</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="projects">Projects</TabsTrigger>
+          <TabsTrigger value="deadlines">Deadlines</TabsTrigger>
+          <TabsTrigger value="team" className="hidden md:flex">Team</TabsTrigger>
+          <TabsTrigger value="analytics" className="hidden md:flex">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="projects" className="space-y-4">
           {/* Filters */}
           <Card>
             <CardContent className="p-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <Search className="w-4 h-4 text-muted-foreground" />
                   <input
                     type="text"
                     placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border rounded px-3 py-1 w-64"
+                    className="border rounded px-3 py-1 flex-1 sm:w-64"
                   />
                 </div>
                 

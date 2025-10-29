@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationDropdown } from "@/components/ui/notifications";
 import UserSessionStatus from "./UserSessionStatus";
+import HeaderClock from "./HeaderClock";
 import { useAuth } from "@/contexts/AuthContext";
 import { Menu, X, Youtube, Shield, LogOut, User, Monitor } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -34,20 +35,20 @@ const Navbar = () => {
             <span className="text-xl font-bold">TOMO Academy</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4 lg:gap-6">
             {isAdmin && (
               <>
-                <Link to="/admin" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                <Link to="/admin" className="text-primary hover:text-primary/80 transition-colors font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-primary/10">
                   <Shield className="w-4 h-4" />
-                  Admin
+                  <span className="hidden lg:inline">Admin</span>
                 </Link>
-                <Link to="/admin/site-monitoring" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                <Link to="/admin/site-monitoring" className="text-primary hover:text-primary/80 transition-colors font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-primary/10">
                   <Monitor className="w-4 h-4" />
-                  Site Visitors
+                  <span className="hidden lg:inline">Site Visitors</span>
                 </Link>
-                <Link to="/admin/monitoring" className="text-primary hover:text-primary/80 transition-fast font-semibold flex items-center gap-1">
+                <Link to="/admin/monitoring" className="text-primary hover:text-primary/80 transition-colors font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-primary/10">
                   <Shield className="w-4 h-4" />
-                  Admin Security
+                  <span className="hidden lg:inline">Admin Security</span>
                 </Link>
               </>
             )}
@@ -64,10 +65,10 @@ const Navbar = () => {
             <Link to="/videos" className="text-muted-foreground hover:text-foreground transition-fast">
               Videos
             </Link>
-            <Link to="/creator-pulse" className="text-muted-foreground hover:text-foreground transition-fast flex items-center gap-1">
+            <Link to="/creator-pulse" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 px-2 py-1 rounded-md hover:bg-primary/10">
               <Youtube className="w-4 h-4" />
-              Creator Pulse
-              <Badge variant="secondary" className="text-xs">AI</Badge>
+              <span className="hidden lg:inline">Creator Pulse</span>
+              <Badge variant="secondary" className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0">AI</Badge>
             </Link>
             <Link to="/tasks" className="text-muted-foreground hover:text-foreground transition-fast">
               Tasks
@@ -75,33 +76,40 @@ const Navbar = () => {
             <Link to="/resources" className="text-muted-foreground hover:text-foreground transition-fast">
               Resources
             </Link>
+                        <HeaderClock className="ml-2 border-l border-border pl-4" />
             <NotificationDropdown />
             <ThemeToggle />
             <UserSessionStatus />
           </div>
 
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X /> : <Menu />}
-          </button>
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <button
+              className="p-2 touch-manipulation active:bg-muted rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-3 border-t border-border">
+          <div className="md:hidden py-4 space-y-2 border-t border-border bg-background/95 backdrop-blur-lg">
             {isAdmin && (
               <>
                 <Link
                   to="/admin"
-                  className="block px-4 py-2 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-fast flex items-center gap-2 font-semibold"
+                  className="block px-4 py-3 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-colors flex items-center gap-2 font-semibold touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <Shield className="w-4 h-4" />
+                  <Shield className="w-5 h-5" />
                   Admin
                 </Link>
                 <Link
                   to="/admin/site-monitoring"
-                  className="block px-4 py-2 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-fast flex items-center gap-2 font-semibold"
+                  className="block px-4 py-3 text-primary hover:text-primary/80 hover:bg-muted rounded-lg transition-colors flex items-center gap-2 font-semibold touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   <Monitor className="w-4 h-4" />
                   Site Visitors
@@ -142,11 +150,11 @@ const Navbar = () => {
             </Link>
             <Link
               to="/creator-pulse"
-              className="block px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-fast flex items-center gap-2"
+              className="block px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors flex items-center gap-2 touch-manipulation"
             >
-              <Youtube className="w-4 h-4" />
+              <Youtube className="w-5 h-5" />
               Creator Pulse
-              <Badge variant="secondary" className="text-xs">AI</Badge>
+              <Badge variant="secondary" className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0">AI</Badge>
             </Link>
             <Link
               to="/tasks"
@@ -160,6 +168,9 @@ const Navbar = () => {
             >
               Resources
             </Link>
+            <div className="px-4 py-3 border-t border-border mt-2 pt-4">
+              <HeaderClock className="justify-center" />
+            </div>
             <div className="px-4 space-y-2">
               <UserSessionStatus />
             </div>
