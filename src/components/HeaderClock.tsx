@@ -749,6 +749,45 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
             padding: 0.5rem;
           }
         }
+
+        /* Mobile (small devices) - anchor modal near top-left/branding and compact the clock */
+        @media (max-width: 480px) {
+          .modal-backdrop {
+            /* place modal near the top so it sits close to header/branding */
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 2.5vh 0.5rem 1rem 0.75rem;
+          }
+
+          .modal-content {
+            max-width: calc(100vw - 1.5rem);
+            width: auto;
+            margin-left: 0.5rem; /* nudge slightly right to align with typical branding */
+            padding: 1rem;
+            border-radius: 12px;
+            max-height: calc(76vh);
+          }
+
+          .modal-analog-clock {
+            width: 120px;
+            height: 120px;
+            margin-left: -36px; /* visually pull clock left toward branding */
+            margin-top: -6px;
+          }
+
+          .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-right: 0.25rem;
+          }
+
+          .modal-main-time { font-size: 1.6rem; }
+
+          .controls-section { gap: 0.5rem; margin-top: 1rem; }
+
+          .modal-back-button { top: 0.75rem; left: 0.75rem; padding: 0.45rem 0.5rem; }
+        }
       `}</style>
       
       <div className={`relative ${className}`}>
