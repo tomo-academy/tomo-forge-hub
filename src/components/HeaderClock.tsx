@@ -424,7 +424,9 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
             0 0 50px rgba(0, 255, 65, 0.3),
             inset 0 0 30px rgba(0, 255, 65, 0.1);
           margin-bottom: 1.5rem;
-          animation: clockGlow 3s ease-in-out infinite alternate;
+          /* initial subtle glow + drop-in animation when modal opens */
+          animation: clockGlow 3s ease-in-out infinite alternate, clockDropIn 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+          animation-delay: 0s, 140ms; /* run glow immediately, drop-in shortly after modal appears */
         }
         
         @keyframes clockGlow {
@@ -439,6 +441,24 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
               0 0 40px var(--hacker-primary),
               0 0 80px rgba(0, 255, 65, 0.5),
               inset 0 0 50px rgba(0, 255, 65, 0.2);
+          }
+        }
+
+        @keyframes clockDropIn {
+          0% {
+            transform: translateY(-24px) scale(0.98);
+            opacity: 0;
+            filter: blur(4px);
+          }
+          60% {
+            transform: translateY(6px) scale(1.02);
+            opacity: 1;
+            filter: blur(0px);
+          }
+          100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            filter: none;
           }
         }
         
