@@ -292,9 +292,10 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           backdrop-filter: blur(10px);
           z-index: 9999;
           display: flex;
-          align-items: center;
+          /* anchor modal a bit lower so it doesn't overlap header content */
+          align-items: flex-start;
           justify-content: center;
-          padding: 1rem;
+          padding: 6vh 1rem 2rem 1rem;
           animation: backdropFadeIn 0.4s ease-out;
         }
         
@@ -319,7 +320,8 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           border-radius: 16px;
           padding: 1.5rem;
           max-width: 90vw;
-          max-height: 85vh;
+          /* leave room for the top page header so modal is fully visible */
+          max-height: calc(80vh);
           width: 100%;
           max-width: 650px;
           overflow-y: auto;
@@ -409,8 +411,8 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         }
         
         .modal-analog-clock {
-          width: 200px;
-          height: 200px;
+          width: 160px;
+          height: 160px;
           position: relative;
           background: radial-gradient(circle at 30% 30%, 
             rgba(0, 255, 65, 0.1), 
@@ -460,6 +462,25 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
             opacity: 1;
             filter: none;
           }
+        }
+
+        /* Back button in top-left of modal */
+        .modal-back-button {
+          position: absolute;
+          top: 1rem;
+          left: 1rem;
+          background: linear-gradient(145deg, rgba(0, 120, 255, 0.12), rgba(0, 120, 255, 0.18));
+          border: 2px solid rgba(0, 120, 255, 0.25);
+          color: var(--hacker-primary);
+          padding: 0.5rem 0.65rem;
+          border-radius: 10px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-weight: 700;
+          font-size: 0.8rem;
+          z-index: 11;
         }
         
         .modal-analog-clock::before {
@@ -751,6 +772,10 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
                 <X size={24} />
               </button>
               
+              {/* Back button for easier dismissal and better UX */}
+              <button className="modal-back-button" onClick={() => setShowModal(false)} aria-label="Back">
+                ⤺ Back
+              </button>
               <div className="modal-header">
                 <div className="modal-title">Quantum Time Portal</div>
                 <div className="modal-subtitle">Advanced Temporal Interface</div>
