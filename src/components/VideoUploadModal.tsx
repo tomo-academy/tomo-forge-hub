@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MiniVideoPlayer } from "@/components/MiniVideoPlayer";
+import MiniVideoPlayer from "@/components/MiniVideoPlayer";
 import { 
   Upload, 
   Video, 
@@ -359,10 +359,10 @@ export const VideoUploadModal = ({ onVideoUploaded, isOpen, onOpenChange }: Vide
               <Card className="p-4">
                 <Label className="text-sm font-medium mb-2 block">Video Preview</Label>
                 <MiniVideoPlayer
-                  src={videoPreview}
+                  videoId={videoPreview}
                   title={title || "Video Preview"}
-                  poster={thumbnailPreview}
-                  className="w-full h-48"
+                  description={description}
+                  onClose={() => {}}
                 />
               </Card>
             )}

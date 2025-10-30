@@ -145,16 +145,15 @@ const MiniVideoPlayer = ({ videoId, title, description, onClose }: MiniVideoPlay
 
 // Add keyboard event listener for ESC key
 export default function MiniVideoPlayerWithEscape(props: MiniVideoPlayerProps) {
+  const { onClose } = props;
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        props.onClose();
+        onClose();
       }
     };
-
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [props.onClose]);
-
+  }, [onClose]);
   return <MiniVideoPlayer {...props} />;
 }
