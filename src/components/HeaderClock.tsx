@@ -316,20 +316,20 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
             rgba(0, 50, 60, 0.88)
           );
           border: 2px solid var(--hacker-primary);
-          border-radius: 20px;
-          padding: 2.5rem;
-          max-width: 95vw;
-          max-height: 95vh;
+          border-radius: 16px;
+          padding: 1.5rem;
+          max-width: 90vw;
+          max-height: 85vh;
           width: 100%;
-          max-width: 1000px;
+          max-width: 650px;
           overflow-y: auto;
           box-shadow: 
-            0 0 50px var(--hacker-primary),
-            0 0 100px rgba(0, 255, 65, 0.3),
-            inset 0 0 30px rgba(0, 255, 65, 0.05);
+            0 0 30px var(--hacker-primary),
+            0 0 60px rgba(0, 255, 65, 0.2),
+            inset 0 0 20px rgba(0, 255, 65, 0.05);
           position: relative;
           font-family: 'Courier New', monospace;
-          animation: modalSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
         }
         
         @keyframes modalSlideIn {
@@ -372,33 +372,33 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         
         .modal-header {
           text-align: center;
-          margin-bottom: 2rem;
-          padding-bottom: 1rem;
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.75rem;
           border-bottom: 1px solid rgba(0, 255, 65, 0.3);
         }
         
         .modal-title {
-          font-size: 2rem;
+          font-size: 1.5rem;
           font-weight: bold;
           background: linear-gradient(45deg, var(--hacker-primary), var(--hacker-secondary));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          margin-bottom: 0.5rem;
-          letter-spacing: 2px;
+          margin-bottom: 0.25rem;
+          letter-spacing: 1px;
           text-transform: uppercase;
         }
         
         .modal-subtitle {
           color: var(--hacker-secondary);
           opacity: 0.8;
-          font-size: 1rem;
+          font-size: 0.875rem;
         }
         
         .modal-body {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 3rem;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
           align-items: start;
         }
         
@@ -409,21 +409,21 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         }
         
         .modal-analog-clock {
-          width: 300px;
-          height: 300px;
+          width: 200px;
+          height: 200px;
           position: relative;
           background: radial-gradient(circle at 30% 30%, 
             rgba(0, 255, 65, 0.1), 
             rgba(0, 0, 0, 0.9), 
             rgba(0, 20, 0, 0.95)
           );
-          border: 4px solid var(--hacker-primary);
+          border: 3px solid var(--hacker-primary);
           border-radius: 50%;
           box-shadow: 
-            0 0 30px var(--hacker-primary),
-            0 0 60px rgba(0, 255, 65, 0.3),
-            inset 0 0 40px rgba(0, 255, 65, 0.1);
-          margin-bottom: 2rem;
+            0 0 25px var(--hacker-primary),
+            0 0 50px rgba(0, 255, 65, 0.3),
+            inset 0 0 30px rgba(0, 255, 65, 0.1);
+          margin-bottom: 1.5rem;
           animation: clockGlow 3s ease-in-out infinite alternate;
         }
         
@@ -466,24 +466,24 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         }
         
         .modal-hour-hand {
-          width: 6px;
-          height: 80px;
+          width: 4px;
+          height: 60px;
           background: linear-gradient(to top, var(--hacker-primary), rgba(0, 255, 65, 0.8));
-          box-shadow: 0 0 15px var(--hacker-primary);
+          box-shadow: 0 0 10px var(--hacker-primary);
         }
         
         .modal-minute-hand {
-          width: 4px;
-          height: 110px;
+          width: 3px;
+          height: 80px;
           background: linear-gradient(to top, var(--hacker-secondary), rgba(0, 212, 255, 0.8));
-          box-shadow: 0 0 12px var(--hacker-secondary);
+          box-shadow: 0 0 8px var(--hacker-secondary);
         }
         
         .modal-second-hand {
           width: 2px;
-          height: 130px;
+          height: 90px;
           background: linear-gradient(to top, #ff0080, #ff4db8);
-          box-shadow: 0 0 10px #ff0080;
+          box-shadow: 0 0 6px #ff0080;
           animation: secondTick 1s linear infinite;
         }
         
@@ -496,15 +496,15 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           position: absolute;
           width: 100%;
           height: 100%;
-          font-size: 18px;
+          font-size: 14px;
           font-weight: bold;
           color: var(--hacker-primary);
         }
         
         .clock-number {
           position: absolute;
-          width: 30px;
-          height: 30px;
+          width: 24px;
+          height: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -512,39 +512,40 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           border: 1px solid var(--hacker-primary);
           border-radius: 50%;
           text-shadow: 0 0 5px var(--hacker-primary);
+          font-size: 12px;
         }
         
-        .clock-number:nth-child(1) { top: 10px; left: 50%; transform: translateX(-50%); }
-        .clock-number:nth-child(2) { top: 25px; right: 25px; }
-        .clock-number:nth-child(3) { top: 50%; right: 10px; transform: translateY(-50%); }
-        .clock-number:nth-child(4) { bottom: 25px; right: 25px; }
-        .clock-number:nth-child(5) { bottom: 10px; left: 50%; transform: translateX(-50%); }
-        .clock-number:nth-child(6) { bottom: 25px; left: 25px; }
-        .clock-number:nth-child(7) { top: 50%; left: 10px; transform: translateY(-50%); }
-        .clock-number:nth-child(8) { top: 25px; left: 25px; }
+        .clock-number:nth-child(1) { top: 8px; left: 50%; transform: translateX(-50%); }
+        .clock-number:nth-child(2) { top: 20px; right: 20px; }
+        .clock-number:nth-child(3) { top: 50%; right: 8px; transform: translateY(-50%); }
+        .clock-number:nth-child(4) { bottom: 20px; right: 20px; }
+        .clock-number:nth-child(5) { bottom: 8px; left: 50%; transform: translateX(-50%); }
+        .clock-number:nth-child(6) { bottom: 20px; left: 20px; }
+        .clock-number:nth-child(7) { top: 50%; left: 8px; transform: translateY(-50%); }
+        .clock-number:nth-child(8) { top: 20px; left: 20px; }
         
         .time-info-section {
           display: flex;
           flex-direction: column;
-          gap: 2rem;
+          gap: 1.5rem;
         }
         
         .digital-time-display {
           background: rgba(0, 0, 0, 0.7);
           border: 2px solid var(--hacker-primary);
-          border-radius: 15px;
-          padding: 2rem;
+          border-radius: 12px;
+          padding: 1.5rem;
           text-align: center;
-          box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+          box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
         }
         
         .modal-main-time {
-          font-size: 3.5rem;
+          font-size: 2.5rem;
           font-weight: bold;
           color: var(--hacker-primary);
-          text-shadow: 0 0 20px var(--hacker-primary);
-          margin-bottom: 1rem;
-          letter-spacing: 3px;
+          text-shadow: 0 0 15px var(--hacker-primary);
+          margin-bottom: 0.75rem;
+          letter-spacing: 2px;
           font-family: 'Courier New', monospace;
           animation: timeGlow 2s ease-in-out infinite alternate;
         }
@@ -555,33 +556,33 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         }
         
         .modal-date {
-          font-size: 1.5rem;
+          font-size: 1.125rem;
           color: var(--hacker-secondary);
-          margin-bottom: 1rem;
+          margin-bottom: 0.75rem;
           font-weight: 600;
         }
         
         .location-info {
           background: rgba(0, 40, 60, 0.6);
           border: 1px solid var(--hacker-secondary);
-          border-radius: 10px;
-          padding: 1rem;
-          margin-bottom: 1rem;
+          border-radius: 8px;
+          padding: 0.75rem;
+          margin-bottom: 0.75rem;
         }
         
         .timezone-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 1rem;
-          margin-bottom: 2rem;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 0.75rem;
+          margin-bottom: 1.5rem;
         }
         
         .timezone-card {
           background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 20, 30, 0.9));
           border: 2px solid transparent;
           background-clip: padding-box;
-          border-radius: 12px;
-          padding: 1.25rem;
+          border-radius: 8px;
+          padding: 0.875rem;
           text-align: center;
           transition: all 0.4s ease;
           position: relative;
@@ -612,19 +613,19 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         }
         
         .timezone-name {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           color: var(--hacker-secondary);
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.5rem;
           font-weight: 600;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 0.5px;
         }
         
         .timezone-time {
-          font-size: 1.4rem;
+          font-size: 1.125rem;
           font-weight: bold;
           color: var(--hacker-primary);
-          text-shadow: 0 0 8px var(--hacker-primary);
+          text-shadow: 0 0 6px var(--hacker-primary);
           font-family: 'Courier New', monospace;
         }
         
@@ -632,10 +633,10 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           grid-column: 1 / -1;
           display: flex;
           flex-wrap: wrap;
-          gap: 1rem;
+          gap: 0.75rem;
           justify-content: center;
-          margin-top: 2rem;
-          padding-top: 2rem;
+          margin-top: 1.5rem;
+          padding-top: 1.5rem;
           border-top: 1px solid rgba(0, 255, 65, 0.3);
         }
         
@@ -643,18 +644,18 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
           background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 30, 40, 0.9));
           border: 2px solid var(--hacker-primary);
           color: var(--hacker-primary);
-          padding: 1rem 2rem;
-          border-radius: 12px;
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
           cursor: pointer;
           transition: all 0.4s ease;
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 0.5rem;
           font-family: 'Courier New', monospace;
           font-weight: bold;
-          font-size: 0.95rem;
+          font-size: 0.8rem;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 0.5px;
           position: relative;
           overflow: hidden;
         }
@@ -683,22 +684,23 @@ const HackerClock: React.FC<HackerClockProps> = ({ className = '' }) => {
         
         @media (max-width: 768px) {
           .modal-content {
-            padding: 1.5rem;
+            padding: 1.25rem;
             margin: 0.5rem;
+            max-width: 95vw;
           }
           
           .modal-body {
             grid-template-columns: 1fr;
-            gap: 2rem;
+            gap: 1.5rem;
           }
           
           .modal-analog-clock {
-            width: 250px;
-            height: 250px;
+            width: 180px;
+            height: 180px;
           }
           
-          .modal-main-time { font-size: 2.5rem; }
-          .timezone-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+          .modal-main-time { font-size: 2rem; }
+          .timezone-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
           
           .modal-close-button {
             top: 1rem;
